@@ -157,6 +157,27 @@
       "rules": {
         "kuuki/design-tokens": "off"
       }
+    },
+    {
+      "files": ["src/client/**/*.{ts,tsx}"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["**/functions/api/**"],
+                "allowTypeImports": true,
+                "message": "Browser code takes values from @kuuki/shared; only types may come from functions/api."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["src/client/journal/**", "src/client/shell.tsx", "src/client/**/*.test.{ts,tsx}"],
+      "rules": { "no-restricted-imports": "off" }
     }
   ],
   "jsPlugins": [
