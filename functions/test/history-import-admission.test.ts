@@ -240,3 +240,13 @@ describe('a file at the record limit', () => {
     expect(tail.nextCursor).toBeNull()
   }, 240_000)
 })
+
+it('refuses an inherited name as a state filter with 400', async () => {
+  const { runId } = await uploadCsv(db, csvOf([bawRecord()]))
+  for (const state of ['constructor', 'toString', 'hasOwnProperty', '__proto__'])
+    expect(await getPage(db, runId, { state })).toMatchObject({
+      status: 400,
+      body: { code: 'INVALID_HISTORY_REQUEST' },
+    })
+  expect((await getPage(db, runId, { state: 'open' })).status).toBe(200)
+})

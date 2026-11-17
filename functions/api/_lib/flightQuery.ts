@@ -210,7 +210,9 @@ export function parsePagination(
 ): { limit: number; offset: number } {
   const rawLimit = Number(params.get('limit'))
   const rawOffset = Number(params.get('offset'))
-  const limit = Number.isFinite(rawLimit) && rawLimit > 0 ? Math.min(rawLimit, 200) : defaultLimit
-  const offset = Number.isFinite(rawOffset) && rawOffset >= 0 ? rawOffset : 0
+  // SQLite LIMIT/OFFSET take integers only; anything else falls back like a missing value.
+  const limit =
+    Number.isSafeInteger(rawLimit) && rawLimit > 0 ? Math.min(rawLimit, 200) : defaultLimit
+  const offset = Number.isSafeInteger(rawOffset) && rawOffset >= 0 ? rawOffset : 0
   return { limit, offset }
 }

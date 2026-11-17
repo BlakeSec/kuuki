@@ -418,7 +418,8 @@ export async function readRunPage(
 ): Promise<HistoryPage> {
   const run = await loadRun(db, userId, runId)
   const filter = query.get('state') ?? 'open'
-  const states = STATE_FILTERS[filter]
+  // Own keys only: an inherited name like `constructor` is an unknown filter, not a prototype member.
+  const states = Object.hasOwn(STATE_FILTERS, filter) ? STATE_FILTERS[filter] : undefined
   if (!states) throw invalid('Unknown state filter')
   const cursor = Number(query.get('cursor') ?? -1)
   const limit = Number(query.get('limit') ?? HISTORY_PAGE_MAX)

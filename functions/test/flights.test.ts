@@ -84,6 +84,35 @@ it('searches owned flight fields literally with matching pagination totals', asy
   }
 })
 
+it('treats a fractional or unsafe page size or offset like any other invalid value', async () => {
+  const { db, dispose } = await createApiDatabase()
+  try {
+    await seed(db)
+    await db.batch(
+      ['2025-04-03', '2025-04-04'].map((date) =>
+        db
+          .prepare(
+            "INSERT INTO flights (user_id,date,origin,destination,flight_number,source,is_upcoming) VALUES (?,?,?,?,?,'manual',0)",
+          )
+          .bind(user.id, date, 'TBS', 'IST', 'Q1'),
+      ),
+    )
+    const read = async (query: string) => {
+      const response = await listFlights(context(db, `/api/flights?${query}`, 'GET'))
+      expect(response.status).toBe(200)
+      return (await response.json()) as { flights: unknown[]; total: number }
+    }
+    expect((await read('limit=1.5')).flights).toHaveLength(2)
+    const fractional = await read('limit=1&offset=0.5')
+    expect(fractional.flights).toHaveLength(1)
+    expect(fractional.total).toBe(2)
+    expect((await read('limit=1&offset=9007199254740993')).flights).toHaveLength(1)
+    expect((await read('limit=1&offset=1')).flights).toHaveLength(1)
+  } finally {
+    await dispose()
+  }
+})
+
 it('shares airport, lifecycle, city/route search and exact filters across list, count and all IDs', async () => {
   const { db, dispose } = await createApiDatabase()
   try {
