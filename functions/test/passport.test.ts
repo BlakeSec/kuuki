@@ -350,3 +350,103 @@ it('adds only catalog countries but still removes a stray stored code', async ()
     await dispose()
   }
 })
+
+const visitId = '6f1c2a3e-8b4d-4c1a-9e2f-0a1b2c3d4e5f'
+
+it('keeps one row when the same visit id is posted twice', async () => {
+  const { db, dispose } = await createApiDatabase()
+  try {
+    await seed(db)
+    const body = { id: visitId, countryCode: 'DE', entryMethod: 'sea' }
+    const first = await addGroundVisit(context(db, '/api/passport/ground-visits', 'POST', body))
+    expect(first.status).toBe(201)
+    expect(await first.json()).toMatchObject({ id: visitId })
+    const second = await addGroundVisit(context(db, '/api/passport/ground-visits', 'POST', body))
+    expect(second.status).toBe(200)
+    expect(await second.json()).toMatchObject({ id: visitId, countryCode: 'DE' })
+    expect(await count(db, 'ground_visits')).toBe(1)
+  } finally {
+    await dispose()
+  }
+})
+
+it('refuses a visit id that belongs to another owner without revealing it', async () => {
+  const { db, dispose } = await createApiDatabase()
+  try {
+    await seed(db)
+    await db
+      .prepare(
+        "INSERT INTO users(id,email,password_hash) VALUES('other','other@example.test','hash')",
+      )
+      .run()
+    await db
+      .prepare(
+        "INSERT INTO ground_visits(id,user_id,country_code,note) VALUES(?, 'other', 'US', 'Private other note')",
+      )
+      .bind(visitId)
+      .run()
+    const response = await addGroundVisit(
+      context(db, '/api/passport/ground-visits', 'POST', { id: visitId, countryCode: 'DE' }),
+    )
+    expect(response.status).toBe(409)
+    const text = await response.text()
+    expect(text).not.toContain('"US"')
+    expect(text).not.toContain('Private')
+    const other = await db
+      .prepare('SELECT user_id, country_code, note FROM ground_visits WHERE id = ?')
+      .bind(visitId)
+      .first()
+    expect(other).toEqual({ user_id: 'other', country_code: 'US', note: 'Private other note' })
+    const own = await db
+      .prepare('SELECT 1 FROM ground_visits WHERE user_id = ?')
+      .bind(user.id)
+      .first()
+    expect(own).toBeNull()
+  } finally {
+    await dispose()
+  }
+})
+
+it('refuses a repeated visit id for a different country', async () => {
+  const { db, dispose } = await createApiDatabase()
+  try {
+    await seed(db)
+    const first = await addGroundVisit(
+      context(db, '/api/passport/ground-visits', 'POST', { id: visitId, countryCode: 'DE' }),
+    )
+    expect(first.status).toBe(201)
+    const second = await addGroundVisit(
+      context(db, '/api/passport/ground-visits', 'POST', { id: visitId, countryCode: 'FR' }),
+    )
+    expect(second.status).toBe(409)
+    expect(await count(db, 'ground_visits')).toBe(1)
+    const row = await db
+      .prepare('SELECT country_code FROM ground_visits WHERE id = ?')
+      .bind(visitId)
+      .first<{ country_code: string }>()
+    expect(row?.country_code).toBe('DE')
+  } finally {
+    await dispose()
+  }
+})
+
+it('rejects a malformed visit id before storing anything', async () => {
+  const { db, dispose } = await createApiDatabase()
+  try {
+    await seed(db)
+    for (const id of [
+      'short',
+      'NOT-A-UUID-0000-0000-000000000000',
+      12,
+      '6F1C2A3E-8B4D-4C1A-9E2F-0A1B2C3D4E5F',
+    ]) {
+      const response = await addGroundVisit(
+        context(db, '/api/passport/ground-visits', 'POST', { id, countryCode: 'DE' }),
+      )
+      expect(response.status).toBe(400)
+    }
+    expect(await count(db, 'ground_visits')).toBe(0)
+  } finally {
+    await dispose()
+  }
+})

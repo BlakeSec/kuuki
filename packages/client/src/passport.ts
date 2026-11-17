@@ -77,9 +77,11 @@ export async function addGroundVisit(
     entryMethod?: EntryMethod
     mode?: GroundVisitMode
   } = {},
+  visitId?: string,
 ): Promise<GroundVisit & DerivedAck> {
   const visit = await api.post<ApiGroundVisit>('/api/passport/ground-visits', {
     countryCode,
+    ...(visitId ? { id: visitId } : {}),
     visitYear: data.visitYear ?? null,
     note: data.note ?? null,
     entryMethod: data.entryMethod ?? null,

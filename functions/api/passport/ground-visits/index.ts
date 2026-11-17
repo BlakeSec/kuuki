@@ -1,16 +1,17 @@
 // GET /api/passport/ground-visits lists the owner's ground visits; POST records one.
 
-import { runHandler, json, readJson } from '../../_lib/http'
+import { runHandler, json, readJson, HttpError } from '../../_lib/http'
 import { requireUser, requireCsrf, type RequestData } from '../../_lib/auth'
 import { newId } from '../../_lib/crypto'
 import { nowIso } from '../../_lib/time'
 import { toGroundVisit, type GroundVisitRow } from '../../_lib/passportDtos'
 import { parseCatalogCountryCode } from '../../_lib/params'
-import { parseGroundVisitFields } from '../../_lib/groundVisits'
+import { parseGroundVisitFields, parseVisitId } from '../../_lib/groundVisits'
 import { dirtyUserStatement, repairUserDerivedState } from '../../_services/derivedState'
 import { assertRows } from '../../_lib/d1'
 
 type GroundVisitBody = {
+  id?: string
   countryCode?: string
   visitYear?: number | null
   note?: string | null
@@ -55,33 +56,30 @@ export function createGroundVisitRequest(
     const body = await readJson<GroundVisitBody>(request)
     const countryCode = parseCatalogCountryCode(body?.countryCode)
 
+    const visitId = parseVisitId(body?.id)
     const { visitYear, note, entryMethod, mode } = parseGroundVisitFields(body ?? {})
-    const id = newId()
+    const id = visitId ?? newId()
     const createdAt = nowIso()
 
-    await env.DB.batch([
+    const [insert] = await env.DB.batch([
       env.DB.prepare(
-        'INSERT INTO ground_visits (id, user_id, country_code, visit_year, note, entry_method, mode, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+        'INSERT INTO ground_visits (id, user_id, country_code, visit_year, note, entry_method, mode, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(id) DO NOTHING',
       ).bind(id, user.id, countryCode, visitYear, note, entryMethod, mode, createdAt),
       dirtyUserStatement(env.DB, user.id),
     ])
+    const row = await env.DB.prepare(
+      'SELECT id, user_id, country_code, visit_year, entry_method, mode, note, created_at, linked_flight_id FROM ground_visits WHERE id = ? AND user_id = ?',
+    )
+      .bind(id, user.id)
+      .first<GroundVisitRow>()
+    // Another owner's id, or this id already used for another country: never reveal or reuse that row.
+    if (!row || row.country_code !== countryCode)
+      throw new HttpError(409, 'Visit id already used for another visit', 'IDEMPOTENCY_CONFLICT')
     const derived = await repairUserDerivedState(env.DB, user.id)
 
     return json(
-      {
-        ...toGroundVisit({
-          id,
-          user_id: user.id,
-          country_code: countryCode,
-          visit_year: visitYear,
-          note,
-          entry_method: entryMethod,
-          mode,
-          created_at: createdAt,
-        }),
-        ...derived,
-      },
-      { status: 201 },
+      { ...toGroundVisit(row), ...derived },
+      { status: (insert.meta.changes ?? 0) > 0 ? 201 : 200 },
     )
   })
 }

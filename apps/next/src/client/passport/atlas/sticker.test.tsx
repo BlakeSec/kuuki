@@ -173,10 +173,15 @@ it('focuses the first way and a Train tap writes a land visit by rail', async ()
   expect(tab('By plane')).toHaveFocus()
 
   fireEvent.click(tab('By train'))
-  expect(api.add).toHaveBeenCalledExactlyOnceWith('owner', 'DE', {
-    entryMethod: 'land',
-    mode: 'rail',
-  })
+  expect(api.add).toHaveBeenCalledExactlyOnceWith(
+    'owner',
+    'DE',
+    {
+      entryMethod: 'land',
+      mode: 'rail',
+    },
+    expect.any(String),
+  )
   expect(inked()).toBe('DE')
   // The train crosses first; the stamp and the toast arrive as it leaves.
   expect(document.querySelector('.atlas-vehicle')).toHaveAttribute('data-way', 'rail')
@@ -195,10 +200,15 @@ it('records an air visit without requiring a flight and offers capture only afte
   api.add.mockReturnValue(write.promise)
   await lift()
   fireEvent.click(tab('By plane'))
-  expect(api.add).toHaveBeenCalledExactlyOnceWith('owner', 'DE', {
-    entryMethod: 'air',
-    mode: null,
-  })
+  expect(api.add).toHaveBeenCalledExactlyOnceWith(
+    'owner',
+    'DE',
+    {
+      entryMethod: 'air',
+      mode: null,
+    },
+    expect.any(String),
+  )
   arrive()
   await flush()
   expect(screen.getByText('Germany is in your passport.')).toBeInTheDocument()
@@ -235,10 +245,15 @@ it('a stub pulled down past its perforation tears', async () => {
   api.add.mockResolvedValue({ id: 'v2', derived_state: 'ready' })
   await lift()
   pull(tab('By train'), 330, 360)
-  expect(api.add).toHaveBeenCalledExactlyOnceWith('owner', 'DE', {
-    entryMethod: 'land',
-    mode: 'rail',
-  })
+  expect(api.add).toHaveBeenCalledExactlyOnceWith(
+    'owner',
+    'DE',
+    {
+      entryMethod: 'land',
+      mode: 'rail',
+    },
+    expect.any(String),
+  )
 })
 
 it('closes on Escape without writing and returns focus to the map', async () => {
@@ -256,7 +271,12 @@ it('Undo pressed before the write returns deletes exactly the created row once i
   api.remove.mockResolvedValue({ ok: true, derived_state: 'ready' })
   await lift()
   fireEvent.click(tab('By car'))
-  expect(api.add).toHaveBeenCalledWith('owner', 'DE', { entryMethod: 'land', mode: 'road' })
+  expect(api.add).toHaveBeenCalledWith(
+    'owner',
+    'DE',
+    { entryMethod: 'land', mode: 'road' },
+    expect.any(String),
+  )
   arrive()
   await flush()
   fireEvent.click(screen.getByRole('button', { name: 'Undo' }))
@@ -274,7 +294,12 @@ it('a failed write restores the country and offers to try again', async () => {
   api.add.mockReturnValueOnce(write.promise)
   await lift()
   fireEvent.click(tab('By sea'))
-  expect(api.add).toHaveBeenCalledWith('owner', 'DE', { entryMethod: 'sea', mode: null })
+  expect(api.add).toHaveBeenCalledWith(
+    'owner',
+    'DE',
+    { entryMethod: 'sea', mode: null },
+    expect.any(String),
+  )
   await act(async () => write.reject(new Error('offline')))
   await act(async () => vi.advanceTimersByTime(150))
   expect(inked()).toBe('')
@@ -285,7 +310,14 @@ it('a failed write restores the country and offers to try again', async () => {
 
   api.add.mockResolvedValueOnce({ id: 'v2', derived_state: 'ready' })
   fireEvent.click(screen.getByRole('button', { name: 'Try again' }))
-  expect(api.add).toHaveBeenLastCalledWith('owner', 'DE', { entryMethod: 'sea', mode: null })
+  expect(api.add).toHaveBeenLastCalledWith(
+    'owner',
+    'DE',
+    { entryMethod: 'sea', mode: null },
+    expect.any(String),
+  )
+  // Try again repeats the first write's visit id, so the server can recognise a write whose answer was lost.
+  expect(api.add.mock.calls[1][3]).toBe(api.add.mock.calls[0][3])
   expect(inked()).toBe('DE')
   await flush()
   expect(screen.getByText('Germany is in your passport.')).toBeInTheDocument()
@@ -305,6 +337,7 @@ it('a later tear of the same country retires the earlier Retry', async () => {
   await act(async () => vi.advanceTimersByTime(240))
   fireEvent.click(retry)
   expect(api.add).toHaveBeenCalledTimes(2)
+  expect(api.add.mock.calls[1][3]).not.toBe(api.add.mock.calls[0][3])
 })
 
 it('a sticker unmounted mid-crossing still offers Undo for the write it started', async () => {
@@ -355,10 +388,15 @@ it('a flick tears by its momentum though released short of the threshold', async
   act(() => vi.advanceTimersByTime(16))
   fireEvent.pointerMove(train, { pointerId: 1, clientX: 200, clientY: 340 })
   fireEvent.pointerUp(train, { pointerId: 1, clientX: 200, clientY: 340 })
-  expect(api.add).toHaveBeenCalledExactlyOnceWith('owner', 'DE', {
-    entryMethod: 'land',
-    mode: 'rail',
-  })
+  expect(api.add).toHaveBeenCalledExactlyOnceWith(
+    'owner',
+    'DE',
+    {
+      entryMethod: 'land',
+      mode: 'rail',
+    },
+    expect.any(String),
+  )
 })
 
 it('follows the camera synchronously on move: one transform, no frame and no React commit', async () => {

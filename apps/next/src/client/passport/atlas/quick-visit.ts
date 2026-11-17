@@ -53,6 +53,7 @@ const names = { en: countryNamer('en'), ru: countryNamer('ru') }
  * Owner-only, held by the page so it outlives the atlas. Starts the POST at the tear, marks the country seen so the
  * cards never replay it, refreshes the passport on the ack and offers Undo. Undo waits for a POST still in flight (and a
  * year edit after it), then deletes exactly the row it created. A later tear of the same country retires an earlier write's Retry.
+ * Try again repeats the write with the same visit id, so a write whose answer was lost is not recorded twice.
  */
 export function useRecordVisit(ownerId: string, refresh: () => Promise<void>): QuickWrites {
   const toast = useToast()
@@ -65,7 +66,12 @@ export function useRecordVisit(ownerId: string, refresh: () => Promise<void>): Q
   const attempts = useRef(new Map<string, number>())
 
   const record = useCallback<RecordVisit>(
-    function record(code, way, view) {
+    function record(
+      code: string,
+      way: VisitWay,
+      view: TearView,
+      visitId: string = crypto.randomUUID(),
+    ) {
       const attempt = (attempts.current.get(code) ?? 0) + 1
       attempts.current.set(code, attempt)
       const mark = (on: boolean) =>
@@ -95,7 +101,7 @@ export function useRecordVisit(ownerId: string, refresh: () => Promise<void>): Q
 
       let undone = false
       let shown: number | null = null
-      const write = addGroundVisit(ownerId, code, wayPayload(way))
+      const write = addGroundVisit(ownerId, code, wayPayload(way), visitId)
       const flightHref =
         way === 'air'
           ? write.then(
@@ -208,7 +214,7 @@ export function useRecordVisit(ownerId: string, refresh: () => Promise<void>): Q
               onAction: () => {
                 // Superseded by a later tear of the same country: that write already speaks for it.
                 if (attempts.current.get(code) !== attempt) return
-                const retry = record(code, way, view)
+                const retry = record(code, way, view, visitId)
                 retry.announce(view.land())
               },
             })

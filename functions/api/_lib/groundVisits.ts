@@ -9,6 +9,16 @@ export type GroundVisitFields = {
   mode: GroundVisitMode
 }
 
+const VISIT_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
+
+/** A visit id the browser chose so a retried create can be recognised: absent, or a lowercase UUID. */
+export function parseVisitId(value: unknown): string | null {
+  if (value == null) return null
+  if (typeof value !== 'string' || !VISIT_ID.test(value))
+    throw new HttpError(400, 'id is invalid', 'INVALID')
+  return value
+}
+
 /** Validates the editable fields of a ground visit; a way (`mode`) is only for a land visit. Shared by POST and PATCH. */
 export function parseGroundVisitFields(fields: Record<string, unknown>): GroundVisitFields {
   const note = fields.note ?? null
