@@ -108,8 +108,20 @@ function proposedVisits(db: D1Database, userId: string): BatchedRead<DerivedVisi
 
   return {
     statements: [flightSources, legacyEvidenceStatement(db, userId)],
-    derive: ([flightResult, evidenceResult]) =>
-      mergeVisits(rowsOf<VisitSource>(flightResult), rowsOf<LegacyVisitSource>(evidenceResult)),
+    derive: ([flightResult, evidenceResult]) => {
+      let skipped = 0
+      const visits = mergeVisits(
+        rowsOf<VisitSource>(flightResult),
+        rowsOf<LegacyVisitSource>(evidenceResult),
+        () => {
+          skipped += 1
+        },
+      )
+      // No user identifier in the log; OPERATIONS.md has the query that finds the rows.
+      if (skipped > 0)
+        console.warn(JSON.stringify({ event: 'legacy_evidence_skipped', count: skipped }))
+      return visits
+    },
   }
 }
 
@@ -130,6 +142,7 @@ export function legacyEvidenceStatement(db: D1Database, userId: string): D1Prepa
 export function mergeVisits(
   flightSources: VisitSource[],
   evidence: LegacyVisitSource[],
+  onSkip?: (reason: 'airport' | 'country') => void,
 ): DerivedVisit[] {
   const merged = new Map<string, DerivedVisit>()
   for (const source of flightSources) {
@@ -150,7 +163,10 @@ export function mergeVisits(
     }
   }
   for (const source of evidence) {
-    if (!source.airport_iata) throw new Error('Contributing legacy evidence lacks airport')
+    if (!source.airport_iata) {
+      onSkip?.('airport') // CODING_STANDARDS rule 5: skip and report malformed legacy rows, never throw.
+      continue
+    }
     const prior = merged.get(source.airport_iata)
     if (prior) {
       // Archived counters may overlap flight history. Keep the larger observed count,
@@ -161,7 +177,10 @@ export function mergeVisits(
       prior.last_visit = prior.last_visit > source.last_visit ? prior.last_visit : source.last_visit
     } else {
       const country = source.country_code ?? source.reference_country_code
-      if (!country) throw new Error('Contributing legacy evidence lacks country')
+      if (!country) {
+        onSkip?.('country')
+        continue
+      }
       merged.set(source.airport_iata, {
         airport_iata: source.airport_iata,
         country_code: country,

@@ -1,6 +1,10 @@
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { createApiDatabase } from './harness'
-import { dirtyUserStatement, repairUserDerivedState } from '../api/_services/derivedState'
+import {
+  dirtyUserStatement,
+  mergeVisits,
+  repairUserDerivedState,
+} from '../api/_services/derivedState'
 
 let dispose: (() => Promise<void>) | undefined
 afterEach(async () => {
@@ -106,6 +110,65 @@ describe('durable derived repair', () => {
       .bind('u1')
       .all()
     expect(badges.results).toEqual([{ badge_id: 1 }, { badge_id: 2 }])
+  })
+
+  it('skips contributing legacy evidence without an airport or a country and still publishes', async () => {
+    const db = await fixture()
+    const evidence = (id: string, airport: string | null, country: string | null, count: number) =>
+      db
+        .prepare(
+          "INSERT INTO legacy_visit_evidence (source_id,user_id,airport_iata,country_code,city,first_visit,last_visit,visit_count,source_digest,provenance,contributes,source_json) VALUES (?,'u1',?,?,NULL,'2019-01-01','2019-01-01',?,'digest','archive',1,'{}')",
+        )
+        .bind(id, airport, country, count)
+    await db.batch([
+      evidence('s-no-airport', null, 'RU', 1),
+      evidence('s-no-country', 'ZZZ', null, 1),
+      evidence('s-good', 'MOW', 'RU', 2),
+      dirtyUserStatement(db, 'u1'),
+    ])
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    try {
+      expect(await repairUserDerivedState(db, 'u1')).toEqual({
+        derived_state: 'ready',
+        revision: 1,
+      })
+      const visits = await db
+        .prepare('SELECT airport_iata FROM visits WHERE user_id = ? ORDER BY airport_iata')
+        .bind('u1')
+        .all()
+      expect(visits.results).toEqual([
+        { airport_iata: 'AAA' },
+        { airport_iata: 'BBB' },
+        { airport_iata: 'MOW' },
+      ])
+      expect(warn).toHaveBeenCalledWith(
+        JSON.stringify({ event: 'legacy_evidence_skipped', count: 2 }),
+      )
+    } finally {
+      warn.mockRestore()
+    }
+  })
+
+  it('mergeVisits skips a malformed contributing row and reports why', () => {
+    const row = {
+      city: null,
+      reference_country_code: null,
+      reference_city: null,
+      first_visit: '2019-01-01',
+      last_visit: '2019-01-01',
+      visit_count: 1,
+    }
+    const reasons: string[] = []
+    const visits = mergeVisits(
+      [],
+      [
+        { ...row, airport_iata: null, country_code: 'RU' },
+        { ...row, airport_iata: 'ZZZ', country_code: null },
+      ],
+      (reason) => reasons.push(reason),
+    )
+    expect(visits).toEqual([])
+    expect(reasons).toEqual(['airport', 'country'])
   })
 
   it('awards countries, airports and airtime_minutes badges at their threshold only', async () => {

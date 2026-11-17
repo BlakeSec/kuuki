@@ -74,8 +74,14 @@ export default {
         await repairUserDerivedState(db, row.user_id)
       }
 
-      // 5. Leaderboards.
-      await refreshLeaderboards(db)
+      // 5. Leaderboards. A failure must not skip cleanup (ADR 0008 staging expiry, sessions, receipts);
+      // it fails the cycle in step 7 instead.
+      let leaderboardFailed = false
+      try {
+        await refreshLeaderboards(db)
+      } catch {
+        leaderboardFailed = true
+      }
 
       // 6. Cleanup: sessions and tokens, receipts and expired import work.
       const idempotencyCutoff = new Date(now.getTime() - 7 * DAY_MS).toISOString()
@@ -128,6 +134,7 @@ export default {
       if ((remaining?.n ?? 0) > 0) throw new Error('Dirty derived users remain')
       if (failedUsers > 0) throw new Error('A due transition failed')
       if ((dueRemaining?.n ?? 0) > 0) throw new Error('Due transitions remain')
+      if (leaderboardFailed) throw new Error('Leaderboard refresh failed')
       await db
         .prepare(
           'UPDATE maintenance_status SET last_success_at = ?, last_error = NULL WHERE id = 1',

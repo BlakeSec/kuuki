@@ -450,4 +450,39 @@ describe('cleanup contracts', () => {
       await dispose()
     }
   })
+
+  it('a leaderboard failure still runs cleanup, fails the cycle, and the next cycle succeeds', async () => {
+    const { db: raw, dispose } = await accountWith([])
+    try {
+      clock()
+      await raw.batch([
+        raw
+          .prepare(
+            'INSERT INTO flight_idempotency (user_id,key,payload_digest,flight_id,created_at) VALUES (?,?,?,NULL,?)',
+          )
+          .bind(USER.id, 'idem-old-001', 'd', ago(8)),
+        raw
+          .prepare(
+            'INSERT INTO flight_idempotency (user_id,key,payload_digest,flight_id,created_at) VALUES (?,?,?,NULL,?)',
+          )
+          .bind(USER.id, 'idem-new-001', 'd', ago(6)),
+      ])
+      const { db, hooks } = instrumentDb(raw)
+      hooks.failBatch(hasSql('DELETE FROM leaderboard_cache'))
+      await expect(cycle(db)).rejects.toThrow('MAINTENANCE_CYCLE_FAILED')
+      const keys = await raw.prepare('SELECT key AS id FROM flight_idempotency').all()
+      expect(keys.results).toEqual([{ id: 'idem-new-001' }])
+      expect(await status(raw)).toMatchObject({
+        last_success_at: null,
+        last_failure_at: NOW.toISOString(),
+        last_error: 'MAINTENANCE_CYCLE_FAILED',
+      })
+      await cycle(raw)
+      const after = await status(raw)
+      expect(after).toMatchObject({ last_error: null })
+      expect(after?.last_success_at).not.toBeNull()
+    } finally {
+      await dispose()
+    }
+  })
 })
