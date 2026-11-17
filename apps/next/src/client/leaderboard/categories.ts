@@ -3,7 +3,7 @@ import {
   GROUND_CATEGORIES,
   SKY_CATEGORIES,
   type LeaderboardCategory,
-} from '../../../../../functions/api/_lib/leaderboard'
+} from '@kuuki/shared/leaderboard'
 export const categories: Record<LeaderboardCategory, [string, string]> = {
   flights: ['Flights', 'Перелёты'],
   distance: ['Distance', 'Расстояние'],

@@ -18,6 +18,8 @@
     "./address": "./src/address.ts",
     "./avatar": "./src/avatar.ts",
     "./geo": "./src/geo.ts",
+    "./leaderboard": "./src/leaderboard.ts",
+    "./regions": "./src/regions.ts",
     "./groundTravel": "./src/groundTravel.ts",
     "./timezones": "./src/timezones.ts",
     "./railTicketOcr": "./src/railTicketOcr.ts",

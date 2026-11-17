@@ -9,7 +9,7 @@ import type {
   LeaderboardEntry,
   ViewerPlace,
 } from '../../../../../functions/api/_services/publicLeaderboard'
-import { LEADERBOARD_CATEGORIES } from '../../../../../functions/api/_lib/leaderboard'
+import { LEADERBOARD_CATEGORIES } from '@kuuki/shared/leaderboard'
 import { LeaderboardBoard } from './leaderboard'
 
 vi.mock('../../server/public', () => ({

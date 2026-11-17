@@ -12,6 +12,7 @@ import {
   type LeaderboardCategory,
 } from '../_lib/leaderboard'
 import { assertRows } from '../_lib/d1'
+import { SHOW_EVERYONE_UP_TO } from '../../../packages/shared/src/leaderboard'
 
 export const leaderboardCategories = LEADERBOARD_CATEGORIES
 export type { LeaderboardCategory }
@@ -115,8 +116,7 @@ export type ViewerPlace =
 
 export type LeaderboardBoardPayload = Awaited<ReturnType<typeof readLeaderboardBoard>>
 
-/** Above this many participants the page shows the top ten plus the viewer's neighbourhood. */
-export const SHOW_EVERYONE_UP_TO = 20
+export { SHOW_EVERYONE_UP_TO }
 const TOP_RANK = 10
 
 /**

@@ -9,10 +9,7 @@ import {
   type CSSProperties,
   type ReactNode,
 } from 'react'
-import {
-  LEADERBOARD_CATEGORIES,
-  type LeaderboardCategory,
-} from '../../../../../functions/api/_lib/leaderboard'
+import { LEADERBOARD_CATEGORIES, type LeaderboardCategory } from '@kuuki/shared/leaderboard'
 import type { LeaderboardBoardPayload } from '../../../../../functions/api/_services/publicLeaderboard'
 import { IdentitySnapshot } from '../activity'
 import { notificationStorage } from '../profile/storage'

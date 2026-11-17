@@ -5,7 +5,7 @@ import { addDays } from '../../packages/shared/src/calendar'
 import { greatCircleKm } from '../../packages/shared/src/geo'
 import { rowCountries } from '../../packages/shared/src/overview/filter'
 import type { OverviewPayload, OverviewRow } from '../../packages/shared/src/overview/model'
-import { COUNTRY_REGION } from '../../functions/api/_lib/countryRegions.generated'
+import { COUNTRY_REGION } from '../../packages/shared/src/countryRegions.generated'
 
 type BoardFlight = {
   date: string

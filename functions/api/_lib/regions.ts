@@ -11,15 +11,14 @@ import {
   REGION_IDS,
   REGION_TOTALS,
   type RegionId,
-} from './countryRegions.generated'
+} from '../../../packages/shared/src/countryRegions.generated'
+import { catalogRegionOf } from '../../../packages/shared/src/regions'
 
 export type { RegionId }
+export { catalogRegionOf }
 
 /** Bump when the grouping, the catalog map or what counts as "reached" changes; Passport reports it. */
 export const REGION_POLICY = { version: 1, id: 'catalog-regions-v1', regions: REGION_IDS } as const
-
-export const catalogRegionOf = (code: string | null | undefined): RegionId | null =>
-  code && Object.hasOwn(COUNTRY_REGION, code) ? COUNTRY_REGION[code] : null
 
 /** True for a code in the app's country catalog (packages/data/src/countries.json), the only codes a write may add. */
 export const isCatalogCountry = (code: string): boolean => Object.hasOwn(COUNTRY_REGION, code)

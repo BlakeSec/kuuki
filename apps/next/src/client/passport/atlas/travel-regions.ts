@@ -1,5 +1,5 @@
 import type { Locale } from '../../../lib/format'
-import { catalogRegionOf } from '../../../../../../functions/api/_lib/regions'
+import { catalogRegionOf } from '@kuuki/shared/regions'
 
 /**
  * Travel regions: a display-only grouping for the phone atlas's pages (GLOSSARY "Travel region"). They exist because a

@@ -5,7 +5,11 @@ import { join } from 'node:path'
 import { expect, it } from 'vitest'
 import { ROOT } from '../../scripts/_cli'
 import { OUTPUT, render } from '../../scripts/generate-country-regions'
-import { COUNTRY_REGION, REGION_IDS, REGION_TOTALS } from '../api/_lib/countryRegions.generated'
+import {
+  COUNTRY_REGION,
+  REGION_IDS,
+  REGION_TOTALS,
+} from '../../packages/shared/src/countryRegions.generated'
 import { catalogRegionOf, regionCount, regionProgress, REGION_POLICY } from '../api/_lib/regions'
 
 const catalog = JSON.parse(

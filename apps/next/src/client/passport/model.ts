@@ -3,7 +3,7 @@
 // transit-suppressed hubs have no published row, so they never appear at all.
 import catalog from '@kuuki/data/countries.json'
 import { COUNTRY_NEIGHBORS } from '@kuuki/data/country-neighbors'
-import { catalogRegionOf } from '../../../../../functions/api/_lib/regions'
+import { catalogRegionOf } from '@kuuki/shared/regions'
 import type { CountryDetail, PassportData } from '../../server/passport'
 import {
   formatDateOnly,

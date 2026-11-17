@@ -12,13 +12,13 @@ import {
 } from 'react'
 import {
   isGroundCategory,
-  type LeaderboardCategory,
-} from '../../../../../functions/api/_lib/leaderboard'
-import {
   SHOW_EVERYONE_UP_TO,
-  type LeaderboardBoardSlice,
-  type LeaderboardEntry,
-  type ViewerPlace,
+  type LeaderboardCategory,
+} from '@kuuki/shared/leaderboard'
+import type {
+  LeaderboardBoardSlice,
+  LeaderboardEntry,
+  ViewerPlace,
 } from '../../../../../functions/api/_services/publicLeaderboard'
 import { formatNumber, type Locale } from '../../lib/format'
 import { avatarInk, ProfileAvatar } from '../profile/avatar'

@@ -4,6 +4,15 @@
 // for the sky and ground gates), so exposing it here is not a privacy leak. Used by both the leaderboard list
 // and the per-user rankings (me/rankings + public profile rankings).
 
+import {
+  GROUND_CATEGORIES,
+  LEADERBOARD_CATEGORIES,
+  SKY_CATEGORIES,
+  isGroundCategory,
+  type GroundCategory,
+  type LeaderboardCategory,
+} from '../../../packages/shared/src/leaderboard'
+
 export interface LeaderboardCacheRow {
   id: number
   user_id: string
@@ -16,13 +25,14 @@ export interface LeaderboardCacheRow {
   updated_at: string
 }
 
-export const SKY_CATEGORIES = ['flights', 'distance', 'countries', 'cities', 'airlines'] as const
-export const GROUND_CATEGORIES = ['rail', 'road', 'ground_countries'] as const
-export const LEADERBOARD_CATEGORIES = [...SKY_CATEGORIES, ...GROUND_CATEGORIES] as const
-export type LeaderboardCategory = (typeof LEADERBOARD_CATEGORIES)[number]
-export type GroundCategory = (typeof GROUND_CATEGORIES)[number]
-export const isGroundCategory = (category: string): category is GroundCategory =>
-  (GROUND_CATEGORIES as readonly string[]).includes(category)
+export {
+  GROUND_CATEGORIES,
+  LEADERBOARD_CATEGORIES,
+  SKY_CATEGORIES,
+  isGroundCategory,
+  type GroundCategory,
+  type LeaderboardCategory,
+}
 
 /** Sky participation needs this many flights; ground needs this many completed rail and road journeys together. */
 export const SKY_MIN_FLIGHTS = 5

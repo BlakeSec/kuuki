@@ -2,7 +2,7 @@ import { utcOffsetMinutes } from '../../../packages/shared/src/timezones'
 import { familyOf } from '../../../packages/data/src/aircraft-lookup'
 import type { OverviewPayload, OverviewRow } from '../../../packages/shared/src/overview/model'
 import type { FlightRow } from '../_lib/flights'
-import { COUNTRY_REGION } from '../_lib/countryRegions.generated'
+import { COUNTRY_REGION } from '../../../packages/shared/src/countryRegions.generated'
 
 export const OVERVIEW_FLIGHT_COLUMNS = `id, date, origin, destination, lifecycle_state, airline_iata, aircraft_icao,
   flight_number, departure_time, arrival_time, distance_km, duration_minutes, zones_overflown,

@@ -18,7 +18,7 @@ import {
 } from '../../../packages/shared/src/groundTravel'
 import { assertRows } from '../_lib/d1'
 import type { FlightRow } from '../_lib/flights'
-import { COUNTRY_REGION } from '../_lib/countryRegions.generated'
+import { COUNTRY_REGION } from '../../../packages/shared/src/countryRegions.generated'
 import { passportRead } from './passport'
 import { ownerJourneysRead } from './groundJourneyRead'
 

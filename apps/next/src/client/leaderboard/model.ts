@@ -1,7 +1,4 @@
-import {
-  isGroundCategory,
-  type LeaderboardCategory,
-} from '../../../../../functions/api/_lib/leaderboard'
+import { isGroundCategory, type LeaderboardCategory } from '@kuuki/shared/leaderboard'
 import type {
   LeaderboardBoardPayload,
   LeaderboardEntry,
