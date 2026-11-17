@@ -4,6 +4,7 @@ import {
   blankState,
   buildCommandBody,
   emptyLeg,
+  routeCountryCodes,
   stateFromDto,
   toJourneyInput,
   validateState,
@@ -130,5 +131,13 @@ describe('countries answer', () => {
   it('treats a stored empty list of a completed journey as a deliberate answer', () => {
     const stored = { ...dto([leg(null, null)]), status: 'completed' as const, countries: [] }
     expect(stateFromDto(stored, false).noCountries).toBe(true)
+  })
+})
+
+describe('route country suggestions', () => {
+  it('suggests only catalog countries from route places', () => {
+    const state = blankState('rail', 'completed')
+    state.legs = [{ ...emptyLeg(place('1', 'FI')), to: place('2', 'AX') }]
+    expect(routeCountryCodes(state)).toEqual(['FI'])
   })
 })

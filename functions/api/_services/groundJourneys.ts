@@ -13,6 +13,7 @@
 // so a lost CAS, even on a journey without children, commits nothing: no receipt, no dirty revision.
 import { HttpError } from '../_lib/http'
 import { sha256Hex } from '../_lib/crypto'
+import { isCatalogCountry } from '../_lib/regions'
 import {
   GROUND_LIMITS,
   isIsoDate,
@@ -164,10 +165,12 @@ function parseCountries(value: unknown): string[] | undefined {
   if (
     !Array.isArray(value) ||
     value.length > 300 ||
-    value.some((code) => typeof code !== 'string' || !/^[A-Z]{2}$/.test(code)) ||
+    value.some(
+      (code) => typeof code !== 'string' || !/^[A-Z]{2}$/.test(code) || !isCatalogCountry(code),
+    ) ||
     new Set(value).size !== value.length
   )
-    throw invalid('countries must be a unique list of uppercase ISO-2 codes')
+    throw invalid('countries must be a unique list of catalog country codes')
   return value as string[]
 }
 

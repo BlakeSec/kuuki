@@ -5,7 +5,7 @@ import { runHandler, json } from '../../../_lib/http'
 import { requireUser, requireCsrf, type RequestData } from '../../../_lib/auth'
 import { newId } from '../../../_lib/crypto'
 import { nowIso } from '../../../_lib/time'
-import { parseCountryCode } from '../../../_lib/params'
+import { parseCatalogCountryCode, parseCountryCode } from '../../../_lib/params'
 import { dirtyUserStatement, repairUserDerivedState } from '../../../_services/derivedState'
 
 export const onRequestPut: PagesFunction<Env, string, RequestData> = (context) =>
@@ -21,7 +21,7 @@ export function claimCountryRequest(
   return runHandler(async () => {
     requireCsrf(request)
     const user = requireUser(data)
-    const cc = parseCountryCode(rawCode)
+    const cc = parseCatalogCountryCode(rawCode)
 
     const [inserted] = await env.DB.batch([
       env.DB.prepare(

@@ -1,6 +1,9 @@
 import { expect, it } from 'vitest'
 import { createApiDatabase, apiContext, csrfRequest, count } from './harness'
-import { onRequestDelete as unclaimCountry } from '../api/passport/claims/[cc]/index'
+import {
+  onRequestDelete as unclaimCountry,
+  onRequestPut as claimCountry,
+} from '../api/passport/claims/[cc]/index'
 import {
   onRequestPost as addGroundVisit,
   onRequestGet as listGroundVisits,
@@ -312,6 +315,37 @@ it("edits only the owner's visit, keeping omitted fields and checking the merged
     })
     const state = await derivedState(db)
     expect(state?.published_revision).toBe(state?.revision)
+  } finally {
+    await dispose()
+  }
+})
+
+it('adds only catalog countries but still removes a stray stored code', async () => {
+  const { db, dispose } = await createApiDatabase()
+  try {
+    await seed(db)
+    const qq = await claimCountry(context(db, '/api/passport/claims/QQ', 'PUT', undefined, 'QQ'))
+    expect(qq.status).toBe(400)
+    expect(await qq.json()).toMatchObject({ code: 'INVALID_COUNTRY' })
+    const xk = await claimCountry(context(db, '/api/passport/claims/XK', 'PUT', undefined, 'XK'))
+    expect(xk.status).toBe(201)
+    const ax = await addGroundVisit(
+      context(db, '/api/passport/ground-visits', 'POST', { countryCode: 'AX' }),
+    )
+    expect(ax.status).toBe(400)
+    expect(await count(db, 'country_claims')).toBe(1)
+    expect(await count(db, 'ground_visits')).toBe(0)
+
+    await db
+      .prepare("INSERT INTO country_claims (id,user_id,country_code) VALUES ('stray', ?, 'QQ')")
+      .bind(user.id)
+      .run()
+    const removed = await unclaimCountry(
+      context(db, '/api/passport/claims/QQ', 'DELETE', undefined, 'QQ'),
+    )
+    expect(removed.status).toBe(200)
+    const left = await db.prepare("SELECT 1 FROM country_claims WHERE country_code = 'QQ'").first()
+    expect(left).toBeNull()
   } finally {
     await dispose()
   }

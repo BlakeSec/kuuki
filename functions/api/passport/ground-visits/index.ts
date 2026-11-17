@@ -5,7 +5,7 @@ import { requireUser, requireCsrf, type RequestData } from '../../_lib/auth'
 import { newId } from '../../_lib/crypto'
 import { nowIso } from '../../_lib/time'
 import { toGroundVisit, type GroundVisitRow } from '../../_lib/passportDtos'
-import { parseCountryCode } from '../../_lib/params'
+import { parseCatalogCountryCode } from '../../_lib/params'
 import { parseGroundVisitFields } from '../../_lib/groundVisits'
 import { dirtyUserStatement, repairUserDerivedState } from '../../_services/derivedState'
 import { assertRows } from '../../_lib/d1'
@@ -53,7 +53,7 @@ export function createGroundVisitRequest(
     const user = requireUser(data)
 
     const body = await readJson<GroundVisitBody>(request)
-    const countryCode = parseCountryCode(body?.countryCode)
+    const countryCode = parseCatalogCountryCode(body?.countryCode)
 
     const { visitYear, note, entryMethod, mode } = parseGroundVisitFields(body ?? {})
     const id = newId()

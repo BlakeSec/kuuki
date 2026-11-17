@@ -16,6 +16,7 @@ import {
   type RailLegInput,
   type RoadPointInput,
 } from '@kuuki/shared/groundTravel'
+import { isCatalogCountry } from '../../passport/model'
 
 export const newId = (): string => crypto.randomUUID()
 
@@ -260,7 +261,8 @@ export function routeCountryCodes(state: Pick<FormState, 'mode' | 'legs' | 'poin
       ? state.legs.flatMap((leg) => [leg.from, leg.to])
       : state.points.map((point) => point.place)
   const seen = new Set<string>()
-  for (const place of places) if (place) seen.add(place.countryCode)
+  for (const place of places)
+    if (place && isCatalogCountry(place.countryCode)) seen.add(place.countryCode)
   return [...seen]
 }
 

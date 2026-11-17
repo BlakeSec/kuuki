@@ -231,6 +231,15 @@ describe('ground journeys API', () => {
       expect((await t.create({ ...base, status: 'planned', countries: ['FR'] })).status).toBe(400)
       expect((await t.create({ ...base, status: 'completed', countries: ['fr'] })).status).toBe(400)
       expect(await count(t.db, 'ground_journeys')).toBe(0)
+      const stray = { operationKey: key(), journeyId: uuid(), journey: rail() }
+      expect((await t.create({ ...stray, status: 'completed', countries: ['QQ'] })).status).toBe(
+        400,
+      )
+      expect(await count(t.db, 'ground_journeys')).toBe(0)
+      const kosovo = { operationKey: key(), journeyId: uuid(), journey: rail() }
+      expect((await t.create({ ...kosovo, status: 'completed', countries: ['XK'] })).status).toBe(
+        201,
+      )
       const empty = await t.create({ ...base, status: 'completed', countries: [] })
       expect(empty.status).toBe(201)
       expect(empty.body.current).toMatchObject({ status: 'completed', countries: [] })
