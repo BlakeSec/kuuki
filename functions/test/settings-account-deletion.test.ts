@@ -72,3 +72,29 @@ it('the settings deletion boundary refuses CSRF and wrong passwords, then revoke
     await dispose()
   }
 })
+
+it('refuses a sixth deletion attempt within the hour, even with the right password, and keeps the account', async () => {
+  const { db, dispose } = await createApiDatabase()
+  const secret = 'settings-delete-test-secret'
+  try {
+    const owner = await createUserWithProfile(
+      db,
+      { email: 'owner@example.test', password: 'current-password' },
+      secret,
+    )
+    const env = { DB: db, AUTH_SECRET: secret } as Env
+    const attempt = (password: string) =>
+      deleteAccountRequest(csrfRequest('/api/auth/account', 'DELETE', { password }), env, {
+        user: owner,
+      })
+    for (let i = 0; i < 5; i++) {
+      expect((await attempt('wrong-password')).status).toBe(401)
+    }
+    const limited = await attempt('current-password')
+    expect(limited.status).toBe(429)
+    expect(await limited.json()).toMatchObject({ code: 'RATE_LIMITED' })
+    expect(await count(db, 'users')).toBe(1)
+  } finally {
+    await dispose()
+  }
+})

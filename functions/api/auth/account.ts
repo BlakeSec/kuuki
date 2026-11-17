@@ -9,6 +9,7 @@ import { runHandler, json, readJson, HttpError } from '../_lib/http'
 import { requireCsrf, requireUser, type RequestData } from '../_lib/auth'
 import { deleteUserCascade, getPasswordHashById, parsePassword } from '../_lib/users'
 import { verifyPassword } from '../_lib/crypto'
+import { rateLimit } from '../_lib/ratelimit'
 import { clearSessionCookies } from '../_lib/authCookies'
 import { clearBetterAuthCookie } from '../_lib/betterAuth'
 import { abortImportJob } from '../_services/importRuntime'
@@ -25,6 +26,8 @@ export function deleteAccountRequest(
   return runHandler(async () => {
     requireCsrf(request)
     const user = requireUser(data)
+    // A stolen session must not become an unlimited password oracle: five checks per account per hour.
+    await rateLimit(env.DB, `account-delete:${user.id}`, 5, 3600)
 
     // Re-auth enforced server-side: prove knowledge of the current password before this
     // irreversible deletion (security finding: delete re-auth was client-side only).
