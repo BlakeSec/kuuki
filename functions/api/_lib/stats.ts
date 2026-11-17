@@ -44,3 +44,21 @@ export function toUserStats(row: UserStatsRow) {
     updated_at: row.updated_at,
   }
 }
+
+/**
+ * The stats a public profile and its owner preview may show (ADR 0007): totals only. Never the
+ * member id or `updated_at`, which would reveal when the member was last active.
+ */
+export function toPublicStats(row: UserStatsRow) {
+  return {
+    total_flights: row.total_flights,
+    total_distance_km: row.total_distance_km,
+    total_duration_minutes: row.total_duration_minutes,
+    airports_count: row.airports_count,
+    countries_count: row.countries_count,
+    continents_count: row.continents_count,
+    airlines_count: row.airlines_count,
+    aircraft_count: row.aircraft_count,
+    has_night_departure: !!row.has_night_departure,
+  }
+}

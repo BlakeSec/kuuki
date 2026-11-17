@@ -1,5 +1,5 @@
 import { toPublicProfile, type ProfileRow } from '../_lib/profiles'
-import { toUserStats, type UserStatsRow } from '../_lib/stats'
+import { toPublicStats, type UserStatsRow } from '../_lib/stats'
 import {
   toUserBadgeWithDefinition,
   type UserBadgeRow,
@@ -113,7 +113,7 @@ async function projectPublic(db: D1Database, profile: ProfileRow, scope: Passpor
     rankings = await readProfileLeaderboardRankings(db, profile.id)
   }
   return {
-    stats: stats ? toUserStats(stats) : null,
+    stats: stats ? toPublicStats(stats) : null,
     badges,
     rankings,
     countries: (results[3].results as Array<{ country_code: string }>).map(

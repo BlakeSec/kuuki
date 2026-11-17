@@ -8,6 +8,7 @@ import {
   onRequestDelete as unhideCountry,
 } from '../api/passport/hidden/[cc]/index'
 import { updateProfileRequest } from '../api/profiles/me'
+import { toUserStats } from '../api/_lib/stats'
 import { readPassport } from '../api/_services/passport'
 import { readPublicProfile, readPublicProfilePreview } from '../api/_services/publicProfiles'
 
@@ -69,6 +70,35 @@ describe('public projection', () => {
     { isPublic: false, publication: 'flights', expected: [] },
     { isPublic: false, publication: 'all', expected: [] },
   ] as const
+
+  it('publishes only the allowlisted totals in the public read and the owner preview', async () => {
+    const { db, dispose } = await fixture({ isPublic: true, publication: 'all' })
+    try {
+      const profile = await readPublicProfile(db, 'pilot')
+      const preview = await readPublicProfilePreview(db, USER.id, 'all')
+      for (const stats of [profile?.stats, preview?.stats]) {
+        expect(stats).not.toBeNull()
+        expect(Object.keys(stats ?? {}).sort()).toEqual([
+          'aircraft_count',
+          'airlines_count',
+          'airports_count',
+          'continents_count',
+          'countries_count',
+          'has_night_departure',
+          'total_distance_km',
+          'total_duration_minutes',
+          'total_flights',
+        ])
+      }
+      const row = await db
+        .prepare('SELECT * FROM user_stats WHERE user_id = ?')
+        .bind(USER.id)
+        .first()
+      expect(toUserStats(row as never)).toHaveProperty('updated_at')
+    } finally {
+      await dispose()
+    }
+  })
 
   it.each(cases)(
     'public=$isPublic publication=$publication publishes codes only',
