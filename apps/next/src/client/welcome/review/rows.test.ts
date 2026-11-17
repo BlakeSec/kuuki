@@ -1,7 +1,7 @@
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { draft } from '../../import/fixtures'
 import type { Draft } from '../../import/import-types'
-import { answerDate } from './rows'
+import { answerDate, isUpcoming } from './rows'
 
 const undated = (over: Partial<Draft> = {}) =>
   draft({
@@ -31,5 +31,22 @@ describe('answerDate', () => {
 
   it('leaves a row unselected while overall confidence is low', () => {
     expect(answerDate(undated({ confidence: 0.3 }), '2026-03-01').selected).toBeUndefined()
+  })
+})
+
+describe('isUpcoming', () => {
+  afterEach(() => vi.useRealTimers())
+
+  // 00:30 on 17 November in the member's own zone: east of UTC this is still 16 November in UTC.
+  const atLocal = () => vi.useFakeTimers({ now: new Date(2026, 10, 17, 0, 30) })
+
+  it('a flight dated today in the member’s zone is not upcoming', () => {
+    atLocal()
+    expect(isUpcoming(undated({ fields: { ...undated().fields, date: '2026-11-17' } }))).toBe(false)
+  })
+
+  it('a flight dated tomorrow in the member’s zone is upcoming', () => {
+    atLocal()
+    expect(isUpcoming(undated({ fields: { ...undated().fields, date: '2026-11-18' } }))).toBe(true)
   })
 })

@@ -6,12 +6,13 @@ import { EARTH_CIRCUMFERENCE_KM } from '@kuuki/shared/constants'
 import { isEmptyFilter, routeKey } from '@kuuki/shared/overview/filter'
 import { SECTION_GATES } from '@kuuki/shared/overview/goals'
 import { dateInstant } from '@kuuki/shared/overview/records'
-import { formatDateOnly, formatDuration } from '../../../../lib/format'
+import { formatCount, formatDateOnly, formatDuration } from '../../../../lib/format'
 import { Disclosure } from '../../../ui/disclosure'
 import { Button } from '../../../ui/button'
 import { StageRows } from '../../charts/stage-rows'
 import { LazyChart } from '../../charts/lazy-chart'
 import { TableView } from '../../charts/table-view'
+import { forms } from '../../copy'
 import { mapPin } from '../../iso/map'
 import { ChapterCard } from '../../layout/chapter-card'
 import { reducedMotion } from '../../layout/drag-motion'
@@ -309,8 +310,8 @@ export function Section({ span }: { span: Span }) {
               <p>
                 {copy(
                   locale,
-                  `${monthName(busy.peakMonth)} accounts for ${busy.months[busy.peakMonth - 1].flights} of ${busy.flights} flights in ${busy.year}.`,
-                  `${monthName(busy.peakMonth)}: ${busy.months[busy.peakMonth - 1].flights} из ${busy.flights} перелётов за ${busy.year} год.`,
+                  `${monthName(busy.peakMonth)} accounts for ${number(locale, busy.months[busy.peakMonth - 1].flights)} of ${formatCount(locale, busy.flights, forms.flightsOf)} in ${busy.year}.`,
+                  `${monthName(busy.peakMonth)}: ${number(locale, busy.months[busy.peakMonth - 1].flights)} из ${formatCount(locale, busy.flights, forms.flightsOf)} за ${busy.year} год.`,
                 )}
               </p>
               {filtered && all && (

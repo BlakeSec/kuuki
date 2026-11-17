@@ -5,14 +5,14 @@ import { makerOf, type MakerKey } from '@kuuki/data/aircraft-makers'
 import { matches } from '@kuuki/shared/overview/filter'
 import { totals } from '@kuuki/shared/overview/figures'
 import { SECTION_GATES } from '@kuuki/shared/overview/goals'
-import { formatDuration } from '../../../../lib/format'
+import { formatCount, formatDuration } from '../../../../lib/format'
 import { MakerSwatch } from '../../../ui/category-mark'
 import { Button } from '../../../ui/button'
 import { SegmentedControl } from '../../../ui/segmented-control'
 import { LazyChart } from '../../charts/lazy-chart'
 import { ArcWaffle } from '../../charts/arc-waffle'
 import { StageRows } from '../../charts/stage-rows'
-import { fill } from '../../copy'
+import { fill, forms } from '../../copy'
 import { ChapterCard } from '../../layout/chapter-card'
 import { useReading } from '../../layout/use-reading'
 import { useOverview } from '../../store/overview-context'
@@ -144,8 +144,8 @@ export function Section({ span }: { span: Span }) {
       } else {
         caption = copy(
           locale,
-          `${flights(locale, reading.flights)} of ${number(locale, made?.total ?? 0)} · ${ordinal(locale, rank)} of ${known.length} makers`,
-          `${flights(locale, reading.flights)} из ${number(locale, made?.total ?? 0)} · ${ordinal(locale, rank)} из ${known.length} производителей`,
+          `${flights(locale, reading.flights)} of ${number(locale, made?.total ?? 0)} · ${ordinal(locale, rank)} of ${formatCount(locale, known.length, forms.makersOf)}`,
+          `${flights(locale, reading.flights)} из ${number(locale, made?.total ?? 0)} · ${ordinal(locale, rank)} из ${formatCount(locale, known.length, forms.makersOf)}`,
         )
       }
     } else {

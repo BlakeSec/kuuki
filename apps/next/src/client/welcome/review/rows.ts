@@ -9,6 +9,7 @@ import {
   isChosen,
   isDuplicate,
   LOW_CONFIDENCE,
+  localToday,
   lowFields,
   readiness,
   toValues,
@@ -113,13 +114,11 @@ export function dateText(draft: Draft): string {
   return day ? `????-${draft.fields.date_month_day}` : DASH
 }
 
-export const todayIso = () => new Date().toISOString().slice(0, 10)
-
-export const isUpcoming = (draft: Draft) => draft.fields.date > todayIso()
+export const isUpcoming = (draft: Draft) => draft.fields.date > localToday()
 
 export function factOf(draft: Draft): FactFlight {
   const { date, origin, destination } = draft.fields
-  return { date, origin, destination, upcoming: date > todayIso() }
+  return { date, origin, destination, upcoming: date > localToday() }
 }
 
 const REQUIRED_HELD = ['origin', 'destination', 'airline_iata']

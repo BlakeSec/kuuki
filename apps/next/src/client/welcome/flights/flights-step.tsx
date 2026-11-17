@@ -29,7 +29,8 @@ import {
 import { stoppedOf } from '../../import/batch-run'
 import { Button } from '../../ui/button'
 import { foundOf } from '../found'
-import type { FactFlight, Found, SavedSummary, StepProps } from '../types'
+import { factOf } from '../review/rows'
+import type { Found, SavedSummary, StepProps } from '../types'
 import { MAX_TEXT_CHARS, carriesFiles, hasV2Header, isEditable, readClipboard } from './clipboard'
 import { COPY, countryForms, reviewForms, stoppedForms } from './copy'
 import './flights.css'
@@ -123,13 +124,6 @@ const readKey = () => (/Mac|iPhone|iPad/.test(navigator.userAgent) ? '⌘V' : 'C
 
 function formatKey(template: string, key: string) {
   return template.replace('{key}', key)
-}
-
-const todayIso = () => new Date().toISOString().slice(0, 10)
-
-function factOf(draft: Draft): FactFlight {
-  const { date, origin, destination } = draft.fields
-  return { date, origin, destination, upcoming: date > todayIso() }
 }
 
 function countriesOf(drafts: Draft[]): number {

@@ -24,6 +24,15 @@ const flightsOf: CountForms = {
     other: '{count} перелётов',
   },
 }
+const makersOf: CountForms = {
+  en: { one: '{count} maker', other: '{count} makers' },
+  ru: {
+    one: '{count} производителя',
+    few: '{count} производителей',
+    many: '{count} производителей',
+    other: '{count} производителей',
+  },
+}
 const routes: CountForms = {
   en: { one: '{count} route', other: '{count} routes' },
   ru: {
@@ -157,6 +166,7 @@ const durationKnown: CountForms = {
 export const forms = {
   flights,
   flightsOf,
+  makersOf,
   routes,
   routesShown,
   unplaced,
