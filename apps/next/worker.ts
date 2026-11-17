@@ -119,6 +119,11 @@ export default {
     const headers = new Headers(response.headers)
     headers.set('X-Frame-Options', 'DENY')
     headers.set('X-Content-Type-Options', 'nosniff')
+    // Report-only until enforcement is decided; with no report endpoint, violations show in the browser console.
+    headers.set(
+      'Content-Security-Policy-Report-Only',
+      "object-src 'none'; base-uri 'self'; frame-ancestors 'none'",
+    )
     headers.set(
       'Referrer-Policy',
       url.pathname === '/reset-password' ? 'no-referrer' : 'strict-origin-when-cross-origin',
