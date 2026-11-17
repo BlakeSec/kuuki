@@ -102,14 +102,10 @@ export function updateProfileRequest(
       throw new HttpError(400, 'Bio must be 140 characters or fewer', 'BAD_REQUEST')
     }
 
-    // Defense-in-depth validation for fields that reach render/fetch sinks (security hardening).
-    if (
-      typeof body.avatar_url === 'string' &&
-      body.avatar_url.length > 0 &&
-      !/^https:\/\//i.test(body.avatar_url) &&
-      !/^data:image\//i.test(body.avatar_url)
-    ) {
-      throw new HttpError(400, 'avatar_url must be an https:// or data:image/ URL', 'BAD_REQUEST')
+    // Avatar characters replaced photo URLs: a remote URL would make every viewer fetch a host the member chose.
+    // null still clears a value, so earlier clients keep saving.
+    if (body.avatar_url !== undefined && body.avatar_url !== null) {
+      throw new HttpError(400, 'avatar_url can only be cleared', 'BAD_REQUEST')
     }
     // Only canonical accent names are stored. null still clears the choice, kept for compatibility with earlier clients. Retired names are mapped by readers, never written.
     if (

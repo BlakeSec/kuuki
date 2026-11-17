@@ -44,7 +44,6 @@ const values = (profile: Profile) => ({
   username: profile.username ?? '',
   bio: profile.bio ?? '',
   home_airport: profile.home_airport ?? '',
-  avatar_url: profile.avatar_url ?? '',
   avatar_face: profile.avatar_face ?? null,
   gemini_api_key: profile.gemini_api_key ?? '',
   is_public: profile.is_public,
@@ -57,7 +56,6 @@ const faceNames: Record<AvatarFace, Record<Locale, string>> = {
   sleepy: { en: 'Sleepy', ru: 'Сонный' },
   content: { en: 'Content', ru: 'Довольный' },
 }
-const isPhoto = (url: string) => url.startsWith('https://') || url.startsWith('data:image/')
 const addsForms = {
   en: { one: 'Adds {count}:', other: 'Adds {count}:' },
   ru: {
@@ -215,7 +213,6 @@ export function SettingsForm({
         ...(passport_publication !== baseline.passport_publication ? { passport_publication } : {}),
         bio: draft.bio.trim() || null,
         home_airport: draft.home_airport.trim() || null,
-        avatar_url: draft.avatar_url.trim() || null,
         gemini_api_key: draft.gemini_api_key.trim() || null,
         show_on_leaderboards: draft.is_public && draft.show_on_leaderboards,
       }
@@ -381,13 +378,7 @@ export function SettingsForm({
           <h2 id="settings-profile-heading">{text('Profile', 'Профиль')}</h2>
           <div className="settings-avatar">
             <div role="img" aria-label={text('Avatar preview', 'Предпросмотр аватара')}>
-              <ProfileAvatar
-                id={profile.id}
-                url={isPhoto(draft.avatar_url) ? draft.avatar_url : null}
-                face={draft.avatar_face}
-                name=""
-                size={72}
-              />
+              <ProfileAvatar id={profile.id} face={draft.avatar_face} name="" size={72} />
             </div>
             <fieldset className="settings-faces" disabled={busy}>
               <legend className="ui-field-label">{text('Character', 'Характер')}</legend>
@@ -408,9 +399,6 @@ export function SettingsForm({
               </div>
               <p className="settings-face-name" aria-hidden="true">
                 {faceNames[avatarFace(profile.id, draft.avatar_face)][locale]}
-                {isPhoto(draft.avatar_url)
-                  ? text(' · shows when the photo can’t', ' · появится, если фото не загрузится')
-                  : null}
               </p>
             </fieldset>
           </div>
@@ -499,14 +487,6 @@ export function SettingsForm({
             value={draft.home_airport}
             disabled={busy}
             onChange={(event) => edit('home_airport', event.target.value.toUpperCase())}
-          />
-          <Field
-            label={text('Avatar URL', 'Ссылка на аватар')}
-            type="url"
-            value={draft.avatar_url}
-            disabled={busy}
-            onChange={(event) => edit('avatar_url', event.target.value)}
-            hint={text('Use an HTTPS image URL.', 'Укажите HTTPS-ссылку на изображение.')}
           />
           <div className="settings-credential">
             <Field

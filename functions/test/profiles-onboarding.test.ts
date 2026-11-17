@@ -180,3 +180,26 @@ it('stores a known avatar character, refuses others and null returns to the deri
     await dispose()
   }
 })
+
+it('refuses any avatar URL and still clears a stored one', async () => {
+  const { db, dispose, users, patch } = await setup(1)
+  try {
+    for (const avatar_url of ['https://example.test/me.png', 'data:image/png;base64,AAAA', '', 7]) {
+      const res = await patch(users[0], { avatar_url })
+      expect(res.status).toBe(400)
+      expect(await res.json()).toMatchObject({
+        code: 'BAD_REQUEST',
+        error: 'avatar_url can only be cleared',
+      })
+    }
+    await db
+      .prepare('UPDATE profiles SET avatar_url = ? WHERE id = ?')
+      .bind('https://example.test/old.png', users[0].id)
+      .run()
+    const cleared = await patch(users[0], { avatar_url: null })
+    expect(cleared.status).toBe(200)
+    expect(await cleared.json()).toMatchObject({ avatar_url: null })
+  } finally {
+    await dispose()
+  }
+})
