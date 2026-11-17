@@ -298,6 +298,9 @@ export function UnifiedImport({
     return () => window.removeEventListener('kuuki:identity-reset', reset)
   }, [session, ownerId])
   useEffect(() => {
+    // The history screen takes no pasted files: a paste there would restart the Flighty upload under way, or start a
+    // document read the owner cannot see.
+    if (historyOpen) return
     const paste = (event: ClipboardEvent) => {
       const target = event.target as HTMLElement | null
       if (savingNow.current || target?.closest('input, textarea, [contenteditable="true"]')) return
@@ -309,7 +312,7 @@ export function UnifiedImport({
     }
     document.addEventListener('paste', paste)
     return () => document.removeEventListener('paste', paste)
-  }, [addFiles])
+  }, [addFiles, historyOpen])
 
   const drafts = withSaved(session.drafts(), session.getOutcomes())
   // The final save carries the owner confirmation. This presentation suppresses only that repeated question.

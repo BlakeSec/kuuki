@@ -167,8 +167,8 @@ export class HistorySession {
   private listeners = new Set<() => void>()
   /** The parsed file of this tab, for sending (or re-sending) chunks. Never stored. */
   private chunks: Chunk[] | null = null
-  /** A run creation whose answer may have been lost: retried with the same operation id. */
-  private creating: HistoryCreateBody | null = null
+  /** A run creation whose answer may have been lost, with its manifest digest: Retry repeats it from memory, so blocked storage cannot lose it. */
+  private creating: { body: HistoryCreateBody; digest: string } | null = null
   private generation = 0
   /** Cancels the wait for the stamps' publication when the tab leaves or restarts the import. */
   private stampsWait: AbortController | null = null
@@ -277,52 +277,59 @@ export class HistorySession {
       const digest = await flighty.flightyManifestDigest(parsed.headers, manifest)
       if (generation !== this.generation) return
       const dateColumn = parsed.headers.indexOf('Date')
-      this.chunks = groups.map((records, index) => ({
+      const chunks: Chunk[] = groups.map((records, index) => ({
         index,
         body: { records: records.map((record) => [record.ordinal, record.line, record.cells]) },
         years: yearsOf(records.map((record) => record.cells[dateColumn])),
       }))
       const prior = this.retained()
       const current = this.state.run
+      // A different file for a run still receiving is refused before it is held, so the owner can choose again.
+      if (current && current.status === 'receiving' && prior && prior.digest !== digest) {
+        // The file of the choice this one replaced is dropped too, so the prompt to choose the file stays.
+        this.chunks = null
+        this.set({ reading: false, failure: { kind: 'different_file' } })
+        return
+      }
+      this.chunks = chunks
       // Re-choosing the file of a run that still lacks chunks continues it; any other file starts its own run.
       if (current && current.status === 'receiving') {
-        if (prior && prior.digest !== digest) {
-          this.set({ reading: false, failure: { kind: 'different_file' } })
-          return
-        }
         this.set({ reading: false })
-        await this.send(current)
+        await this.send(generation, current)
         return
       }
       const operationId =
         prior && prior.digest === digest && !prior.runId ? prior.operationId : crypto.randomUUID()
       this.retain({ runId: null, operationId, digest })
       this.creating = {
-        operationId,
-        profile: flighty.FLIGHTY_PROFILE,
-        headers: parsed.headers,
-        totalRecords: parsed.records.length,
-        blankLines: parsed.blankLines,
-        chunks: manifest,
+        body: {
+          operationId,
+          profile: flighty.FLIGHTY_PROFILE,
+          headers: parsed.headers,
+          totalRecords: parsed.records.length,
+          blankLines: parsed.blankLines,
+          chunks: manifest,
+        },
+        digest,
       }
-      await this.create(generation, digest)
+      await this.create(generation)
     } catch (error) {
       if (generation === this.generation) this.fail(error)
     }
   }
 
-  private async create(generation: number, digest: string) {
-    const body = this.creating!
+  private async create(generation: number) {
+    const { body, digest } = this.creating!
     const { run } = await this.transport.createRun(body)
     if (generation !== this.generation) return
     this.creating = null
     this.retain({ runId: run.id, operationId: body.operationId, digest })
     this.set({ reading: false, run })
-    await this.send(run)
+    await this.send(generation, run)
   }
 
   /** Send the chunks the server lacks, one at a time; an admitted chunk resent after a lost answer inserts nothing. */
-  private async send(run: HistoryRunSummary) {
+  private async send(generation: number, run: HistoryRunSummary) {
     const chunks = this.chunks
     if (!chunks) return
     const missing = new Set(run.chunks.missing)
@@ -338,6 +345,7 @@ export class HistorySession {
     })
     for (const chunk of pending) {
       const { run: next } = await this.transport.putChunk(run.id, chunk.index, chunk.body)
+      if (generation !== this.generation) return
       this.set({
         run: next,
         upload: {
@@ -349,7 +357,7 @@ export class HistorySession {
     }
     this.chunks = null
     this.set({ upload: null })
-    await this.refresh()
+    await this.refresh(generation)
   }
 
   private applyPage(page: HistoryPage) {
@@ -357,9 +365,10 @@ export class HistorySession {
   }
 
   /** Show the failure, then the server's current state: a refused write never leaves a stale screen. */
-  private async recover(error: unknown) {
+  private async recover(error: unknown, generation: number) {
+    if (generation !== this.generation) return
     this.fail(error)
-    await this.refresh().catch(() => undefined)
+    await this.refresh(generation).catch(() => undefined)
   }
 
   /** Restore an import from the server alone (after a refresh or from the URL). */
@@ -380,19 +389,21 @@ export class HistorySession {
   /** After a failure: repeat a creation whose answer was lost, or re-read the run and send what this tab holds. */
   async retry() {
     const run = this.state.run
+    // Nothing to repeat: the failure stays, and the owner closes the import and chooses the file again.
+    if (!run && !this.creating) return
     const generation = this.generation
     this.set({ failure: null })
     try {
       if (!run) {
-        const prior = this.retained()
-        if (this.creating && prior) await this.create(generation, prior.digest)
+        await this.create(generation)
         return
       }
       const page = await this.transport.readPage(run.id, { state: 'review' })
+      if (generation !== this.generation) return
       this.applyPage(page)
-      if (page.run.status === 'receiving' && this.chunks) await this.send(page.run)
+      if (page.run.status === 'receiving' && this.chunks) await this.send(generation, page.run)
     } catch (error) {
-      this.fail(error)
+      if (generation === this.generation) this.fail(error)
     }
   }
 
@@ -400,18 +411,22 @@ export class HistorySession {
   holdsFile = () => this.chunks !== null
 
   /** Re-read the summary and the first page of exceptions; rows the owner already answered drop out. */
-  async refresh() {
+  async refresh(generation = this.generation) {
     const run = this.state.run
     if (!run) return
-    this.applyPage(await this.transport.readPage(run.id, { state: 'review' }))
+    const page = await this.transport.readPage(run.id, { state: 'review' })
+    if (generation !== this.generation) return
+    this.applyPage(page)
     if (this.state.ready) await this.showReady()
   }
 
   async more() {
     const { run, nextCursor } = this.state
     if (!run || nextCursor === null) return
+    const generation = this.generation
     try {
       const page = await this.transport.readPage(run.id, { state: 'review', cursor: nextCursor })
+      if (generation !== this.generation) return
       const seen = new Set(this.state.exceptions.map((row) => row.id))
       this.set({
         run: page.run,
@@ -419,7 +434,7 @@ export class HistorySession {
         nextCursor: page.nextCursor,
       })
     } catch (error) {
-      this.fail(error)
+      if (generation === this.generation) this.fail(error)
     }
   }
 
@@ -429,15 +444,17 @@ export class HistorySession {
     if (!run) return
     const cursor = more ? this.state.ready?.nextCursor : undefined
     if (more && (cursor === null || cursor === undefined)) return
+    const generation = this.generation
     try {
       const page = await this.transport.readPage(run.id, {
         state: 'ready',
         cursor: cursor ?? undefined,
       })
+      if (generation !== this.generation) return
       const rows = more ? [...(this.state.ready?.rows ?? []), ...page.rows] : page.rows
       this.set({ ready: { rows, nextCursor: page.nextCursor } })
     } catch (error) {
-      this.fail(error)
+      if (generation === this.generation) this.fail(error)
     }
   }
 
@@ -449,6 +466,7 @@ export class HistorySession {
   async answerGroup(group: HistoryGroup, answer: string | boolean | null) {
     const run = this.state.run
     if (!run || this.state.busy.has(group.group)) return
+    const generation = this.generation
     this.setBusy(group.group, true)
     this.set({ failure: null })
     try {
@@ -457,15 +475,16 @@ export class HistorySession {
         answer,
         revision: run.revision,
       })
+      if (generation !== this.generation) return
       this.set({
         settled: [
           ...this.state.settled,
           { group: group.group, token: group.token, answer, rows: group.rows },
         ],
       })
-      await this.refresh()
+      await this.refresh(generation)
     } catch (error) {
-      await this.recover(error)
+      await this.recover(error, generation)
     } finally {
       this.setBusy(group.group, false)
     }
@@ -475,13 +494,15 @@ export class HistorySession {
   async patchRow(row: HistoryRowView, change: { answers?: HistoryRowAnswers; ignore?: boolean }) {
     const run = this.state.run
     if (!run || this.state.busy.has(row.id)) return
+    const generation = this.generation
     this.setBusy(row.id, true)
     this.set({ failure: null })
     try {
       await this.transport.patchRow(run.id, row.id, { version: row.version, ...change })
-      await this.refresh()
+      if (generation !== this.generation) return
+      await this.refresh(generation)
     } catch (error) {
-      await this.recover(error)
+      await this.recover(error, generation)
     } finally {
       this.setBusy(row.id, false)
     }
@@ -496,10 +517,10 @@ export class HistorySession {
     // A pending answer or Skip must land first: confirming ahead of it could save the record being excluded.
     if (!run || this.state.saving || this.state.busy.size) return
     const total = run.totals.states.ready
+    const generation = this.generation
     this.cancelStamps()
     this.set({ saving: { done: 0, total }, failure: null, ready: null, stamps: null })
     let done = 0
-    const generation = this.generation
     // One stamp ledger per run in this tab, so a save that failed half-way or ran before the last questions were
     // answered still counts: the passport before the run's first confirm (read beside the first page; null claims
     // no stamp) and the route countries of every row created since.
@@ -514,8 +535,10 @@ export class HistorySession {
     try {
       for (;;) {
         const page = await this.transport.readPage(run.id, { state: 'ready', limit: 50 })
+        if (generation !== this.generation) return
         if (!page.rows.length) break
         await ledger.baseline
+        if (generation !== this.generation) return
         const response = await this.transport.confirm(
           run.id,
           page.rows.map((row) => ({
@@ -524,6 +547,7 @@ export class HistorySession {
             key: historyConfirmKey(row),
           })),
         )
+        if (generation !== this.generation) return
         const progressed = response.results.filter((result) => result.status !== 'error').length
         const byId = new Map(page.rows.map((row) => [row.id, row]))
         for (const result of response.results) {
@@ -545,13 +569,14 @@ export class HistorySession {
         if (!progressed) break
       }
       this.set({ saving: null })
-      await this.refresh()
+      await this.refresh(generation)
       const before = await ledger.baseline
       if (ledger.created > 0 && before && generation === this.generation)
         void this.followStamps(generation, before, ledger.touched)
     } catch (error) {
+      if (generation !== this.generation) return
       this.set({ saving: null })
-      await this.recover(error)
+      await this.recover(error, generation)
     }
   }
 
@@ -588,22 +613,24 @@ export class HistorySession {
   async discard() {
     const run = this.state.run
     if (!run) return
+    const generation = this.generation
     try {
       await this.transport.discard(run.id)
-      this.forget()
+      if (generation === this.generation) this.forget()
     } catch (error) {
-      this.fail(error)
+      if (generation === this.generation) this.fail(error)
     }
   }
 
   async eraseSource() {
     const run = this.state.run
     if (!run) return
+    const generation = this.generation
     try {
       await this.transport.erase(run.id)
-      await this.refresh()
+      await this.refresh(generation)
     } catch (error) {
-      this.fail(error)
+      if (generation === this.generation) this.fail(error)
     }
   }
 

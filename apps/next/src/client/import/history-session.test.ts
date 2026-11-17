@@ -184,6 +184,8 @@ it(
 
       await second.choose(fileOf(cleanCsv(150, Date.UTC(2022, 0, 1))))
       expect(second.getState().failure).toEqual({ kind: 'different_file' })
+      // A refused file is not held: the "Choose the file" prompt must stay.
+      expect(second.holdsFile()).toBe(false)
       expect(calls).toEqual([])
 
       await second.choose(fileOf(text))
@@ -264,6 +266,111 @@ it(
         return response
       }
       const session = new HistorySession(kept.retain, kept.read, transport)
+      await session.choose(fileOf(cleanCsv(3)))
+      expect(session.getState()).toMatchObject({ run: null, failure: { kind: 'offline' } })
+      await session.retry()
+      expect(session.getState().failure).toBeNull()
+      expect(session.getState().run).toMatchObject({ status: 'review', totals: { received: 3 } })
+      const runs = await db
+        .prepare('SELECT COUNT(*) AS n FROM history_import_runs')
+        .first<{ n: number }>()
+      expect(runs?.n).toBe(1)
+    } finally {
+      await dispose()
+    }
+  },
+)
+
+it(
+  'a Close while an answer is on its way keeps the old run off the screen',
+  { timeout: 60_000 },
+  async () => {
+    const { db, dispose } = await historyAccount()
+    try {
+      const kept = storage()
+      const transport = transportFor(db)
+      const session = new HistorySession(kept.retain, kept.read, transport)
+      await session.choose(fileOf(fixtureCsv()))
+      const read = transport.readPage
+      let gate: Promise<void> | null = null
+      let held = 0
+      transport.readPage = async (...args: Parameters<HistoryTransport['readPage']>) => {
+        if (gate) {
+          held += 1
+          await gate
+        }
+        return read(...args)
+      }
+      let open!: () => void
+      gate = new Promise<void>((resolve) => (open = resolve))
+      const target = session.getState().run!.groups.find((group) => group.group === 'airline:THA')!
+      const answering = session.answerGroup(target, 'TG')
+      await vi.waitFor(() => expect(held).toBe(1))
+      session.forget()
+      open()
+      await answering
+      expect(session.getState()).toMatchObject({
+        run: null,
+        exceptions: [],
+        settled: [],
+        failure: null,
+      })
+    } finally {
+      await dispose()
+    }
+  },
+)
+
+it('a file chosen during an upload stops the upload it replaced', { timeout: 60_000 }, async () => {
+  const { db, dispose } = await historyAccount()
+  try {
+    const kept = storage()
+    const calls: string[] = []
+    const transport = transportFor(db, calls)
+    const put = transport.putChunk
+    let release!: () => void
+    const held = new Promise<void>((resolve) => (release = resolve))
+    transport.putChunk = async (runId, index, body) => {
+      const reply = await put(runId, index, body)
+      if (index === 0) await held
+      return reply
+    }
+    const session = new HistorySession(kept.retain, kept.read, transport)
+    const first = session.choose(fileOf(cleanCsv(150)))
+    await vi.waitFor(() => expect(calls).toContain('chunk:0'))
+    await session.choose(fileOf(cleanCsv(150, Date.UTC(2022, 0, 1)), 'other.csv'))
+    release()
+    await first
+    expect(calls.filter((call) => call.startsWith('chunk:'))).toEqual(['chunk:0'])
+    expect(session.getState()).toMatchObject({ failure: { kind: 'different_file' }, upload: null })
+    expect(session.holdsFile()).toBe(false)
+  } finally {
+    await dispose()
+  }
+})
+
+it(
+  'repeats a lost run creation from memory when the tab cannot store it',
+  { timeout: 60_000 },
+  async () => {
+    const { db, dispose } = await historyAccount()
+    try {
+      const transport = transportFor(db)
+      const create = transport.createRun
+      let lost = false
+      transport.createRun = async (body) => {
+        const response = await create(body)
+        if (!lost) {
+          lost = true
+          throw new TypeError('Failed to fetch')
+        }
+        return response
+      }
+      const session = new HistorySession(
+        () => {},
+        () => null,
+        transport,
+      )
       await session.choose(fileOf(cleanCsv(3)))
       expect(session.getState()).toMatchObject({ run: null, failure: { kind: 'offline' } })
       await session.retry()
