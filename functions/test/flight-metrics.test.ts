@@ -328,8 +328,12 @@ describe('server-authoritative flight metrics', () => {
     })
 
     await patch(first.id, { arrival_time: '13:30' })
-    expect(await stored()).toMatchObject({ utc_explicit: 0 })
-    expect(await stored()).not.toMatchObject({ arrival_utc: '2026-03-10T22:30:00.000Z' })
+    expect(await stored()).toEqual({
+      departure_utc: '2026-03-10T15:30:00.000Z',
+      arrival_utc: '2026-03-10T23:30:00.000Z',
+      duration_minutes: 480,
+      utc_explicit: 0,
+    })
   })
 
   it('zones use the departure instant, or date noon when times are unknown', async () => {
@@ -467,5 +471,57 @@ it('duration ladder uses own times, median, accepted schedule, then estimate and
   expect(decideDuration({ ...args, timesMinutes: 1400 })).toEqual({
     minutes: 1200,
     source: 'times',
+  })
+})
+
+it('infers the arrival day across the date line and refuses an implausible pair', () => {
+  const infer = (
+    date: string,
+    departureTime: string,
+    originTz: string,
+    arrivalTime: string,
+    destTz: string,
+    existingDurationMinutes: number | null = null,
+  ) =>
+    computeFlightDuration({
+      date,
+      departureTime,
+      arrivalTime,
+      originTz,
+      destTz,
+      existingDurationMinutes,
+    })
+
+  // LAX to SYD lands two local dates later.
+  expect(infer('2026-01-15', '22:30', 'America/Los_Angeles', '07:30', 'Australia/Sydney')).toEqual({
+    departureUtc: '2026-01-16T06:30:00.000Z',
+    arrivalUtc: '2026-01-16T20:30:00.000Z',
+    durationMinutes: 840,
+  })
+  // HND to HNL lands on the previous local date.
+  expect(infer('2026-03-11', '00:30', 'Asia/Tokyo', '13:30', 'Pacific/Honolulu')).toEqual({
+    departureUtc: '2026-03-10T15:30:00.000Z',
+    arrivalUtc: '2026-03-10T23:30:00.000Z',
+    durationMinutes: 480,
+  })
+  // Overnight across a DST change.
+  expect(infer('2026-03-28', '22:30', 'America/New_York', '10:30', 'Europe/London')).toEqual({
+    departureUtc: '2026-03-29T02:30:00.000Z',
+    arrivalUtc: '2026-03-29T09:30:00.000Z',
+    durationMinutes: 420,
+  })
+  // Same day.
+  expect(infer('2026-06-01', '08:00', 'Europe/London', '11:15', 'Europe/Paris')).toEqual({
+    departureUtc: '2026-06-01T07:00:00.000Z',
+    arrivalUtc: '2026-06-01T09:15:00.000Z',
+    durationMinutes: 135,
+  })
+  // No candidate day gives a plausible block time: unknown arrival, existing duration kept.
+  expect(
+    infer('2026-06-01', '00:00', 'Pacific/Kiritimati', '23:59', 'Pacific/Pago_Pago', 77),
+  ).toEqual({
+    departureUtc: '2026-05-31T10:00:00.000Z',
+    arrivalUtc: null,
+    durationMinutes: 77,
   })
 })

@@ -7,17 +7,22 @@
 // then derives duration. We replicate `AT TIME ZONE` semantics with Intl (see localWallClockToUtc).
 //
 // Parity quirks (do NOT "fix"):
-//   * `departure_utc` is set UNCONDITIONALLY from the same-day departure — both CASE branches use it.
-//   * The duration CASE and the arrival_utc CASE use DIFFERENT conditions:
-//       - duration : same-day branch requires 0 < dur <= 1440; else cross-day branch requires the
-//         same bounds; else KEEP the existing duration_minutes.
-//       - arrival_utc : same-day branch requires only dur > 0 (NO <= 1440 upper bound); else cross-day.
-//     So a >1440 same-day duration keeps the OLD duration but still stamps the SAME-DAY arrival_utc.
+//   * `departure_utc` is set UNCONDITIONALLY from the same-day departure.
 //   * Missing time or tz → row is excluded by the WHERE clause → leave everything unchanged
 //     (departureUtc/arrivalUtc null, durationMinutes = existing).
+//
+// Deliberate departure from the migration: the arrival is the candidate date from −1 to +2 days
+// whose duration falls in (0, 1440], taking the smallest such duration. With no candidate the
+// arrival is unknown (null) and the existing duration is kept. This replaces the legacy arrival
+// CASE, which stamped inverted or day-shifted arrivals across the date line; ADR 0002 (the server
+// is the authority) justifies it now that the legacy backfill is done.
 
 const MS_PER_MINUTE = 60_000
 const MS_PER_DAY = 86_400_000
+/** Arrival dates tried, relative to the departure date: date-line eastbound (−1) to westbound trans-Pacific (+2). */
+const ARRIVAL_DAY_OFFSETS = [-1, 0, 1, 2] as const
+/** The plausible window for an inferred block time, in minutes (legacy bound; decideDuration clamps to 1200 later). */
+const MAX_INFERRED_MINUTES = 1440
 
 /**
  * Replicate Postgres `(timestamp without time zone) AT TIME ZONE tz` → `timestamptz`.
@@ -102,7 +107,7 @@ export interface ComputeFlightDurationResult {
  * Compute departure_utc, arrival_utc and duration_minutes for a flight.
  *
  * Pure (no D1) — origin_tz/dest_tz are already on the flight row (airport tz lookup happens at
- * enrichment/import time, not here). Mirrors the migration's WHERE + CASE exactly. Never throws.
+ * enrichment/import time, not here). Mirrors the migration's WHERE; the arrival day is searched, not copied from its CASE. Never throws.
  */
 export function computeFlightDuration(
   input: ComputeFlightDurationInput,
@@ -128,45 +133,37 @@ export function computeFlightDuration(
     return { departureUtc: null, arrivalUtc: null, durationMinutes: existingDurationMinutes }
   }
 
-  // (date + arrival_time) AT TIME ZONE dest_tz       — same-day arrival.
-  const arrSameDay = localWallClockToUtc(y, mo, day, arr[0], arr[1], arr[2], destTz)
-  // ((date + INTERVAL '1 day') + arrival_time) AT TIME ZONE dest_tz — cross-day arrival.
-  // Add a day to the DATE first (so DST is evaluated at next-day wall-clock), matching PG.
-  const next = new Date(Date.UTC(y, mo - 1, day) + MS_PER_DAY)
-  const arrNextDay = localWallClockToUtc(
-    next.getUTCFullYear(),
-    next.getUTCMonth() + 1,
-    next.getUTCDate(),
-    arr[0],
-    arr[1],
-    arr[2],
-    destTz,
-  )
-  if (Number.isNaN(arrSameDay.getTime()) || Number.isNaN(arrNextDay.getTime())) {
-    return { departureUtc: null, arrivalUtc: null, durationMinutes: existingDurationMinutes }
+  let best: { arrival: Date; minutes: number } | null = null
+  for (const offset of ARRIVAL_DAY_OFFSETS) {
+    // Shift the DATE first so DST is evaluated at that date's wall clock, as before.
+    const arrivalDate = new Date(Date.UTC(y, mo - 1, day) + offset * MS_PER_DAY)
+    const arrival = localWallClockToUtc(
+      arrivalDate.getUTCFullYear(),
+      arrivalDate.getUTCMonth() + 1,
+      arrivalDate.getUTCDate(),
+      arr[0],
+      arr[1],
+      arr[2],
+      destTz,
+    )
+    if (Number.isNaN(arrival.getTime())) {
+      return { departureUtc: null, arrivalUtc: null, durationMinutes: existingDurationMinutes }
+    }
+    const minutes = (arrival.getTime() - depUtc.getTime()) / MS_PER_MINUTE
+    if (
+      minutes > 0 &&
+      minutes <= MAX_INFERRED_MINUTES &&
+      (best === null || minutes < best.minutes)
+    ) {
+      best = { arrival, minutes }
+    }
   }
-
-  // EXTRACT(EPOCH FROM (arrival_utc - departure_utc)) / 60  — PG rounds the integer-minute UTC diff.
-  const durSameDay = (arrSameDay.getTime() - depUtc.getTime()) / MS_PER_MINUTE
-  const durNextDay = (arrNextDay.getTime() - depUtc.getTime()) / MS_PER_MINUTE
-
-  // duration_minutes CASE: same-day if 0 < dur <= 1440; else cross-day if 0 < dur <= 1440; else keep.
-  let durationMinutes: number | null
-  if (durSameDay > 0 && durSameDay <= 1440) {
-    durationMinutes = pgRound(durSameDay)
-  } else if (durNextDay > 0 && durNextDay <= 1440) {
-    durationMinutes = pgRound(durNextDay)
-  } else {
-    durationMinutes = existingDurationMinutes
-  }
-
-  // arrival_utc CASE: same-day if durSameDay > 0 (NO upper bound); else cross-day. (Distinct from above.)
-  const arrivalUtcDate = durSameDay > 0 ? arrSameDay : arrNextDay
 
   return {
     departureUtc: depUtc.toISOString(),
-    arrivalUtc: arrivalUtcDate.toISOString(),
-    durationMinutes,
+    // No plausible candidate: an unknown arrival, never an inverted or day-shifted pair.
+    arrivalUtc: best ? best.arrival.toISOString() : null,
+    durationMinutes: best ? pgRound(best.minutes) : existingDurationMinutes,
   }
 }
 
