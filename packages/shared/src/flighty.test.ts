@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import {
+  FLIGHTY_MAX_TOKEN_LENGTH,
   FLIGHTY_OBSERVED_HEADERS,
   FlightyParseError,
   flightyChunkDigest,
@@ -358,6 +359,32 @@ describe('mapFlightyRecord', () => {
       refs,
     )
     expect(other.projection.flightNumber).toBe('LH400')
+  })
+
+  it('keeps every issue token short enough for the staged row', () => {
+    const long = (char: string) => char.repeat(9000)
+    const candidate = mapFlightyRecord(
+      {
+        ordinal: 0,
+        line: 2,
+        cells: ['2026-01-01', long('A'), '1', long('B'), long('C'), long('\u0001'), long('D')],
+      },
+      [...header.split(','), 'Canceled', 'Diverted To'],
+      refs,
+    )
+    expect(candidate.issues.map((issue) => issue.code).sort()).toEqual([
+      'UNKNOWN_AIRLINE',
+      'UNKNOWN_AIRPORT',
+      'UNKNOWN_AIRPORT',
+      'UNKNOWN_AIRPORT',
+      'UNKNOWN_CANCELED',
+    ])
+    for (const issue of candidate.issues) {
+      expect(Array.from(issue.token!).length).toBeLessThanOrEqual(FLIGHTY_MAX_TOKEN_LENGTH)
+      expect(issue.token!.endsWith('…')).toBe(true)
+      expect(issue.group).toBeNull()
+    }
+    expect(JSON.stringify(candidate.issues).length).toBeLessThanOrEqual(8192)
   })
 
   it('needs a decision for an unreadable time, a nonexistent time or an out-of-range duration', () => {

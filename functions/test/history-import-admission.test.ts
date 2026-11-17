@@ -126,6 +126,32 @@ describe('admitting chunks', () => {
     return { prepared, runId: created.body.run.id as string }
   }
 
+  it('admits a record whose airport cell is far longer than any code', async () => {
+    const { runId, run } = await uploadCsv(db, csvOf([bawRecord({ From: 'Q'.repeat(9000) })]))
+    expect(run.status).toBe('review')
+    const [row] = (await getPage(db, runId)).body.rows
+    expect(row.issues).toContainEqual(
+      expect.objectContaining({ code: 'UNKNOWN_AIRPORT', field: 'origin', group: null }),
+    )
+    expect(row.issues.every((issue) => (issue.token ?? '').length <= 64)).toBe(true)
+  })
+
+  it('refuses a times answer keyed by anything but a clock header', async () => {
+    const { runId } = await uploadCsv(db, csvOf([bawRecord()]))
+    const [row] = (await getPage(db, runId)).body.rows
+    const many = Object.fromEntries(
+      Array.from({ length: 80 }, (_, i) => [`x${String(i).padStart(2, '0')}${'h'.repeat(70)}`, 0]),
+    )
+    for (const offsets of [{ 'Not a clock': 0 }, many]) {
+      const reply = await patchRow(db, runId, row.id, {
+        version: row.version,
+        answers: { times: { offsets } },
+      })
+      expect(reply.status, JSON.stringify(reply.body)).toBe(400)
+      expect(reply.body.code).toBe('INVALID_HISTORY_REQUEST')
+    }
+  })
+
   it('refuses a payload that differs from the manifest, wrong ordinals and an oversize body', async () => {
     const { prepared, runId } = await open()
     const body = prepared.chunkBody(0)

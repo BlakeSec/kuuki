@@ -26,6 +26,8 @@ export const FLIGHTY_MAX_RECORDS = 10_000
 export const FLIGHTY_MAX_RECORD_BYTES = 64 * 1024
 export const FLIGHTY_MAX_HEADERS = 64
 export const FLIGHTY_MAX_HEADER_LENGTH = 80
+/** Longest source token an issue repeats; staged issues are capped at 8192 characters (migration 0020). */
+export const FLIGHTY_MAX_TOKEN_LENGTH = 64
 /** Records per upload chunk. */
 export const FLIGHTY_CHUNK_RECORDS = 100
 /** Chunks per run: 10 000 records with long notes split by bytes into more than the 100 a record count needs. */
@@ -392,7 +394,7 @@ export interface FlightyIssue {
    * code, an unknown airport code, an unreadable cancellation token. Null for a question about this record only.
    */
   group: string | null
-  /** The source token behind the question: a code or status word, never free text. */
+  /** The source token behind the question: a code or status word, cut to FLIGHTY_MAX_TOKEN_LENGTH with "…". */
   token?: string
   /** Catalog values the owner can pick from; never pre-selected. */
   candidates?: string[]
@@ -461,6 +463,15 @@ const upper = (value: string) => value.trim().toUpperCase()
 /** A recurring short token shares one question; a long free-text value stays a question about its own row. */
 const groupKey = (prefix: string, token: string) =>
   token.length <= 32 ? `${prefix}:${token}` : null
+
+/** Cuts an overlong token after grouping: a grouped token is at most 32 characters and never changes. */
+const boundToken = (issue: FlightyIssue): FlightyIssue => {
+  if (issue.token === undefined) return issue
+  const points = Array.from(issue.token)
+  return points.length <= FLIGHTY_MAX_TOKEN_LENGTH
+    ? issue
+    : { ...issue, token: `${points.slice(0, FLIGHTY_MAX_TOKEN_LENGTH - 1).join('')}…` }
+}
 
 export function headerIndex(headers: string[]): (record: FlightyRecord, name: string) => string {
   const positions = new Map(headers.map((header, index) => [header, index]))
@@ -747,7 +758,7 @@ export function mapFlightyRecord(
     ordinal: record.ordinal,
     projection,
     events,
-    issues,
+    issues: issues.map(boundToken),
     action,
     identity: {
       flightyFlightId,

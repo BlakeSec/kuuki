@@ -13,6 +13,10 @@ import {
   type HistoryStoredAnswers,
 } from '../../../packages/shared/src/flightyHistory'
 import { canonicalTimeZone } from '../../../packages/shared/src/calendar'
+import {
+  FLIGHTY_COLUMN_ROLES,
+  type FlightyObservedHeader,
+} from '../../../packages/shared/src/flighty'
 import type { FlightInput } from '../../../packages/shared/src/flightValidation'
 import { sha256Hex } from '../_lib/crypto'
 import { HttpError } from '../_lib/http'
@@ -40,6 +44,11 @@ import { OPEN_ROW_STATE_LIST } from './historyImportRetention'
 const invalid = (message: string) => new HttpError(400, message, 'INVALID_HISTORY_REQUEST')
 const iata = (value: unknown) =>
   typeof value === 'string' && /^[A-Z]{3}$/.test(value) && !!catalogFlightyRefs.airport(value)
+
+/** Offsets settle a DST fold for one clock column; any other key is meaningless and unbounded. */
+const isClockHeader = (header: string) =>
+  Object.hasOwn(FLIGHTY_COLUMN_ROLES, header) &&
+  FLIGHTY_COLUMN_ROLES[header as FlightyObservedHeader] === 'clock'
 
 function parseRowAnswers(value: unknown): HistoryRowAnswers {
   if (!isRecord(value)) throw invalid('Answers must be an object')
@@ -80,7 +89,9 @@ function parseRowAnswers(value: unknown): HistoryRowAnswers {
           isRecord(raw.offsets) &&
           Object.entries(raw.offsets).every(
             ([header, offset]) =>
-              header.length <= 80 && Number.isInteger(offset) && Math.abs(offset as number) <= 900,
+              isClockHeader(header) &&
+              Number.isInteger(offset) &&
+              Math.abs(offset as number) <= 900,
           )
         )
           answers.times = { offsets: raw.offsets as Record<string, number> }
