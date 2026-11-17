@@ -1,18 +1,4 @@
-import type { AircraftType } from '@kuuki/shared/types'
 import { greatCircleKm } from '@kuuki/shared/geo'
-
-// Speed estimates (km/h) for different aircraft types
-const SPEED_BY_AIRCRAFT_TYPE: Record<AircraftType, number> = {
-  widebody: 850,
-  narrowbody: 850,
-  regional: 750,
-  bizjet: 800,
-  turboprop: 500,
-  piston: 300,
-}
-
-// Default speed when aircraft type unknown
-const DEFAULT_SPEED_KMH = 800
 
 /** Rounded great-circle flight distance in km. */
 export function calculateFlightDistance(
@@ -22,23 +8,6 @@ export function calculateFlightDistance(
   lon2: number,
 ): number {
   return Math.round(greatCircleKm({ lat: lat1, lon: lon1 }, { lat: lat2, lon: lon2 }))
-}
-
-/**
- * Estimate flight duration when departure/arrival times not provided
- * @param distanceKm Flight distance in kilometers
- * @param aircraftType Type of aircraft (affects cruise speed)
- * @returns Duration in minutes
- */
-export function estimateFlightDuration(distanceKm: number, aircraftType?: AircraftType): number {
-  const speed = aircraftType ? SPEED_BY_AIRCRAFT_TYPE[aircraftType] : DEFAULT_SPEED_KMH
-
-  // Add fixed time for taxi, takeoff, climb, descent, landing
-  // Short haul: ~30min overhead, long haul: ~45min overhead
-  const overheadMinutes = distanceKm > 3000 ? 45 : 30
-
-  const cruiseMinutes = (distanceKm / speed) * 60
-  return Math.round(cruiseMinutes + overheadMinutes)
 }
 
 /**
@@ -161,36 +130,4 @@ export function localTimeToUtcMs(
   } catch {
     return null
   }
-}
-
-/**
- * Calculate days until a future flight
- */
-export function daysUntilFlight(date: string): number {
-  const flightDate = new Date(date)
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-  flightDate.setHours(0, 0, 0, 0)
-  const diffMs = flightDate.getTime() - today.getTime()
-  return Math.ceil(diffMs / (1000 * 60 * 60 * 24))
-}
-
-/**
- * Format distance for display
- * Shows full number with thousand separators: "1,542 km"
- */
-export function formatDistance(km: number): string {
-  return `${Math.round(km).toLocaleString()} km`
-}
-
-/**
- * Format duration for display
- */
-export function formatDuration(minutes: number): string {
-  const hours = Math.floor(minutes / 60)
-  const mins = minutes % 60
-  if (hours === 0) {
-    return `${mins}m`
-  }
-  return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`
 }
