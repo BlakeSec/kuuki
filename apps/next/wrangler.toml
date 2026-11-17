@@ -17,6 +17,7 @@ required = ["AUTH_SECRET", "BETTER_AUTH_SECRET", "GEMINI_API_KEY"]
 directory = ".open-next/assets"
 binding = "ASSETS"
 run_worker_first = true
+html_handling = "none"
 not_found_handling = "none"
 
 [observability]

@@ -109,7 +109,7 @@ const mf = new Miniflare({
     directory: assetsDir,
     binding: 'ASSETS',
     routerConfig: { invoke_user_worker_ahead_of_assets: true, has_user_worker: true },
-    assetConfig: { not_found_handling: 'none' },
+    assetConfig: { html_handling: 'none', not_found_handling: 'none' },
   },
   outboundService: async (request: WorkerRequest) => {
     if (
@@ -190,8 +190,8 @@ function artifact() {
     workerGzipBytes: gzipBytes,
     staticAssets: assets,
     staticBytes: assetBytes,
-    next: '16.3.8',
-    openNext: '1.20.10',
+    next: '16.4.6',
+    openNext: '1.20.17',
     compatibilityDate: '2026-08-06',
   }
 }

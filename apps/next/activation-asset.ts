@@ -6,7 +6,7 @@ export async function activationAsset(
 ): Promise<Response> {
   const url = new URL(request.url)
   const script = url.pathname === '/activate.js'
-  const assetUrl = new URL(script ? '/activate.js' : '/activate', url)
+  const assetUrl = new URL(script ? '/activate.js' : '/activate.html', url)
   const response = await env.ASSETS.fetch(new Request(assetUrl, request))
   if (response.status !== 304 && !response.ok)
     return new Response('Activation page unavailable', {
