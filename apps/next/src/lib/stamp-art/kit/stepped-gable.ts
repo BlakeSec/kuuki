@@ -25,7 +25,6 @@ export const steppedGable: KitModule = ([x, y, w, h], p) => {
   let outline: Pt[]
   if (style === 'stepped') {
     const sw = (w * 0.62) / steps
-    const sh = gableH / (steps + 0.5)
     const topY = wallY - gableH
     const pts: Pt[] = [[x, wallY]]
     for (let i = 0; i < steps; i++) {

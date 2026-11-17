@@ -17,17 +17,6 @@ const DEFAULT_PROFILE: Pt[] = [
   [1, 1],
 ]
 
-/** y of a polyline sorted by x ascending, at x. */
-function yAt(line: Pt[], x: number): number {
-  if (x <= line[0][0]) return line[0][1]
-  for (let i = 0; i + 1 < line.length; i++) {
-    const a = line[i],
-      b = line[i + 1]
-    if (x >= a[0] && x <= b[0]) return a[1] + ((x - a[0]) / (b[0] - a[0] || 1)) * (b[1] - a[1])
-  }
-  return line[line.length - 1][1]
-}
-
 export const rockHill: KitModule = ([x, y, w, h], p) => {
   const rand = mulberry32(Math.round(num(p, 'seed', 5)))
   const crag = num(p, 'crag', 1)

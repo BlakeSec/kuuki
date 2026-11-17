@@ -2,18 +2,7 @@
 // course lines, the right `shade` of it in T4, a crown of merlons that crowd toward the edges the
 // way a cylinder's do, and an optional rectangular `spur` buttress on the right. The box is the
 // shaft base width by the whole height; the bottom is the ground.
-import {
-  type Pt,
-  type SvgNode,
-  body,
-  fill,
-  hline,
-  occlude,
-  quad,
-  rectPts,
-  stroke,
-  toneFill,
-} from '../grid'
+import { type Pt, type SvgNode, body, fill, hline, quad, rectPts, stroke, toneFill } from '../grid'
 import { type KitModule, num } from './util'
 
 export const drumB: KitModule = ([x, y, w, h], p) => {

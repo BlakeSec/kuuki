@@ -115,6 +115,7 @@ export function sanitizeSourceLabel(type: SourceType, value: unknown): string | 
   if (type === 'text' || typeof value !== 'string') return null
   const base = value.split(/[\\/]/).pop() ?? ''
   const clean = base
+    // oxlint-disable-next-line no-control-regex -- strips control and line-separator characters from a file name on purpose
     .replace(/[\u0000-\u001f\u007f-\u009f\u2028\u2029]/g, '')
     .replace(/\s+/g, ' ')
     .trim()
@@ -340,7 +341,8 @@ export async function persistDraftRows(
       ),
   )
   const results = await db.batch(statements)
-  const sequence = (results.at(-1)?.results as Array<{ sequence: number }>)[0]?.sequence
+  const sequence = (results.at(-1)?.results as Array<{ sequence: number }> | undefined)?.[0]
+    ?.sequence
   if (sequence === undefined) return null
   return { sequence, rowIds: ids.filter((_, index) => (results[index].meta.changes ?? 0) > 0) }
 }
@@ -382,7 +384,8 @@ export async function persistDraftVerification(
       .bind(instant, ...fenceBinds),
   )
   const results = await db.batch(statements)
-  const sequence = (results.at(-1)?.results as Array<{ sequence: number }>)[0]?.sequence
+  const sequence = (results.at(-1)?.results as Array<{ sequence: number }> | undefined)?.[0]
+    ?.sequence
   if (sequence === undefined) return null
   return {
     sequence,

@@ -1,4 +1,4 @@
-import { X, Y, Zd, flat } from './flat'
+import { X, Zd, flat } from './flat'
 import { Scene, type IsoFigureData, type P3, type Pt } from './scene'
 
 /** Largest code size, in plane units; a code too long for the face shrinks to fit it. */

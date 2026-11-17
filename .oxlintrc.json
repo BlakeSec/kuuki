@@ -1,0 +1,17 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "oxc"],
+  "categories": { "correctness": "error" },
+  "rules": {
+    "no-unused-vars": "error",
+    "typescript/no-explicit-any": "error"
+  },
+  "overrides": [
+    {
+      "files": ["functions/test/**", "**/*.test.ts"],
+      "rules": { "typescript/no-explicit-any": "off" }
+    }
+  ],
+  "options": { "reportUnusedDisableDirectives": "warn" },
+  "ignorePatterns": ["**/*.generated.*", "**/dist/**", "**/node_modules/**"]
+}

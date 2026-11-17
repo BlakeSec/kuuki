@@ -342,7 +342,7 @@ export const mirCastle: KitModule = ([x, y, w, h]) => {
 }
 
 /** Castle Cornet: a fortress on a rocky islet with a long breakwater and a small beacon. */
-export const castleCornet: KitModule = ([x, y, w, h]) => {
+export const castleCornet: KitModule = ([x, y, _w, h]) => {
   const base = y + h
   const out: SvgNode[] = []
   const isl: Pt[] = [

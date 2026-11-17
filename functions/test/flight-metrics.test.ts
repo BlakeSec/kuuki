@@ -129,7 +129,7 @@ describe('server-authoritative flight metrics', () => {
       [91, 0],
       [0, 181],
       [null, null],
-      [1e999, 0],
+      [Infinity, 0],
     ]) {
       await db
         .prepare('UPDATE airports_reference SET latitude = ?, longitude = ? WHERE iata = ?')

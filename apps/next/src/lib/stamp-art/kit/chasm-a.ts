@@ -28,7 +28,6 @@ export const chasmA: KitModule = ([x, y, w, h], p) => {
   const nearBot = y + h * 0.97
   const out: SvgNode[] = []
   const farY = (yn: number, u: number) => vy + (yn - vy) * (1 - (1 - k) * u)
-  const farX = (side: -1 | 1, u: number) => cx + side * near * (1 - (1 - k) * u)
   const gapTop = farY(nearTop, 1)
   const gapBot = farY(nearBot, 1)
   const gx0 = cx - near * k

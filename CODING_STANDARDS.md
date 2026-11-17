@@ -4,7 +4,7 @@ Read this before changing code and apply it when reviewing a diff. Oxlint, Oxfmt
 
 Formatting uses single quotes and no semicolons; generated files, vendored maps and scratch work are excluded. In a shared checkout, format only owned paths with `pnpm exec oxfmt <paths>`; run repository-wide formatting in an isolated candidate. The direct pre-commit hook selects staged paths but reads working-tree content. For partial staging or shared files, use [shared-checkout Git](docs/agents/shared-checkout.md) to run the hook against the actual candidate.
 
-`pnpm lint` runs Oxlint for `apps/next`. Its config preserves the migrated Next, React, accessibility and TypeScript rules. Native React rules check immutability, refs and state updates in effects; JavaScript compatibility plugins retain Next's navigation checks and React's deprecated API check. The local `kuuki/design-tokens` rule enforces semantic colors and explicit transition properties outside unit tests. JSX usage is handled by Oxlint's unused-variable analysis.
+`pnpm lint` runs Oxlint for `apps/next` and, through `pnpm lint:server` and the root `.oxlintrc.json`, for `functions`, `packages` and `workers`: correctness rules, unused code, and no explicit `any` outside tests. Its config preserves the migrated Next, React, accessibility and TypeScript rules. Native React rules check immutability, refs and state updates in effects; JavaScript compatibility plugins retain Next's navigation checks and React's deprecated API check. The local `kuuki/design-tokens` rule enforces semantic colors and explicit transition properties outside unit tests. JSX usage is handled by Oxlint's unused-variable analysis.
 
 ## Where code changes go
 

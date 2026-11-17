@@ -235,6 +235,7 @@ export function FlightForm({
   const savedOnce = useRef(false)
   useEffect(() => {
     if (editId) return
+    // oxlint-disable-next-line react/incompatible-library -- React Compiler is off (no reactCompiler in next.config.ts); watch() only feeds a draft-saving subscription inside this effect
     const subscription = watch((current) => {
       if (savedOnce.current) return
       if (!Object.values(current).some(Boolean)) {

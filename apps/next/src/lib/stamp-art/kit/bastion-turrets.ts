@@ -1,16 +1,6 @@
 // Terrace of arcades with a row of conical turrets and broad steps (Fisherman's Bastion, HU).
 // The box base is the foot of the steps.
-import {
-  type Pt,
-  type SvgNode,
-  body,
-  fill,
-  hatchPoly,
-  hline,
-  occlude,
-  rectPts,
-  stroke,
-} from '../grid'
+import { type Pt, type SvgNode, body, fill, hatchPoly, hline, rectPts, stroke } from '../grid'
 import { type KitModule, num } from './util'
 import { archPts } from './windows'
 

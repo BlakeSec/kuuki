@@ -2,7 +2,7 @@
 // ends, a float (ama) lying in front of it on two curved booms (iako), and an optional crab-claw
 // sail on a short mast. The box holds the whole craft; its bottom is the waterline.
 import { type Pt, type SvgNode, body, fill, hline, occlude, quad, stroke, toneFill } from '../grid'
-import { type KitModule, bool, num } from './util'
+import { type KitModule, bool } from './util'
 
 export const outriggerA: KitModule = ([x, y, w, h], p) => {
   const base = y + h

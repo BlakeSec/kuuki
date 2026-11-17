@@ -7,6 +7,10 @@ if [ -n "$(git diff --cached --name-only --diff-filter=ACMR)" ]; then
 fi
 # Lint and typecheck only the packages affected by current changes.
 pnpm turbo run lint typecheck --affected --output-logs=errors-only
+# Server code (functions, packages, workers) has its own Oxlint config at the repo root.
+if git diff --cached --name-only | grep -qE '^(functions|packages|workers)/'; then
+  pnpm lint:server
+fi
 # When Pages Functions are staged, typecheck them and verify the generated route table is current.
 if git diff --cached --name-only | grep -q '^functions/'; then
   pnpm typecheck:api

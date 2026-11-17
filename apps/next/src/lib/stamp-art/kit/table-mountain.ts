@@ -83,7 +83,6 @@ export const tableMountain: KitModule = ([x, y, w, h], p) => {
   const cliffDepth = num(p, 'cliff', 0.32) * h
   const cb = (px: number) =>
     topY + cliffDepth + Math.sin(px * 0.17) * 1.0 + Math.sin(px * 0.06) * 1.2
-  const shadeFrom = x + w * num(p, 'shade', 0.62)
   const strokes: StrokeNode[] = []
 
   // Cliff: buttresses. Each has a lit left part (a few fine runs) and a shaded right part (vertical

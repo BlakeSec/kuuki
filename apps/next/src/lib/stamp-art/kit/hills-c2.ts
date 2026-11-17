@@ -14,8 +14,7 @@ import {
   stroke,
   toneFill,
 } from '../grid'
-import { pointInPoly } from '../geom'
-import { type KitModule, num } from './util'
+import { type KitModule } from './util'
 import {
   arcCourse,
   arch,
@@ -267,7 +266,7 @@ export const gediminas: KitModule = ([x, y, w, h]) => {
 }
 
 /** Dubrovnik: Minčeta tower top left, walls descending to the sea around a dense block of tile roofs. */
-export const dubrovnik: KitModule = ([x, y, w, h]) => {
+export const dubrovnik: KitModule = ([x, y, _w, h]) => {
   const base = y + h
   const out: SvgNode[] = []
   const wall: Pt[] = [

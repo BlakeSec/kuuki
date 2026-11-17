@@ -4,7 +4,7 @@
 // The snow cap stays paper under a jagged snow line with long white gullies reaching down.
 import { mulberry32 } from '../hash'
 import { clipStrokeOutside } from '../geom'
-import { type Pt, type SvgNode, hline, occlude, quad, stroke, toneFill } from '../grid'
+import { type Pt, type SvgNode, occlude, quad, stroke, toneFill } from '../grid'
 import { type KitModule, num, nums, str } from './util'
 
 type Edge = Pt[]

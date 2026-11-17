@@ -34,7 +34,7 @@ it.each([
 ])('rejects invalid or truncated envelope %s', (text) => {
   const scanner = new FlightScanner()
   expect(() => {
-    ;[...scanner.push(text)]
+    Array.from(scanner.push(text))
     scanner.finish()
   }).toThrow()
 })
@@ -53,14 +53,14 @@ it('rejects a repeated opening chunk that breaks the JSON grammar', () => {
   const chunk = '{"flights":[' + JSON.stringify(providerFlight())
   expect([...scanner.push(chunk)]).toHaveLength(1)
   expect(() => {
-    ;[...scanner.push(chunk)]
+    Array.from(scanner.push(chunk))
     scanner.finish()
   }).toThrow()
 })
 it('rejects duplicate flights keys rather than reconciling the wrong envelope', () => {
   const scanner = new FlightScanner()
   expect(() => {
-    ;[...scanner.push('{"flights":[{}],"flights":[{}]}')]
+    Array.from(scanner.push('{"flights":[{}],"flights":[{}]}'))
     scanner.finish()
   }).toThrow()
 })
@@ -79,7 +79,7 @@ it('rejects a repeated flights key even when its first value was not an array', 
 it('classifies a root JSON string as an invalid provider response', () => {
   const scanner = new FlightScanner()
   expect(() => {
-    ;[...scanner.push('"not an envelope"')]
+    Array.from(scanner.push('"not an envelope"'))
     scanner.finish()
   }).toThrow(expect.objectContaining({ code: 'PROVIDER_INVALID_RESPONSE' }))
 })

@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "turbo dev",
     "build": "turbo build",
-    "lint": "turbo lint",
+    "lint": "turbo lint && pnpm lint:server",
+    "lint:server": "oxlint -c .oxlintrc.json --deny-warnings functions packages workers",
     "typecheck": "turbo typecheck",
     "typecheck:api": "tsc --noEmit -p functions/tsconfig.json",
     "typecheck:scripts": "tsc --noEmit -p scripts/tsconfig.sbd1.json",

@@ -1,7 +1,7 @@
 // T09 / ADR 0001 §5 and C4: the awaiting queue, atomic confirmation receipts, replay, mixed invalid state,
 // cross-account access, post-commit repair failure and concurrency (A3, A7, A8).
 import { describe, expect, it } from 'vitest'
-import { apiContext, count, csrfRequest } from './harness'
+import { apiContext, count } from './harness'
 import { hasSql, instrumentDb } from './db-hooks'
 import {
   FLIGHTS,

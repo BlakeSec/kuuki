@@ -9,7 +9,7 @@
     "preview": "wrangler dev --local --config wrangler.toml",
     "typecheck": "next typegen && tsc --noEmit",
     "typecheck:worker": "tsc --noEmit -p tsconfig.worker.json",
-    "lint": "oxlint .",
+    "lint": "oxlint . --deny-warnings",
     "test": "vitest run"
   },
   "dependencies": {
