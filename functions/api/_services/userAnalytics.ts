@@ -6,6 +6,11 @@ export interface UserAnalyticsData {
   asOf: string
   startDate: string
   activity: { since: string | null; daily: number; weekly: number; monthly: number }
+  maintenance: {
+    lastSuccessAt: string | null
+    lastFailureAt: string | null
+    lastError: string | null
+  }
   totals: {
     users: number
     onboarded: number
@@ -55,8 +60,9 @@ export async function readUserAnalytics(
   previousStart.setUTCDate(previousStart.getUTCDate() - days)
   const startIso = start.toISOString()
 
-  const [totalsResult, periodResult, dailyResult, activityResult] = await env.DB.batch([
-    env.DB.prepare(`SELECT
+  const [totalsResult, periodResult, dailyResult, activityResult, maintenanceResult] =
+    await env.DB.batch([
+      env.DB.prepare(`SELECT
       COUNT(*) AS users,
       (SELECT COUNT(*) FROM profiles p JOIN users u ON u.id = p.id WHERE p.onboarded_at IS NOT NULL) AS onboarded,
       SUM(CASE WHEN
@@ -75,24 +81,24 @@ export async function readUserAnalytics(
       (SELECT COUNT(DISTINCT f.user_id) FROM flights f JOIN users u ON u.id = f.user_id
         WHERE f.source = 'ai_import') AS importUsers
       FROM users u`),
-    env.DB.prepare(`${events} SELECT
+      env.DB.prepare(`${events} SELECT
       COUNT(CASE WHEN kind = 'users' AND julianday(created_at) >= julianday(?1) THEN 1 END) AS newUsers,
       COUNT(CASE WHEN kind = 'users' AND julianday(created_at) < julianday(?1) THEN 1 END) AS previousNewUsers,
       COUNT(DISTINCT CASE WHEN kind <> 'users' AND julianday(created_at) >= julianday(?1) THEN user_id END) AS contributors,
       COUNT(CASE WHEN kind = 'flights' AND julianday(created_at) >= julianday(?1) THEN 1 END) AS flightsAdded,
       COUNT(CASE WHEN kind = 'ground' AND julianday(created_at) >= julianday(?1) THEN 1 END) AS groundAdded
       FROM events WHERE julianday(created_at) >= julianday(?2) AND julianday(created_at) <= julianday(?3)`).bind(
-      startIso,
-      previousStart.toISOString(),
-      asOf,
-    ),
-    env.DB.prepare(`${events} SELECT date(created_at) AS date,
+        startIso,
+        previousStart.toISOString(),
+        asOf,
+      ),
+      env.DB.prepare(`${events} SELECT date(created_at) AS date,
       COUNT(CASE WHEN kind = 'users' THEN 1 END) AS users,
       COUNT(CASE WHEN kind = 'flights' THEN 1 END) AS flights,
       COUNT(CASE WHEN kind = 'ground' THEN 1 END) AS ground
       FROM events WHERE julianday(created_at) >= julianday(?) AND julianday(created_at) <= julianday(?)
       GROUP BY date(created_at)`).bind(startIso, asOf),
-    env.DB.prepare(`SELECT
+      env.DB.prepare(`SELECT
       (SELECT started_at FROM user_activity_collection WHERE id = 1) AS since,
       COUNT(DISTINCT CASE WHEN day = date(?1) THEN user_id END) AS daily,
       COUNT(DISTINCT CASE WHEN day >= date(?1, '-6 days') THEN user_id END) AS weekly,
@@ -100,7 +106,10 @@ export async function readUserAnalytics(
       FROM user_activity_days a JOIN users u ON u.id = a.user_id
       WHERE day >= date(?1, '-29 days') AND day <= date(?1)
         AND julianday(first_seen_at) <= julianday(?1)`).bind(asOf),
-  ])
+      env.DB.prepare(
+        'SELECT last_success_at AS lastSuccessAt, last_failure_at AS lastFailureAt, last_error AS lastError FROM maintenance_status WHERE id = 1',
+      ),
+    ])
 
   const totals = totalsResult.results[0] as UserAnalyticsData['totals']
   // SUM has no rows for an empty database; every count still has a numeric zero.
@@ -120,6 +129,11 @@ export async function readUserAnalytics(
     asOf,
     startDate: startIso.slice(0, 10),
     activity: activityResult.results[0] as UserAnalyticsData['activity'],
+    maintenance: (maintenanceResult.results[0] as UserAnalyticsData['maintenance'] | undefined) ?? {
+      lastSuccessAt: null,
+      lastFailureAt: null,
+      lastError: null,
+    },
     totals,
     period: periodResult.results[0] as UserAnalyticsData['period'],
     daily,

@@ -678,6 +678,10 @@ place. Active users have separate fixed Today / 7 days / 30 days totals
 (DAU/WAU/MAU) with the collection start date; before the first recorded visit,
 these values show an em dash. Only visible signed-in visits are counted; early
 windows remain partial rather than inventing pre-collection history.
+A Maintenance panel shows the
+last successful and failed maintenance runs in UTC and the last error code
+with an alert icon in `--danger-text`; each shows an em dash until it
+exists.
 Loading begins only after owner admission; unavailable reads show an error
 with Retry. Zero registrations have their own empty state. Metric definitions and
 retained-data limitations live in a disclosure and [the dashboard contract](docs/user-analytics.md).

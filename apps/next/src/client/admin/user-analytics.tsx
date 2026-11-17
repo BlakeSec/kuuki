@@ -1,5 +1,6 @@
 'use client'
 
+import { CircleAlert } from '@keyline-icons/react'
 import { useRouter } from 'next/navigation'
 import { useTransition } from 'react'
 import type { UserAnalyticsData } from '../../../../../functions/api/_services/userAnalytics'
@@ -36,6 +37,8 @@ export function UserAnalytics({
   const { totals, period, daily } = data
   const difference = period.newUsers - period.previousNewUsers
   const max = Math.max(1, ...daily.map((day) => day.users))
+  const when = (iso: string | null) =>
+    iso ? <time dateTime={iso}>{timestamp.format(new Date(iso))} UTC</time> : '—'
   const percent = (value: number) =>
     new Intl.NumberFormat(ru ? 'ru-RU' : 'en-US', {
       style: 'percent',
@@ -255,6 +258,33 @@ export function UserAnalytics({
           </dl>
         </section>
       </div>
+
+      <section className="ua-panel" aria-labelledby="ua-maintenance-title">
+        <h2 id="ua-maintenance-title">{text('Maintenance', 'Обслуживание')}</h2>
+        <dl className="ua-maintenance">
+          <div>
+            <dt>{text('Last successful run', 'Последний успешный запуск')}</dt>
+            <dd>{when(data.maintenance.lastSuccessAt)}</dd>
+          </div>
+          <div>
+            <dt>{text('Last failed run', 'Последний неудачный запуск')}</dt>
+            <dd>{when(data.maintenance.lastFailureAt)}</dd>
+          </div>
+          <div>
+            <dt>{text('Error code', 'Код ошибки')}</dt>
+            <dd>
+              {data.maintenance.lastError ? (
+                <span className="ua-maintenance-error">
+                  <CircleAlert size={16} strokeWidth={2} aria-hidden="true" />
+                  {data.maintenance.lastError}
+                </span>
+              ) : (
+                '—'
+              )}
+            </dd>
+          </div>
+        </dl>
+      </section>
 
       <details className="ua-details ua-definitions">
         <summary>{text('Metric definitions', 'Как считаем')}</summary>

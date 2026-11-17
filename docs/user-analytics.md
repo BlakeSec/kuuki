@@ -19,18 +19,19 @@ accounts and entries disappear from both current counts and historical series.
 Migration `0016_user_activity.sql` adds a daily presence ledger and its collection
 start. It leaves existing journals, profiles and historical records unchanged.
 
-| Metric                        | Definition                                                                                                                      |
-| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| Total users                   | Rows in `users`                                                                                                                 |
-| New users / registrations     | Retained accounts by `users.created_at`, normalized to UTC                                                                      |
-| Active users: DAU / WAU / MAU | Distinct retained accounts with a recorded visible, signed-in visit today / over 7 / over 30 UTC calendar days, including today |
-| Added flights or journeys     | Distinct current users who added at least one retained flight or nondeleted ground journey in the period                        |
-| Entries added                 | Retained flights and nondeleted rail/road journeys by creation timestamp, including planned travel                              |
-| Finished welcome              | Profiles with `onboarded_at`; includes choosing to add entries later and migration backfills                                    |
-| Have journal entries          | Accounts with a flight, nondeleted ground journey, country claim or manual ground visit                                         |
-| Public passports              | Public profiles with a nonblank username                                                                                        |
-| Imported flights              | Accounts with at least one retained flight whose source is `ai_import`                                                          |
-| Journal entries               | All retained flights and nondeleted rail/road journeys, including planned travel                                                |
+| Metric                        | Definition                                                                                                                         |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| Total users                   | Rows in `users`                                                                                                                    |
+| New users / registrations     | Retained accounts by `users.created_at`, normalized to UTC                                                                         |
+| Active users: DAU / WAU / MAU | Distinct retained accounts with a recorded visible, signed-in visit today / over 7 / over 30 UTC calendar days, including today    |
+| Added flights or journeys     | Distinct current users who added at least one retained flight or nondeleted ground journey in the period                           |
+| Entries added                 | Retained flights and nondeleted rail/road journeys by creation timestamp, including planned travel                                 |
+| Maintenance                   | Row 1 of maintenance_status: the last successful and the last failed hourly cycle, and the last error code, which a success clears |
+| Finished welcome              | Profiles with `onboarded_at`; includes choosing to add entries later and migration backfills                                       |
+| Have journal entries          | Accounts with a flight, nondeleted ground journey, country claim or manual ground visit                                            |
+| Public passports              | Public profiles with a nonblank username                                                                                           |
+| Imported flights              | Accounts with at least one retained flight whose source is `ai_import`                                                             |
+| Journal entries               | All retained flights and nondeleted rail/road journeys, including planned travel                                                   |
 
 The 7/30/90-day selector affects registrations, contributors, added entries and
 the daily table. Adoption percentages and journal totals always describe all

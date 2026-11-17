@@ -155,11 +155,39 @@ it('returns zero totals and a complete UTC calendar for an empty database', asyn
     })
     expect(result.daily).toHaveLength(30)
     expect(result.activity).toEqual({ since: null, daily: 0, weekly: 0, monthly: 0 })
+    expect(result.maintenance).toEqual({
+      lastSuccessAt: null,
+      lastFailureAt: null,
+      lastError: null,
+    })
     expect(result.daily[0]).toEqual({ date: '2026-09-29', users: 0, flights: 0, ground: 0 })
     expect(result.daily[29]).toEqual({ date: '2026-10-28', users: 0, flights: 0, ground: 0 })
     expect(
       result.daily.every((row) => row.users === 0 && row.flights === 0 && row.ground === 0),
     ).toBe(true)
+  } finally {
+    await dispose()
+  }
+})
+
+it('reports the last maintenance success, failure and error code', async () => {
+  const { db, dispose } = await createApiDatabase()
+  try {
+    await db
+      .prepare(
+        `UPDATE maintenance_status
+        SET last_success_at = '2026-10-28T10:00:00.000Z',
+            last_failure_at = '2026-10-28T11:00:00.000Z',
+            last_error = 'MAINTENANCE_CYCLE_FAILED'
+        WHERE id = 1`,
+      )
+      .run()
+    const result = await readUserAnalytics({ DB: db, ADMIN_USER_ID: 'owner' }, 'owner', 7, now)
+    expect(result.maintenance).toEqual({
+      lastSuccessAt: '2026-10-28T10:00:00.000Z',
+      lastFailureAt: '2026-10-28T11:00:00.000Z',
+      lastError: 'MAINTENANCE_CYCLE_FAILED',
+    })
   } finally {
     await dispose()
   }
