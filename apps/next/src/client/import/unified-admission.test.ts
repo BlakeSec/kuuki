@@ -72,6 +72,12 @@ it('admits Nomads files without a provider, preserves hints and requires explici
                 date_start: '2026-03-12',
                 date_end: '2026-03-15',
               },
+              {
+                place: 'Chicago',
+                country_code: 'US',
+                date_start: '2026-03-14',
+                date_end: '2026-03-16',
+              },
             ],
           }),
         ],
@@ -80,7 +86,7 @@ it('admits Nomads files without a provider, preserves hints and requires explici
       ),
     ])
     await expect.poll(() => session.getEntries()[0]?.phase).toBe('ready')
-    expect(session.drafts()).toHaveLength(1)
+    expect(session.drafts()).toHaveLength(2)
     expect(session.drafts()[0]).toMatchObject({
       selected: false,
       fields: {
@@ -90,6 +96,10 @@ it('admits Nomads files without a provider, preserves hints and requires explici
       },
     })
     expect(session.requiresSelection()).toBe(true)
+    expect(session.drafts()[1]).toMatchObject({
+      selected: false,
+      fields: { date: '', origin_hint: 'Boston, US', destination_hint: 'Chicago, US' },
+    })
     expect(JSON.stringify(sources)).not.toContain('private-user')
     session.leave()
   } finally {

@@ -2,6 +2,7 @@ import { expect, it } from 'vitest'
 import { nomadsToText } from './nomads-json'
 import { parseStructuredText } from '../../../../../functions/api/import/_text'
 import { rowOf } from '../../../../../functions/api/_services/importJob'
+import { normalizeFlights } from '../../../../../functions/api/import/_extract'
 
 const stay = (place: string, start: string, end = start) => ({
   place,
@@ -45,7 +46,10 @@ it('leaves overlapping dates unknown and skips repeated or ambiguously ordered s
     }),
   )
   expect(result.skipped).toBe(2)
-  expect(parseStructuredText(result.content)!.flights[0].date).toBe('')
+  const normalized = normalizeFlights(parseStructuredText(result.content)!)
+  expect(normalized.flights).toHaveLength(1)
+  expect(normalized.flights[0].date).toBe('')
+  expect(rowOf(normalized.flights[0]).selected).toBe(false)
 })
 it('retains unknown countries and rejects invalid dates, oversized exports and list injection', () => {
   const result = nomadsToText(
@@ -69,4 +73,23 @@ it('retains unknown countries and rejects invalid dates, oversized exports and l
 it('does not invent flights for an empty export or a single stay', () => {
   expect(nomadsToText('{"trips":[]}').content).toBe('')
   expect(nomadsToText(JSON.stringify({ trips: [stay('Boston', '2026-01-01')] })).content).toBe('')
+})
+
+it('still rejects undated empty routes without distinct city hints and an explicit review marker', () => {
+  const flight = {
+    date: '',
+    origin: '',
+    destination: '',
+    airline_iata: 'ZZ',
+    confidence: 0.5,
+    origin_hint: 'Boston',
+    destination_hint: 'Chicago',
+    review_required: true,
+  }
+  for (const change of [
+    { review_required: false },
+    { destination_hint: 'Boston' },
+    { destination_hint: '' },
+  ])
+    expect(() => normalizeFlights({ flights: [{ ...flight, ...change }] })).toThrow()
 })
