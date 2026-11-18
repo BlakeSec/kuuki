@@ -235,6 +235,11 @@ export class HistorySession {
     this.set({ failure: classifyHistoryError(error), reading: false, saving: null })
   }
 
+  /** A superseded run never reports its failure over the current one. */
+  private failIfCurrent(error: unknown, generation: number) {
+    if (generation === this.generation) this.fail(error)
+  }
+
   private setBusy(id: string, on: boolean) {
     const busy = new Set(this.state.busy)
     if (on) busy.add(id)
@@ -314,7 +319,7 @@ export class HistorySession {
       }
       await this.create(generation)
     } catch (error) {
-      if (generation === this.generation) this.fail(error)
+      this.failIfCurrent(error, generation)
     }
   }
 
@@ -382,7 +387,7 @@ export class HistorySession {
       this.set({ reading: false })
       this.applyPage(page)
     } catch (error) {
-      if (generation === this.generation) this.fail(error)
+      this.failIfCurrent(error, generation)
     }
   }
 
@@ -403,7 +408,7 @@ export class HistorySession {
       this.applyPage(page)
       if (page.run.status === 'receiving' && this.chunks) await this.send(generation, page.run)
     } catch (error) {
-      if (generation === this.generation) this.fail(error)
+      this.failIfCurrent(error, generation)
     }
   }
 
@@ -434,7 +439,7 @@ export class HistorySession {
         nextCursor: page.nextCursor,
       })
     } catch (error) {
-      if (generation === this.generation) this.fail(error)
+      this.failIfCurrent(error, generation)
     }
   }
 
@@ -454,7 +459,7 @@ export class HistorySession {
       const rows = more ? [...(this.state.ready?.rows ?? []), ...page.rows] : page.rows
       this.set({ ready: { rows, nextCursor: page.nextCursor } })
     } catch (error) {
-      if (generation === this.generation) this.fail(error)
+      this.failIfCurrent(error, generation)
     }
   }
 
@@ -618,7 +623,7 @@ export class HistorySession {
       await this.transport.discard(run.id)
       if (generation === this.generation) this.forget()
     } catch (error) {
-      if (generation === this.generation) this.fail(error)
+      this.failIfCurrent(error, generation)
     }
   }
 
@@ -630,7 +635,7 @@ export class HistorySession {
       await this.transport.erase(run.id)
       await this.refresh(generation)
     } catch (error) {
-      if (generation === this.generation) this.fail(error)
+      this.failIfCurrent(error, generation)
     }
   }
 

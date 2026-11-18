@@ -61,9 +61,7 @@ export function UserAnalytics({
       <header className="ua-header">
         <div>
           <h1>{text('Users', 'Пользователи')}</h1>
-          <p className="ua-updated">
-            <time dateTime={data.asOf}>{timestamp.format(new Date(data.asOf))} UTC</time>
-          </p>
+          <p className="ua-updated">{when(data.asOf)}</p>
         </div>
         <Button
           variant="ghost"

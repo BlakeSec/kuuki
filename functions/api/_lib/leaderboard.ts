@@ -4,12 +4,13 @@
 // for the sky and ground gates), so exposing it here is not a privacy leak. Used by both the leaderboard list
 // and the per-user rankings (me/rankings + public profile rankings).
 
-import {
+import { SKY_CATEGORIES } from '../../../packages/shared/src/leaderboard'
+
+export {
   GROUND_CATEGORIES,
   LEADERBOARD_CATEGORIES,
   SKY_CATEGORIES,
   isGroundCategory,
-  type GroundCategory,
   type LeaderboardCategory,
 } from '../../../packages/shared/src/leaderboard'
 
@@ -23,15 +24,6 @@ export interface LeaderboardCacheRow {
   percentile: number | null
   metadata: string | null
   updated_at: string
-}
-
-export {
-  GROUND_CATEGORIES,
-  LEADERBOARD_CATEGORIES,
-  SKY_CATEGORIES,
-  isGroundCategory,
-  type GroundCategory,
-  type LeaderboardCategory,
 }
 
 /** Sky participation needs this many flights; ground needs this many completed rail and road journeys together. */

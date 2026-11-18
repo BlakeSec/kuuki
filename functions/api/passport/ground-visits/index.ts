@@ -61,17 +61,18 @@ export function createGroundVisitRequest(
     const id = visitId ?? newId()
     const createdAt = nowIso()
 
-    const [insert] = await env.DB.batch([
+    const results = await env.DB.batch([
       env.DB.prepare(
         'INSERT INTO ground_visits (id, user_id, country_code, visit_year, note, entry_method, mode, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(id) DO NOTHING',
       ).bind(id, user.id, countryCode, visitYear, note, entryMethod, mode, createdAt),
       dirtyUserStatement(env.DB, user.id),
+      env.DB.prepare(
+        'SELECT id, user_id, country_code, visit_year, entry_method, mode, note, created_at, linked_flight_id FROM ground_visits WHERE id = ? AND user_id = ?',
+      ).bind(id, user.id),
     ])
-    const row = await env.DB.prepare(
-      'SELECT id, user_id, country_code, visit_year, entry_method, mode, note, created_at, linked_flight_id FROM ground_visits WHERE id = ? AND user_id = ?',
-    )
-      .bind(id, user.id)
-      .first<GroundVisitRow>()
+    assertRows(results, 'Ground visit unavailable', 3)
+    const [insert, , read] = results
+    const row = read.results[0] as GroundVisitRow | undefined
     // Another owner's id, or this id already used for another country: never reveal or reuse that row.
     if (!row || row.country_code !== countryCode)
       throw new HttpError(409, 'Visit id already used for another visit', 'IDEMPOTENCY_CONFLICT')

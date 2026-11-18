@@ -7,7 +7,6 @@
 //     Badges are award-only, so a changed input never revokes an earned award.
 //   * `regionOf` (`./continents.ts`): the persisted `user_advanced_stats` breakdowns.
 import {
-  COUNTRY_REGION,
   REGION_IDS,
   REGION_TOTALS,
   type RegionId,
@@ -21,7 +20,7 @@ export { catalogRegionOf }
 export const REGION_POLICY = { version: 1, id: 'catalog-regions-v1', regions: REGION_IDS } as const
 
 /** True for a code in the app's country catalog (packages/data/src/countries.json), the only codes a write may add. */
-export const isCatalogCountry = (code: string): boolean => Object.hasOwn(COUNTRY_REGION, code)
+export const isCatalogCountry = (code: string): boolean => catalogRegionOf(code) !== null
 
 export interface RegionProgress {
   id: RegionId

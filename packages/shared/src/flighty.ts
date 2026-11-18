@@ -466,7 +466,8 @@ const groupKey = (prefix: string, token: string) =>
 
 /** Cuts an overlong token after grouping: a grouped token is at most 32 characters and never changes. */
 const boundToken = (issue: FlightyIssue): FlightyIssue => {
-  if (issue.token === undefined) return issue
+  // A string's UTF-16 length never undercounts its code points, so a short one needs no split.
+  if (issue.token === undefined || issue.token.length <= FLIGHTY_MAX_TOKEN_LENGTH) return issue
   const points = Array.from(issue.token)
   return points.length <= FLIGHTY_MAX_TOKEN_LENGTH
     ? issue

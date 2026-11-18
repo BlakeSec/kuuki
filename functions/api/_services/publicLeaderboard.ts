@@ -116,7 +116,6 @@ export type ViewerPlace =
 
 export type LeaderboardBoardPayload = Awaited<ReturnType<typeof readLeaderboardBoard>>
 
-export { SHOW_EVERYONE_UP_TO }
 const TOP_RANK = 10
 
 /**
