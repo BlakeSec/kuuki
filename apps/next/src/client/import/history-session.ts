@@ -491,7 +491,7 @@ export class HistorySession {
     } catch (error) {
       await this.recover(error, generation)
     } finally {
-      this.setBusy(group.group, false)
+      if (generation === this.generation) this.setBusy(group.group, false)
     }
   }
 
@@ -509,7 +509,7 @@ export class HistorySession {
     } catch (error) {
       await this.recover(error, generation)
     } finally {
-      this.setBusy(row.id, false)
+      if (generation === this.generation) this.setBusy(row.id, false)
     }
   }
 

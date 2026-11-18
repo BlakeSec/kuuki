@@ -65,7 +65,8 @@ export function createGroundVisitRequest(
       env.DB.prepare(
         'INSERT INTO ground_visits (id, user_id, country_code, visit_year, note, entry_method, mode, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(id) DO NOTHING',
       ).bind(id, user.id, countryCode, visitYear, note, entryMethod, mode, createdAt),
-      dirtyUserStatement(env.DB, user.id),
+      // A replayed or refused id inserts nothing, so it must not mark the derived state dirty either.
+      dirtyUserStatement(env.DB, user.id, true),
       env.DB.prepare(
         'SELECT id, user_id, country_code, visit_year, entry_method, mode, note, created_at, linked_flight_id FROM ground_visits WHERE id = ? AND user_id = ?',
       ).bind(id, user.id),

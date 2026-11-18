@@ -361,10 +361,17 @@ it('keeps one row when the same visit id is posted twice', async () => {
     const first = await addGroundVisit(context(db, '/api/passport/ground-visits', 'POST', body))
     expect(first.status).toBe(201)
     expect(await first.json()).toMatchObject({ id: visitId })
+    const revision = () =>
+      db
+        .prepare('SELECT revision FROM user_derived_state WHERE user_id = ?')
+        .bind(user.id)
+        .first<{ revision: number }>()
+    const before = await revision()
     const second = await addGroundVisit(context(db, '/api/passport/ground-visits', 'POST', body))
     expect(second.status).toBe(200)
     expect(await second.json()).toMatchObject({ id: visitId, countryCode: 'DE' })
     expect(await count(db, 'ground_visits')).toBe(1)
+    expect(await revision()).toEqual(before)
   } finally {
     await dispose()
   }
