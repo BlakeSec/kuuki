@@ -20,6 +20,13 @@ beforeEach(() => {
   if (!Element.prototype.animate)
     Element.prototype.animate = () =>
       ({ cancel() {}, currentTime: 0, onfinish: null }) as unknown as Animation
+  // Radix measures popper arrows with a ResizeObserver.
+  if (!window.ResizeObserver)
+    window.ResizeObserver = class {
+      observe() {}
+      unobserve() {}
+      disconnect() {}
+    }
   if (!window.matchMedia)
     window.matchMedia = (() => ({
       matches: false,

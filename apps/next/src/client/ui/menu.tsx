@@ -124,6 +124,9 @@ export function Menu({
             if (event.target === shield.current) event.preventDefault()
           }}
         >
+          {/* Invisible arrow: Radix then puts the transform origin at the trigger, measured after collision shifts.
+              First child, so `:last-child` rules still see the real last item. */}
+          <DropdownMenu.Arrow width={0} height={0} aria-hidden="true" />
           {children}
         </DropdownMenu.Content>
       </DropdownMenu.Portal>

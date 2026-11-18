@@ -82,6 +82,7 @@ const MountedPopoverContent = forwardRef<HTMLDivElement, RadixPopover.PopoverCon
       className = '',
       onOpenAutoFocus,
       onCloseAutoFocus,
+      children,
       ...props
     },
     ref,
@@ -123,7 +124,12 @@ const MountedPopoverContent = forwardRef<HTMLDivElement, RadixPopover.PopoverCon
           }
           event.preventDefault()
         }}
-      />
+      >
+        {/* Invisible arrow: Radix then puts the transform origin at the trigger, measured after collision shifts.
+            First child, so `:last-child` rules still see the real last item. */}
+        <RadixPopover.Arrow width={0} height={0} aria-hidden="true" />
+        {children}
+      </RadixPopover.Content>
     )
   },
 )

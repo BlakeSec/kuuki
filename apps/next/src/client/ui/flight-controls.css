@@ -147,6 +147,7 @@
   border: 0;
   box-shadow: none;
   background: transparent;
+  transition: none;
 }
 .flight-calendar-heading {
   display: grid;
@@ -379,6 +380,29 @@
 .flight-search-popover,
 .flight-calendar-popover {
   border: 1px solid var(--hairline);
+}
+/* Enter from the trigger, like .ui-popover: the list hangs from the whole field, the calendar from its end button.
+   Both unmount on close, so they leave at once. */
+@media (prefers-reduced-motion: no-preference) {
+  .flight-search-popover,
+  .flight-calendar-popover {
+    transition:
+      opacity var(--dur-fast) var(--ease-out),
+      transform var(--dur-fast) var(--ease-out);
+  }
+  .flight-search-popover {
+    transform-origin: 50% 0;
+  }
+  .flight-calendar-popover {
+    transform-origin: 100% 0;
+  }
+  @starting-style {
+    .flight-search-popover,
+    .flight-calendar-popover {
+      opacity: 0;
+      transform: scale(0.97);
+    }
+  }
 }
 .flight-date-input > button {
   display: grid;

@@ -118,6 +118,8 @@ export function ContextMenu({
                 else returnFocus?.()?.focus()
               }}
             >
+              {/* Grows from the pointer or the button even when the list is shifted to stay on screen (see menu.tsx). */}
+              <DropdownMenu.Arrow width={0} height={0} aria-hidden="true" />
               {items.map((item) => (
                 <MenuItem
                   key={item.id}
