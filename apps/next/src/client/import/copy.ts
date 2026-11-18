@@ -485,6 +485,7 @@ ${PROMPT_EXAMPLE.ru}
   ),
   unsentRow: p('Not sent yet.', 'Ещё не отправлено.'),
   backToReview: p('Back to review', 'Назад к проверке'),
+  moreStamps: p('+{count} in Passport', '+{count} в паспорте'),
   passport: p('Open Passport', 'Открыть паспорт'),
   journal: p('Go to Journal', 'В журнал'),
   importMore: p('Import more', 'Импортировать ещё'),

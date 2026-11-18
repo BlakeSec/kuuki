@@ -21,14 +21,14 @@
 }
 .gt-note {
   margin: 0;
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
   color: var(--text-muted);
 }
 .gt-count {
   margin: 0;
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
   color: var(--text-muted);
 }
 .gt-toolbar {
@@ -75,8 +75,8 @@
   list-style: none;
 }
 .gt-totals-line {
-  font-size: 15px;
-  line-height: 24px;
+  font-size: 0.9375rem;
+  line-height: 1.5rem;
   font-variant-numeric: tabular-nums;
   overflow-wrap: anywhere;
 }
@@ -86,8 +86,8 @@
 .gt-totals-line small,
 .gt-facts small {
   color: var(--text-muted);
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
 }
 .gt-facts > div {
   display: flex;
@@ -97,15 +97,15 @@
 }
 .gt-facts dt {
   color: var(--text-muted);
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
 }
 .gt-facts dd {
   margin: 0;
   display: flex;
   flex-direction: column;
-  font-size: 15px;
-  line-height: 24px;
+  font-size: 0.9375rem;
+  line-height: 1.5rem;
   font-variant-numeric: tabular-nums;
   overflow-wrap: anywhere;
 }
@@ -118,8 +118,8 @@
 }
 .gt-list-section h2 {
   margin: 0;
-  font-size: 17px;
-  line-height: 24px;
+  font-size: 1.0625rem;
+  line-height: 1.5rem;
   font-weight: 600;
 }
 .gt-list {
@@ -147,8 +147,8 @@
 }
 .gt-card-title {
   margin: 0;
-  font-size: 17px;
-  line-height: 24px;
+  font-size: 1.0625rem;
+  line-height: 1.5rem;
   font-weight: 600;
   overflow-wrap: anywhere;
 }
@@ -187,8 +187,8 @@
   align-items: center;
   gap: var(--space-1) var(--space-3);
   margin: 0;
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
   color: var(--text-muted);
 }
 /* Distance is secondary to the route: body size, quieter unit; other facts read "label value" in metadata size. */
@@ -200,8 +200,8 @@
   min-width: 0;
   margin: 0;
   font-variant-numeric: tabular-nums;
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
   color: var(--text-muted);
 }
 .gt-card-facts > div {
@@ -215,16 +215,16 @@
   color: var(--text);
 }
 .gt-card-facts .gt-card-distance dd {
-  font-size: 15px;
-  line-height: 24px;
+  font-size: 0.9375rem;
+  line-height: 1.5rem;
 }
 .gt-unit {
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--text-muted);
 }
 .gt-card-facts small {
   margin-inline-start: var(--space-2);
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--text-muted);
 }
 .gt-card-topline {
@@ -241,20 +241,20 @@
   justify-content: flex-end;
   gap: var(--space-1) var(--space-2);
   margin: 0 0 0 auto;
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
   color: var(--text-muted);
   text-align: end;
 }
 .gt-card-when .gt-status {
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
 }
 /* The route leads: departure left, destination right, each wrapping in its own half instead of truncating. */
 .gt-card .gt-card-title {
   margin-top: var(--space-3);
-  font-size: 20px;
-  line-height: 28px;
+  font-size: 1.25rem;
+  line-height: 1.75rem;
   font-weight: 500;
   letter-spacing: -0.02em;
   overflow-wrap: break-word;
@@ -278,8 +278,8 @@
   text-align: end;
 }
 .gt-card-country {
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
   font-weight: 400;
   letter-spacing: 0;
   color: var(--text-muted);
@@ -352,8 +352,8 @@
 }
 .gt-card-via {
   margin: var(--space-2) 0 0;
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
   color: var(--text-muted);
   text-align: center;
   overflow-wrap: break-word;
@@ -379,8 +379,8 @@
 .gt-totals-line .gt-mode {
   align-self: center;
   margin: 0;
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
   color: var(--text-muted);
 }
 .gt-totals-values {
@@ -388,16 +388,16 @@
   flex-wrap: wrap;
   gap: var(--space-1) var(--space-4);
   margin: 0;
-  font-size: 15px;
-  line-height: 24px;
+  font-size: 0.9375rem;
+  line-height: 1.5rem;
 }
 .gt-card-hint {
   display: flex;
   align-items: flex-start;
   gap: var(--space-2);
   margin: var(--space-2) 0 0;
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
   color: var(--warning-text);
 }
 .gt-card-hint svg {
@@ -454,14 +454,14 @@
 }
 .gt-detail-heading {
   margin: var(--space-2) 0 0;
-  font-size: 15px;
-  line-height: 20px;
+  font-size: 0.9375rem;
+  line-height: 1.25rem;
   font-weight: 600;
 }
 .gt-note-text {
   margin: 0;
-  font-size: 15px;
-  line-height: 24px;
+  font-size: 0.9375rem;
+  line-height: 1.5rem;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
@@ -480,8 +480,8 @@
 .gt-sketch figcaption {
   display: grid;
   gap: var(--space-1);
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
   color: var(--text-muted);
 }
 .gt-list-actions {
@@ -736,8 +736,8 @@
   min-height: 36px;
   margin: 0;
   padding: var(--space-2) 0 var(--space-2) 36px;
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
   color: var(--text-muted);
   font-variant-numeric: tabular-nums;
 }
@@ -772,7 +772,7 @@
   border-radius: var(--radius-full);
   background: var(--surface);
   color: var(--accent-text);
-  font: 600 11px/1 var(--font-mono);
+  font: 600 0.6875rem/1 var(--font-mono);
   font-variant-numeric: tabular-nums;
 }
 .gt-stop-mark[data-role='via'] {
@@ -795,15 +795,15 @@
 }
 .gt-stop-name {
   margin: 0;
-  font-size: 15px;
-  line-height: 24px;
+  font-size: 0.9375rem;
+  line-height: 1.5rem;
   font-weight: 500;
   overflow-wrap: anywhere;
 }
 .gt-stop-meta {
   margin: 0;
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
   color: var(--text-muted);
   overflow-wrap: anywhere;
 }
@@ -811,8 +811,8 @@
   display: grid;
   justify-items: end;
   margin: 0;
-  font-size: 13px;
-  line-height: 24px;
+  font-size: 0.8125rem;
+  line-height: 1.5rem;
   color: var(--text-muted);
   text-align: end;
   font-variant-numeric: tabular-nums;

@@ -19,7 +19,7 @@ vi.mock('next/navigation', () => ({ useRouter: () => ({ refresh }) }))
 vi.mock('../write-feedback', () => ({
   useWriteFeedback: () => ({ acknowledge: vi.fn(), status: 'idle' }),
 }))
-vi.mock('../signature/stamp', () => ({ Stamp: () => null }))
+vi.mock('../stamps', () => ({ CountryStamp: () => null }))
 vi.mock('@kuuki/client/apiClient', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@kuuki/client/apiClient')>()),
   api: { post: (...args: unknown[]) => post(...args) },

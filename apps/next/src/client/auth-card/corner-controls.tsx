@@ -2,57 +2,19 @@
 
 import { useEffect, useState, type ReactNode } from 'react'
 import { Droplet, Pause, Play } from '@keyline-icons/react'
-import { deviceAccent, rememberSignedOutPick, setAccent, setLocale } from '../appearance'
-import { useAppearance, useLocale } from '../preferences'
+import { deviceAccent, rememberSignedOutPick, setAccent } from '../appearance'
+import { useLocale } from '../preferences'
 import { Menu, MenuTray } from '../ui/menu'
 import { NAMES } from '../ui/swatch-picker'
 import { ACCENTS, type Accent } from '../../lib/theme-colors'
 import type { Locale } from '../../lib/format'
 import { HorizonToggle } from './horizon-toggle'
+import { LanguageControl } from './language-control'
 import './auth-card.css'
 
 const words = {
   en: { pause: 'Pause animation', accent: 'Accent' },
   ru: { pause: 'Приостановить анимацию', accent: 'Акцент' },
-}
-
-/** The visible code, and the endonym that names the language to someone who cannot read the current page. */
-const languages: Record<Locale, { code: string; name: string }> = {
-  en: { code: 'EN', name: 'English' },
-  ru: { code: 'RU', name: 'Русский' },
-}
-
-/**
- * Two languages need no picker: the button shows the other language's code and switches to it in one tap. The page
- * itself shows the current language. The accessible name is the endonym with the visible code, so voice control can
- * say "RU". Both codes share one grid cell, so the button never changes width when the label swaps.
- */
-function LanguageControl({
-  locale,
-  onLocaleChange = setLocale,
-}: {
-  locale: Locale
-  onLocaleChange?: (locale: Locale) => void
-}) {
-  const other: Locale = useAppearance(locale).locale === 'ru' ? 'en' : 'ru'
-  const { code, name } = languages[other]
-  return (
-    <button
-      type="button"
-      className="auth-corner-control"
-      data-kind="language"
-      lang={other}
-      aria-label={`${name} (${code})`}
-      title={name}
-      onClick={() => onLocaleChange(other)}
-    >
-      {(Object.keys(languages) as Locale[]).map((key) => (
-        <span key={key} aria-hidden="true" data-shown={key === other || undefined}>
-          {languages[key].code}
-        </span>
-      ))}
-    </button>
-  )
 }
 
 /**

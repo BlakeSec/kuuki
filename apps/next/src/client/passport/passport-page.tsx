@@ -339,9 +339,6 @@ function OwnerInner({
       <MenuItem onSelect={fromMenu(() => setAdding(true))}>
         {ru ? 'Добавить страну' : 'Add country'}
       </MenuItem>
-      <MenuItem asChild>
-        <Link href="/passport/manage">{ru ? 'Самолёты в журнале' : 'Aircraft in journal'}</Link>
-      </MenuItem>
     </Menu>
   )
 

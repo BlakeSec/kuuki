@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { Sheet } from '../../ui/sheet'
+import { useScrollFade } from '../../ui/use-scroll-fade'
 import { useMobile } from '../../ui/use-mobile'
 import { formatDateOnly, type Locale } from '../../../lib/format'
 import { FoundingStub } from '../founding-crew'
@@ -23,7 +24,7 @@ import {
   sarcastic,
   toGo,
 } from './copy'
-import { LadderFigure, useStripK, type RungState } from './ladder-figure'
+import { LadderFigure, STRIP_THUMB, useStripK, type RungState } from './ladder-figure'
 import {
   ladderOf,
   ladderValue,
@@ -252,6 +253,8 @@ function RungStrip({
       box.left -
       parseFloat(getComputedStyle(list).paddingInlineStart)
   }, [rung, rungs])
+  // Rungs out of view fade the strip's edge so it never ends in a hard cut.
+  useScrollFade(strip, rungs)
   return (
     <>
       <ol ref={strip} className="ladder-strip">
@@ -267,6 +270,7 @@ function RungStrip({
                 size="thumb"
                 state={state}
                 k={k}
+                box={STRIP_THUMB}
                 initials={initials}
               />
               <span className="ladder-slot-name">{name}</span>

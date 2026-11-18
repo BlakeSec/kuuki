@@ -151,7 +151,7 @@ export type CardState =
   | { step: 'welcome'; init: WelcomeInit }
   | RequestState
 
-/** Where focus goes after a state change. The heading is the default; the create step and Change are the exceptions. */
+/** Where focus goes after a state change. The heading is the default; the create step, Change and field errors are the exceptions. */
 type FocusTarget = 'heading' | 'primary' | 'email-selected' | 'email' | 'password' | 'none'
 
 /** Continue answered `{ next: 'create' }`: no session was issued, so the identity mutation must not navigate. */
@@ -315,11 +315,12 @@ export function AuthCard({
       // The create step focuses Create account, the one documented exception to focusing the heading.
       if (error instanceof NoJournal) return go({ step: 'create', email: address }, 'primary')
       const code = codeOf(error)
+      // A field error focuses its field (text selected), which reads out the error it describes; the alert announces it too.
       if (code === 'INVALID_CREDENTIALS' || code === 'INVALID_EMAIL_OR_PASSWORD')
-        return go({ step: 'form', error: 'invalid' })
+        return go({ step: 'form', error: 'invalid' }, 'password')
       if (code === 'INVALID_EMAIL' || code === 'MISSING_CREDENTIALS')
-        return go({ step: 'form', error: 'email' })
-      if (code === 'MISSING_PASSWORD') return go({ step: 'form', error: 'password' })
+        return go({ step: 'form', error: 'email' }, 'email-selected')
+      if (code === 'MISSING_PASSWORD') return go({ step: 'form', error: 'password' }, 'password')
       go({ step: 'form', error: statusOf(error) === 429 ? 'rate' : 'network' })
     }
   }

@@ -427,6 +427,15 @@ export function JournalDetail({
   /** Header slot beside Close; the content portals its Edit button here so identity and actions share one region. */
   const [actionSlot, setActionSlot] = useState<HTMLElement | null>(null)
   const actions = <span ref={setActionSlot} className="jd-actions" />
+  /** Footer slot: Edit portals Save and Cancel here so they stay in view while the body scrolls. Hidden while empty. */
+  const [footerSlot, setFooterSlot] = useState<HTMLElement | null>(null)
+  const footerContent =
+    flight && !idle ? (
+      <>
+        <div ref={setFooterSlot} className="jd-form-slot" />
+        {footer}
+      </>
+    ) : undefined
   const body = useRef<HTMLDivElement | null>(null)
   /** A swap started inside the sheet (a connection leg): the clicked button unmounts, so focus moves to the title. */
   const swapFromInside = useRef(false)
@@ -526,6 +535,7 @@ export function JournalDetail({
         onOpenFlight={swap}
         guardRef={guard}
         actionSlot={actionSlot}
+        footerSlot={footerSlot}
       />
     </Crossfade>
   ) : (
@@ -596,7 +606,7 @@ export function JournalDetail({
             </>
           )}
         </div>
-        {footer && flight && !idle && <div className="jd-footer">{footer}</div>}
+        {footerContent && <div className="jd-footer">{footerContent}</div>}
       </aside>
     )
   }
@@ -616,7 +626,7 @@ export function JournalDetail({
       side={mobile ? 'bottom' : 'right'}
       className={mobile ? 'journal-detail-sheet flight-full-sheet' : 'journal-detail-sheet'}
       closeLabel={t.close}
-      footer={footer && flight && !idle ? footer : undefined}
+      footer={footerContent}
       onCloseAutoFocus={(event) => {
         const row = shownId !== null ? rowFor(shownId) : null
         if (row) {

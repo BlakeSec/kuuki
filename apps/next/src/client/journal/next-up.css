@@ -7,8 +7,8 @@
 }
 .journal-next h2 {
   margin: 0;
-  font-size: 15px;
-  line-height: 24px;
+  font-size: 0.9375rem;
+  line-height: 1.5rem;
   font-weight: 500;
   color: var(--accent-text);
 }
@@ -95,16 +95,16 @@
   outline-offset: 2px;
 }
 .journal-next-cities {
-  font-size: 20px;
-  line-height: 28px;
+  font-size: 1.25rem;
+  line-height: 1.75rem;
   font-weight: 500;
   text-wrap: balance;
   overflow-wrap: anywhere;
 }
 /* The date is a phrase, so it stays in the text face; only codes are mono. */
 .journal-next-date {
-  font-size: 15px;
-  line-height: 20px;
+  font-size: 0.9375rem;
+  line-height: 1.25rem;
   font-variant-numeric: tabular-nums;
 }
 .journal-next-meta {
@@ -112,7 +112,7 @@
   flex-wrap: wrap;
   gap: 0 var(--space-3);
   margin-block-start: 2px;
-  font: 400 13px/20px var(--font-mono);
+  font: 400 0.8125rem/1.25rem var(--font-mono);
   font-variant-numeric: tabular-nums;
   color: var(--pass-ink-muted);
   overflow-wrap: anywhere;
@@ -139,16 +139,16 @@
   }
 }
 .journal-next-unit {
-  font-size: 13px;
-  line-height: 16px;
+  font-size: 0.8125rem;
+  line-height: 1rem;
   color: var(--pass-ink-muted);
 }
 .journal-next-word {
   padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-xs);
   background: var(--pass-flap);
-  font-size: 15px;
-  line-height: 20px;
+  font-size: 0.9375rem;
+  line-height: 1.25rem;
   font-weight: 500;
   color: var(--pass-flap-foreground);
 }
@@ -163,8 +163,8 @@
 }
 .journal-next-then {
   padding-inline: var(--space-2);
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
   color: var(--pass-ink-muted);
 }
 .journal-next-later ul {
@@ -189,16 +189,16 @@
   outline-offset: 0;
 }
 .journal-next-item-route {
-  font-size: 15px;
-  line-height: 20px;
+  font-size: 0.9375rem;
+  line-height: 1.25rem;
   overflow-wrap: anywhere;
 }
 .journal-next-item-sub {
   display: flex;
   flex-wrap: wrap;
   gap: 0 var(--space-1);
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
   font-variant-numeric: tabular-nums;
   color: var(--pass-ink-muted);
 }
@@ -239,14 +239,14 @@
     --split-flap-font-size: 26px;
   }
   .journal-next-unit {
-    font-size: 12px;
+    font-size: 0.75rem;
   }
   .journal-next-cities {
-    font-size: 17px;
-    line-height: 24px;
+    font-size: 1.0625rem;
+    line-height: 1.5rem;
   }
   .journal-next-date {
-    font-size: 13px;
+    font-size: 0.8125rem;
   }
 }
 

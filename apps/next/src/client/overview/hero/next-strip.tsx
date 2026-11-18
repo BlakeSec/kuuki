@@ -27,6 +27,8 @@ export function NextStrip() {
     }
   }, [bus, id])
   if (!payload || !scope || !all) return <p role="status">{t(S.loading, locale)}</p>
+  // По земле describes ground trips only; the next flight and the review queue wait for Всё and Перелёты.
+  if (scope.figures.scope === 'ground') return null
   if (!next) {
     const awaiting = all.figures.awaiting
     if (!awaiting) return null

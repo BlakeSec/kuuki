@@ -36,7 +36,6 @@ export function DoneStep({
   expiresAt = null,
   aircraftTargets,
   aircraftApi,
-  theme,
   retryBlocked,
   onRetry,
   onReview,
@@ -63,7 +62,6 @@ export function DoneStep({
   expiresAt?: string | null
   aircraftTargets: AircraftTarget[]
   aircraftApi?: AircraftApi
-  theme: 'light' | 'dark'
   /** Why the retry is held back (corrections on the review page are not saved yet); shown beside the button. */
   retryBlocked?: ReactNode
   onRetry: () => void
@@ -121,13 +119,7 @@ export function DoneStep({
           <span>{S.checkFailed[locale]}</span>
         </p>
       ) : null}
-      <StampSection
-        locale={locale}
-        publication={publication}
-        stamps={stamps}
-        theme={theme}
-        hero={hero}
-      />
+      <StampSection locale={locale} publication={publication} stamps={stamps} hero={hero} />
 
       {partial ? (
         <div className="import-failed">

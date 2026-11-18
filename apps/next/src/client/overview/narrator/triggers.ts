@@ -14,6 +14,8 @@ export interface Trigger {
   priority: number
   /** Hero triggers name the record whose takeover shows their line. */
   record?: HeroRecord
+  /** Params written as words at fill time: `month` 1–12 as its name, `yearMonth` 'YYYY-MM' as "October 2020", `day` 'YYYY-MM-DD' as a date. */
+  words?: Record<string, 'month' | 'yearMonth' | 'day'>
   when(scope: OverviewScope, all: OverviewScope): Record<string, string | number> | null
 }
 
@@ -68,6 +70,7 @@ export const TRIGGERS: Trigger[] = [
     id: 'records:busiest-day',
     slot: 'records',
     priority: 80,
+    words: { date: 'day' },
     when: (scope) => {
       if (scope.records.status !== 'ready') return null
       const v = scope.records.value
@@ -644,6 +647,7 @@ export const TRIGGERS: Trigger[] = [
     id: 'rhythm:gap',
     slot: 'rhythm',
     priority: 70,
+    words: { from: 'yearMonth', to: 'yearMonth' },
     when: (scope) => {
       if (scope.rhythm.status !== 'ready') return null
       const v = scope.rhythm.value
@@ -699,6 +703,7 @@ export const TRIGGERS: Trigger[] = [
     id: 'rhythm:pooled-month',
     slot: 'rhythm',
     priority: 60,
+    words: { month: 'month' },
     when: (scope) => {
       if (scope.rhythm.status !== 'ready') return null
       const v = scope.rhythm.value
@@ -854,6 +859,31 @@ export const TRIGGERS: Trigger[] = [
     record: 'flights',
     priority: 40,
     when: (scope) => (scope.figures.flights >= 25 ? { flights: scope.figures.flights } : null),
+  },
+  // Under Всё, completed ground km (straight-line) are at least a tenth of all travel km: the ground gets the footer over the km lines.
+  {
+    id: 'hero:ground-share',
+    slot: 'hero',
+    record: 'km',
+    priority: 75,
+    when: (scope) => {
+      const f = scope.figures
+      const ground = f.travelKm - f.distanceKm
+      return f.scope === 'all' &&
+        f.groundJourneys > 0 &&
+        f.travelKm > 0 &&
+        ground >= f.travelKm * 0.1
+        ? { percent: Math.round((ground / f.travelKm) * 100) }
+        : null
+    },
+  },
+  // A hundred flights or more: the flights takeover admits what flying costs. No figure: nothing here measures emissions.
+  {
+    id: 'hero:flights-cost',
+    slot: 'hero',
+    record: 'flights',
+    priority: 42,
+    when: (scope) => (scope.figures.flights >= 100 ? { flights: scope.figures.flights } : null),
   },
   // A timing belt is due at roughly 100,000 km on most cars; the line states no number, so the bar carries it.
   {

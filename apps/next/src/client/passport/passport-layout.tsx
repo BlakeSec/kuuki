@@ -175,6 +175,13 @@ export function PassportLayout(props: PassportLayoutProps) {
   const next = isOwner ? nearestRung(props.badges, props.stats) : null
   const hiddenCount = hiddenCodes.length
 
+  // A brand-new owner's passport: the atlas is its picture, so a first country can be stickered straight away.
+  const blank =
+    !!owner &&
+    entries.length === 0 &&
+    pending.length === 0 &&
+    hiddenCount === 0 &&
+    props.derivedState === 'ready'
   let collection: ReactNode
   if (entries.length === 0) {
     if (!owner) {
@@ -280,8 +287,9 @@ export function PassportLayout(props: PassportLayoutProps) {
       recording: owner.quickWrites.recording,
     }
   }, [owner, mode, draft, state.region, state.sources, entries, pending, hiddenCodes])
-  // The atlas draws what the filters leave, pending included; a pending-only passport keeps its explanation above it.
-  if (state.view === 'map' && filtered.length + filteredPending.length > 0) {
+  // The atlas draws what the filters leave, pending included; a pending-only or blank passport keeps its explanation
+  // above it. A blank one shows it in either view: there are no cards to choose instead.
+  if (blank || (state.view === 'map' && filtered.length + filteredPending.length > 0)) {
     const atlas = (
       <PassportAtlas
         locale={locale}

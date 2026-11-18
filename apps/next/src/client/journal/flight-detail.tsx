@@ -91,7 +91,6 @@ const copy = {
     loading: 'Loading the editor…',
     loadFailed: 'Could not load the editor.',
     retry: 'Try again',
-    invalid: 'Check the highlighted fields.',
     discard: 'Discard your changes to this flight?',
     discardYes: 'Discard',
     discardNo: 'Keep editing',
@@ -138,7 +137,6 @@ const copy = {
     loading: 'Загружаем редактор…',
     loadFailed: 'Не удалось загрузить редактор.',
     retry: 'Повторить',
-    invalid: 'Проверьте отмеченные поля.',
     discard: 'Отменить изменения этого перелёта?',
     discardYes: 'Отменить изменения',
     discardNo: 'Продолжить',
@@ -542,6 +540,7 @@ type EditFormProps = {
   onSave: (flight: JournalFlight, changes: Changes) => Promise<EditOutcome>
   onDone: () => void
   guardRef: RefObject<CloseGuard | null>
+  footerSlot?: HTMLElement | null
 }
 
 const ORDER: readonly EditableField[] = [
@@ -564,6 +563,7 @@ function FlightEditForm({
   onSave,
   onDone,
   guardRef,
+  footerSlot,
 }: EditFormProps) {
   // Changes are measured against the flight as it was when Edit started, so a refresh that lands meanwhile is never reverted.
   const [base] = useState(flight)
@@ -582,6 +582,7 @@ function FlightEditForm({
   const inputs = useRef(new Map<EditableField, HTMLInputElement>())
   const keepEditing = useRef<HTMLButtonElement | null>(null)
   const problemId = useId()
+  const formId = useId()
 
   const airports = useMemo(() => editor.airportChoices(locale), [editor, locale])
   const inputFor = (field: EditableField): InputKind =>
@@ -704,6 +705,18 @@ function FlightEditForm({
     if (!inFlight.current) onDone()
   }
   const keys = (event: KeyboardEvent<HTMLFormElement>) => {
+    // Save sits in the footer, outside the form, so Enter in a field submits here rather than through a default button.
+    if (
+      event.key === 'Enter' &&
+      !event.defaultPrevented &&
+      !event.nativeEvent.isComposing &&
+      event.target instanceof HTMLInputElement &&
+      event.currentTarget.contains(event.target)
+    ) {
+      event.preventDefault()
+      event.currentTarget.requestSubmit()
+      return
+    }
     if (
       event.key !== 'Escape' ||
       event.defaultPrevented ||
@@ -735,45 +748,9 @@ function FlightEditForm({
     </div>
   )
 
-  const invalid = ORDER.some((name) => errors[name])
-  return (
-    <form
-      className="jd-form"
-      aria-label={t.form}
-      aria-describedby={problem ? problemId : undefined}
-      aria-busy={saving || undefined}
-      noValidate
-      onSubmit={(event) => void submit(event)}
-      onKeyDown={keys}
-    >
-      <div className="jd-form-group">
-        {field('origin')}
-        {field('destination')}
-      </div>
-      <div className="jd-form-group">
-        {field('date')}
-        <div className="jd-form-pair">
-          {field('departure_time')}
-          {field('arrival_time')}
-        </div>
-      </div>
-      <div className="jd-form-group">
-        {field('airline_iata')}
-        {field('flight_number')}
-        {field('aircraft_icao')}
-      </div>
-      {preview.length > 0 && (
-        <div className="jd-preview" aria-live="polite">
-          {preview.map((line) => (
-            <p key={line}>{line}</p>
-          ))}
-        </div>
-      )}
-      {invalid && (
-        <p className="jd-form-note" role="alert">
-          {t.invalid}
-        </p>
-      )}
+  // Save, Cancel and what blocks them sit in the panel footer, so they stay in view however long the form is.
+  const footer = (
+    <>
       {problem && (
         <p
           id={problemId}
@@ -809,14 +786,57 @@ function FlightEditForm({
         </div>
       ) : (
         <div className="jd-form-actions">
-          <Button type="submit" variant="primary" loading={saving} loadingLabel={t.saving}>
-            {t.save}
-          </Button>
           <Button variant="ghost" disabled={saving} onClick={cancel}>
             {t.cancel}
           </Button>
+          <Button
+            type="submit"
+            form={formId}
+            variant="primary"
+            loading={saving}
+            loadingLabel={t.saving}
+          >
+            {t.save}
+          </Button>
         </div>
       )}
+    </>
+  )
+  return (
+    <form
+      id={formId}
+      className="jd-form"
+      aria-label={t.form}
+      aria-describedby={problem ? problemId : undefined}
+      aria-busy={saving || undefined}
+      noValidate
+      onSubmit={(event) => void submit(event)}
+      onKeyDown={keys}
+    >
+      <div className="jd-form-group">
+        {field('origin')}
+        {field('destination')}
+      </div>
+      <div className="jd-form-group">
+        {field('date')}
+        <div className="jd-form-pair">
+          {field('departure_time')}
+          {field('arrival_time')}
+        </div>
+      </div>
+      <div className="jd-form-group">
+        {field('airline_iata')}
+        {field('flight_number')}
+        {field('aircraft_icao')}
+      </div>
+      {preview.length > 0 && (
+        <div className="jd-preview" aria-live="polite">
+          {preview.map((line) => (
+            <p key={line}>{line}</p>
+          ))}
+        </div>
+      )}
+      {footerSlot ? createPortal(footer, footerSlot) : footer}
     </form>
   )
 }
@@ -845,6 +865,8 @@ export type FlightDetailProps = {
   guardRef: RefObject<CloseGuard | null>
   /** The sheet header's action slot: Edit sits beside Close there. Without it, Edit stays at the top of the content. */
   actionSlot?: HTMLElement | null
+  /** The sheet footer's slot: Edit's Save and Cancel sit there. Without it, they end the form. */
+  footerSlot?: HTMLElement | null
 }
 
 export function FlightDetail({
@@ -862,6 +884,7 @@ export function FlightDetail({
   onOpenFlight,
   guardRef,
   actionSlot,
+  footerSlot,
 }: FlightDetailProps) {
   const t = copy[locale]
   const [editing, setEditing] = useState(() => !!initialField && online)
@@ -882,11 +905,24 @@ export function FlightDetail({
       editButton.current?.focus()
     }
   }, [editing])
+  // The docked pane is sticky but starts mid-screen at the top of the page, which puts its footer (Save, Cancel) below the
+  // fold. Starting Edit brings the pane up to where it sticks; its height is already capped to the viewport there.
+  useEffect(() => {
+    const pane = editing ? editHeading.current?.closest<HTMLElement>('.journal-detail') : null
+    if (!pane) return
+    const offset = pane.getBoundingClientRect().top - parseFloat(getComputedStyle(pane).top)
+    if (offset > 1)
+      window.scrollBy({
+        top: offset,
+        behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
+      })
+  }, [editing])
 
   const done = useCallback(() => {
     // Focus returns to Edit only when it was inside Edit; a close or swap moves it elsewhere.
     const active = document.activeElement
-    returnFocus.current = !active || active === document.body || !!active.closest('.jd-content')
+    returnFocus.current =
+      !active || active === document.body || !!active.closest('.jd-content, .jd-form-slot')
     setEditing(false)
   }, [])
   const unavailable = !online || busy
@@ -918,6 +954,7 @@ export function FlightDetail({
             onSave={onSave}
             onDone={done}
             guardRef={guardRef}
+            footerSlot={footerSlot}
           />
         ) : editorState === 'failed' ? (
           <div className="jd-form-actions">

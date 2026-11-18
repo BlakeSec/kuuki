@@ -44,25 +44,75 @@ function highlight(text: string, query: string) {
   )
 }
 
-/** Filters by code, name and aliases; an exact code ranks first, and an empty query lists recents first. */
+// The catalog carries no size or traffic data, so "International" in the name stands in for a larger airport.
+const significant = /\binternational\b|международн/i
+
+type PreparedChoice = {
+  code: string
+  squashed: string
+  names: string[]
+  words: string[]
+  significant: boolean
+}
+// Folding and splitting a few thousand choices per keystroke is wasteful; do it once per choices array.
+const preparedByChoices = new WeakMap<Choice[], PreparedChoice[]>()
+function preparedChoices(choices: Choice[]): PreparedChoice[] {
+  let prepared = preparedByChoices.get(choices)
+  if (!prepared) {
+    prepared = choices.map((choice) => ({
+      code: choice.code.toLocaleLowerCase(),
+      squashed: foldSearchText(
+        `${choice.code} ${choice.label} ${choice.detail ?? ''} ${choice.search ?? ''}`,
+      ).replace(/[^\p{L}\p{N}]/gu, ''),
+      names: [choice.detail ?? '', choice.label].map(foldSearchText),
+      words: foldSearchText(`${choice.label} ${choice.detail ?? ''} ${choice.search ?? ''}`).split(
+        /[^\p{L}\p{N}]+/u,
+      ),
+      significant: significant.test(choice.label),
+    }))
+    preparedByChoices.set(choices, prepared)
+  }
+  return prepared
+}
+
+/**
+ * Filters by code, name and aliases. A typed query ranks an exact code first, then choices whose city or name starts
+ * with it, then a word starting with it, then any other match; ties go to the member's recents, then to an
+ * "International" name, then catalog order. An empty query lists recents first.
+ */
 export function searchChoices(choices: Choice[], query: string, recents: string[] = []) {
   const needle = query.trim().toLocaleLowerCase()
-  const words = foldSearchText(needle)
+  const folded = foldSearchText(needle)
+  const words = folded
     .split(/\s+/)
     .map((word) => word.replace(/[^\p{L}\p{N}]/gu, ''))
     .filter(Boolean)
-  const all = choices.filter((choice) => {
-    const text = foldSearchText(
-      `${choice.code} ${choice.label} ${choice.detail ?? ''} ${choice.search ?? ''}`,
-    ).replace(/[^\p{L}\p{N}]/gu, '')
-    return !needle || (words.length > 0 && words.every((word) => text.includes(word)))
-  })
-  const ordered = needle
-    ? [...all].sort(
-        (a, b) =>
-          Number(b.code.toLocaleLowerCase() === needle) -
-          Number(a.code.toLocaleLowerCase() === needle),
+  const prepared = preparedChoices(choices)
+  const matched = needle
+    ? choices.flatMap((choice, index) =>
+        words.length > 0 && words.every((word) => prepared[index].squashed.includes(word))
+          ? [{ choice, entry: prepared[index] }]
+          : [],
       )
+    : choices.map((choice, index) => ({ choice, entry: prepared[index] }))
+  const all = matched.map(({ choice }) => choice)
+  const tier = ({ entry }: (typeof matched)[number]) => {
+    if (entry.code === needle) return 0
+    if (entry.names.some((name) => name.startsWith(folded))) return 1
+    return entry.words.some((word) => word.startsWith(words[0] ?? '')) ? 2 : 3
+  }
+  const recent = (choice: Choice) => {
+    const index = recents.indexOf(choice.code)
+    return index < 0 ? recents.length : index
+  }
+  const ordered = needle
+    ? matched
+        .map((item) => ({
+          choice: item.choice,
+          rank: [tier(item), recent(item.choice), item.entry.significant ? 0 : 1],
+        }))
+        .sort((a, b) => a.rank[0] - b.rank[0] || a.rank[1] - b.rank[1] || a.rank[2] - b.rank[2])
+        .map(({ choice }) => choice)
     : [
         ...all
           .filter((choice) => recents.includes(choice.code))
@@ -70,6 +120,30 @@ export function searchChoices(choices: Choice[], query: string, recents: string[
         ...all.filter((choice) => !recents.includes(choice.code)),
       ]
   return { needle, all, matches: ordered.slice(0, 50) }
+}
+
+/**
+ * Radix dialogs and sheets close on an Escape seen at document capture, before a field inside them gets the key. While an
+ * inline list is open, claim Escape first at window capture (Radix skips a prevented event) and close the list here, so
+ * the key works from every control beside the field too; the next Escape closes the panel. A list in its own Sheet is a
+ * Radix layer already.
+ */
+export function useListClaimsEscape(open: boolean, close: () => void) {
+  const latest = useRef(close)
+  useEffect(() => {
+    latest.current = close
+  })
+  useEffect(() => {
+    if (!open) return
+    const claim = (event: globalThis.KeyboardEvent) => {
+      if (event.key !== 'Escape') return
+      event.preventDefault()
+      // Escape during composition belongs to the input method.
+      if (!event.isComposing && event.keyCode !== 229) latest.current()
+    }
+    window.addEventListener('keydown', claim, true)
+    return () => window.removeEventListener('keydown', claim, true)
+  }, [open])
 }
 
 /** The shared result list: a count status and a listbox. A place (city in `detail`) leads with the city; the code sits at the end in muted mono. */
@@ -183,6 +257,10 @@ export function Combobox({
     onChange(editing?.committed ?? value)
     setEditing(null)
   }
+  useListClaimsEscape(open && !mobile, () => {
+    setOpen(false)
+    revert()
+  })
   // Leaving the field without a choice: take the exact code or the single match, otherwise go back to the last chosen code.
   const settle = () => {
     if (query === null) return
@@ -475,6 +553,7 @@ export function AsyncCombobox<T>({
   const current = loading ? -1 : Math.min(active, Math.max(0, options.length - 1))
   // Closing keeps the typed text as an unresolved query; only a choice replaces it.
   const close = () => setOpen(false)
+  useListClaimsEscape(open && !mobile, close)
   const choose = (item: T) => {
     onSelect(item)
     setTyped(null)

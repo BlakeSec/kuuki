@@ -339,7 +339,7 @@ export function HistoryImport({
             </section>
           )}
 
-          {groups.length || state.settled.length ? (
+          {!finished && (groups.length || state.settled.length) ? (
             <section className="import-questions" aria-labelledby="history-questions">
               <h2 id="history-questions" tabIndex={-1}>
                 {H.questions[locale]}

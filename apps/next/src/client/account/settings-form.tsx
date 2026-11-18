@@ -582,8 +582,8 @@ export function SettingsForm({
                     {previewAdded.length
                       ? `${formatCount(locale, previewAdded.length, addsForms)} ${previewAdded.join(', ')}.`
                       : text(
-                          'Nothing would be added: your public passport already has every confirmed country.',
-                          'Ничего не добавится: в публичном паспорте уже есть все подтверждённые страны.',
+                          'Nothing to add now: every confirmed country is already public. New ones will be published as you confirm them.',
+                          'Сейчас добавлять нечего: все подтверждённые страны уже публичны. Новые будут публиковаться по мере подтверждения.',
                         )}
                   </p>
                   <div className="settings-actions">
@@ -596,7 +596,9 @@ export function SettingsForm({
                         setProposing(false)
                       }}
                     >
-                      {formatCount(locale, previewAll.length, publishForms)}
+                      {previewAdded.length
+                        ? formatCount(locale, previewAll.length, publishForms)
+                        : text('Turn on', 'Включить')}
                     </Button>
                     <Button type="button" disabled={busy} onClick={() => setProposing(false)}>
                       {text('Cancel', 'Отмена')}
@@ -726,7 +728,14 @@ export function SettingsForm({
           <Button
             variant="danger"
             disabled={busy}
-            onClick={() => guard.request(() => setDeleteOpen(true))}
+            onClick={() =>
+              guard.request(() => {
+                // The dialog must not inherit the form's status line ("Saved.").
+                setMessage(null)
+                setError(null)
+                setDeleteOpen(true)
+              })
+            }
           >
             {text('Delete account', 'Удалить аккаунт')}
           </Button>

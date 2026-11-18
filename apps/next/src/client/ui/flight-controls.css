@@ -20,7 +20,7 @@
 .flight-combobox small,
 .flight-calendar small {
   color: var(--text-muted);
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .flight-combobox p[role='alert'],
 .flight-calendar p[role='alert'] {
@@ -44,14 +44,14 @@
 .flight-search-popover p,
 .flight-search-sheet p {
   margin: var(--space-2);
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--text-muted);
 }
 .flight-search-empty p {
   margin: 0;
   color: var(--text-muted);
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
 }
 .flight-combobox ul,
 .flight-search-sheet ul {
@@ -88,7 +88,7 @@
 .flight-choice-code {
   flex: none;
   font-family: var(--font-mono);
-  font-size: 15px;
+  font-size: 0.9375rem;
   color: var(--text-muted);
 }
 .flight-combobox mark,
@@ -196,8 +196,8 @@
 }
 .flight-calendar-grid small[role='columnheader'] {
   color: var(--text-muted);
-  font-size: 12px;
-  line-height: 24px;
+  font-size: 0.75rem;
+  line-height: 1.5rem;
 }
 /* Months sit on one strip inside a clipped window; every pane has six weeks, so the height never changes. */
 .flight-calendar-viewport {
@@ -227,7 +227,7 @@
   background: transparent;
   color: var(--text);
   font: inherit;
-  font-size: 14px;
+  font-size: 0.875rem;
   line-height: 1;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
@@ -259,6 +259,18 @@
 }
 .ui-dialog.flight-add-dialog {
   width: min(560px, calc(100vw - 32px));
+}
+/* The dialog body scrolls and clips an overlay, so a result list takes room in the form instead (as in the bulk dialog). While
+   one is open the dialog may use the viewport's height, and the route list leaves room for the route summary above it
+   (~400px of header, footer and summary), so four or more results show without scrolling the summary under the header. */
+.ui-dialog.flight-add-dialog .flight-search-popover {
+  position: static;
+}
+.ui-dialog.flight-add-dialog:has(.flight-search-popover) {
+  max-height: calc(100dvh - 48px);
+}
+.ui-dialog.flight-add-dialog .flight-search-popover.route-picker {
+  max-height: max(300px, calc(100dvh - 410px));
 }
 .flight-full-sheet.ui-sheet[data-side='bottom'] {
   height: calc(100dvh - var(--sheet-kb));

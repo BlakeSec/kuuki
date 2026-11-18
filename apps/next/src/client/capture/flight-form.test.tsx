@@ -530,11 +530,24 @@ describe.each(['ru'] as const)('offline, errors and focus (%s)', (locale) => {
         ),
       ),
     ).toBeInTheDocument()
-    expect(
-      screen.getAllByText(say('Choose an airport from the list.', 'Выберите аэропорт из списка.')),
-    ).toHaveLength(2)
+    // One message per end, each linked to its own row.
+    expect(routeRow(locale, 'from')).toHaveAccessibleDescription(
+      say('Choose a departure airport.', 'Выберите аэропорт вылета.'),
+    )
+    expect(routeRow(locale, 'to')).toHaveAccessibleDescription(
+      say('Choose an arrival airport.', 'Выберите аэропорт прилёта.'),
+    )
     expect(screen.queryByText(/Check this field|Проверьте значение поля/)).not.toBeInTheDocument()
     expect(mocks.create).not.toHaveBeenCalled()
+  })
+  it('closes the airport search on Escape from a route button beside it', async () => {
+    render(<FlightForm ownerId="a" locale={locale} />)
+    await userEvent.click(routeRow(locale, 'from'))
+    expect(screen.getByRole('combobox', { name: words[locale].pickFrom })).toBeInTheDocument()
+    // Focus leaves the search field but stays in the route card, so the list stays open.
+    routeRow(locale, 'to').focus()
+    fireEvent.keyDown(routeRow(locale, 'to'), { key: 'Escape' })
+    expect(screen.queryByRole('combobox', { name: words[locale].pickFrom })).not.toBeInTheDocument()
   })
   it('accepts a leap day and rejects the same day in a common year', async () => {
     render(<FlightForm ownerId="a" locale={locale} />)

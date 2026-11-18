@@ -219,7 +219,15 @@ export function KuukiesNotice({
   useLayoutEffect(() => {
     const node = layerRef.current
     if (!node) return
-    const read = () => setLayerWidth(node.clientWidth)
+    // Content width: on phone card pages the layer sits in the page flow with side padding.
+    const read = () => {
+      const style = getComputedStyle(node)
+      setLayerWidth(
+        node.clientWidth -
+          parseFloat(style.paddingLeft || '0') -
+          parseFloat(style.paddingRight || '0'),
+      )
+    }
     read()
     if (typeof ResizeObserver === 'undefined') return
     const observer = new ResizeObserver(read)

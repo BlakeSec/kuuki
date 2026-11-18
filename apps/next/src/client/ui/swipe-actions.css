@@ -65,9 +65,9 @@
   background: var(--swipe-bg);
   color: var(--swipe-fg);
   font: inherit;
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 500;
-  line-height: 18px;
+  line-height: 1.125rem;
   cursor: pointer;
   transition: opacity var(--dur-fast) var(--ease-out);
 }

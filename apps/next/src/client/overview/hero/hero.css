@@ -193,7 +193,7 @@
   display: inline-flex;
   align-items: center;
   color: var(--accent-text);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 600;
 }
 .ov3-next-flight:focus-visible,
@@ -231,19 +231,19 @@
   color: var(--accent-on-tint);
   border-radius: var(--radius-full);
   padding: 3px 8px;
-  font-size: 12px;
+  font-size: 0.75rem;
   letter-spacing: 0.06em;
   font-weight: 600;
   white-space: nowrap;
 }
 .ov3-next-route {
-  font: 500 15px/20px var(--font-mono);
+  font: 500 0.9375rem/1.25rem var(--font-mono);
   color: var(--text);
 }
 .ov3-next-details,
 .ov3-next-more {
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
   color: var(--text-muted);
 }
 .ov3-next-more {
@@ -351,8 +351,8 @@
   }
   .ov3-next-route {
     grid-column: 1;
-    font-size: 28px;
-    line-height: 32px;
+    font-size: 1.75rem;
+    line-height: 2rem;
   }
   .ov3-next-details {
     grid-column: 1;

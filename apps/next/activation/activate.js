@@ -24,7 +24,6 @@ const words = {
     resend: 'Send a new link',
     signin: 'Back to sign in',
     darkTheme: 'Dark theme',
-    pause: 'Pause animation',
     accent: 'Accent',
   },
   ru: {
@@ -33,20 +32,19 @@ const words = {
     description:
       'Kuuki переехал. Задайте пароль, чтобы открыть журнал. Все ваши перелёты на месте.',
     password: 'Новый пароль',
-    rule: 'Не меньше 8 символов',
+    rule: 'Не менее 8 символов',
     show: 'Показать пароль',
     save: 'Сохранить пароль',
     saving: 'Сохраняем…',
-    short: 'Используйте не меньше 8 символов.',
+    short: 'Используйте не менее 8 символов.',
     limited: 'Слишком много попыток. Подождите и повторите.',
     network: 'Не удалось сохранить пароль. Повторите попытку.',
     expiredTitle: 'Срок действия ссылки истёк',
     expiredHeading: 'Срок действия ссылки истёк',
-    expiredDescription: 'Ссылка работает один раз в течение 30 минут.',
+    expiredDescription: 'Ссылки действуют 30 минут и работают только один раз.',
     resend: 'Отправить новую ссылку',
     signin: 'Назад ко входу',
     darkTheme: 'Тёмная тема',
-    pause: 'Приостановить анимацию',
     accent: 'Акцент',
   },
 }
@@ -175,64 +173,6 @@ function setup() {
     render()
     $('expired-heading').focus()
   }
-
-  // Reuse the card's lap calculation; SVG placement stays unchanged under reduced motion.
-  document.querySelectorAll('.planes').forEach((svg) => {
-    const width = Number(svg.getAttribute('width'))
-    const height = Number(svg.getAttribute('height'))
-    svg.querySelectorAll('use').forEach((plane) => {
-      const [, x, y] = plane
-        .getAttribute('transform')
-        .match(/^translate\((\d+) (\d+)\)/)
-        .map(Number)
-      const enter = Math.max((-16 - x) / 400, (y - height - 16) / 800)
-      const leave = Math.min((width + 16 - x) / 400, (y + 16) / 800)
-      const lap = document.createElementNS('http://www.w3.org/2000/svg', 'g')
-      lap.classList.add('plane')
-      lap.style.setProperty('--plane-start', String(Math.round((enter - 0.01) * 1e4) / 1e4))
-      lap.style.setProperty('--plane-span', String(Math.round((leave - enter + 0.02) * 1e4) / 1e4))
-      plane.replaceWith(lap)
-      lap.append(plane)
-    })
-  })
-  const field = document.querySelector('.brand-field')
-  const pause = $('motion-pause')
-  let motionPaused = false
-  try {
-    motionPaused = localStorage.getItem('kuuki-auth-motion-paused') === 'true'
-  } catch {
-    // Storage may be blocked; the pause still lasts for this page.
-  }
-  let onScreen = false
-  const syncPlanes = () => {
-    field.dataset.running = String(onScreen && !document.hidden && !motionPaused)
-    pause.setAttribute('aria-pressed', String(motionPaused))
-    // Keyline Play/Pause geometry, matching the auth card's static state icons.
-    pause
-      .querySelector('path')
-      .setAttribute(
-        'd',
-        motionPaused
-          ? 'M6 6C6 5.2291 6.4431 4.5268 7.1389 4.1949C7.8347 3.8629 8.6593 3.9605 9.2585 4.4456L17.6292 11.2228C17.8638 11.4127 18 11.6983 18 12C18 12.3017 17.8638 12.5873 17.6292 12.7772L9.2585 19.5544C8.6593 20.0395 7.8347 20.1371 7.1389 19.8051C6.4431 19.4732 6 18.7709 6 18Z'
-          : 'M5 5C5 4.447715 5.447715 4 6 4L8 4C8.552285 4 9 4.447715 9 5L9 19C9 19.552285 8.552285 20 8 20L6 20C5.447715 20 5 19.552285 5 19ZM15 5C15 4.447715 15.447715 4 16 4L18 4C18.552285 4 19 4.447715 19 5L19 19C19 19.552285 18.552285 20 18 20L16 20C15.447715 20 15 19.552285 15 19Z',
-      )
-  }
-  pause.addEventListener('click', () => {
-    motionPaused = !motionPaused
-    try {
-      localStorage.setItem('kuuki-auth-motion-paused', String(motionPaused))
-    } catch {
-      // Keep the explicit pause even when its saved choice cannot be written.
-    }
-    syncPlanes()
-  })
-  syncPlanes()
-  const observer = new IntersectionObserver((entries) => {
-    onScreen = entries[entries.length - 1].isIntersecting
-    syncPlanes()
-  })
-  observer.observe(field)
-  document.addEventListener('visibilitychange', syncPlanes)
 
   $('locale').addEventListener('click', () => {
     locale = locale === 'ru' ? 'en' : 'ru'

@@ -2,7 +2,8 @@
 
 import { useLocale } from './preferences'
 
-import { useEffect, type ReactNode } from 'react'
+import { useEffect, useRef, type ReactNode } from 'react'
+import { useOnline } from './awaiting'
 import { ToastProvider, useToast, type ToastInput } from './ui/toast'
 import type { Locale } from '../server/locale'
 
@@ -36,7 +37,24 @@ export function announceShellNotice(ownerId: string, toast: ToastInput) {
 }
 
 function Host({ ownerId }: { ownerId: string }) {
-  const { show } = useToast()
+  const { show, dismiss } = useToast()
+  const offline = useRef<number | null>(null)
+  // A loaded session keeps running while the network is gone; say so until it returns. Hard navigations while offline
+  // never reach the app, so this only covers client-side use.
+  const online = useOnline()
+  useEffect(() => {
+    if (online) {
+      if (offline.current !== null) dismiss(offline.current)
+    } else if (offline.current === null) {
+      offline.current = show({
+        message: { en: 'You are offline.', ru: 'Нет сети.' },
+        duration: 0,
+        onClose: () => {
+          offline.current = null
+        },
+      })
+    }
+  }, [online, show, dismiss])
   useEffect(() => {
     const host = { ownerId, show }
     hosts.add(host)

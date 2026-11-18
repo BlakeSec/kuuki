@@ -16,7 +16,7 @@
 
 .arc-waffle-name {
   color: var(--text);
-  font: 400 13px/36px var(--font-sans);
+  font: 400 0.8125rem/2.25rem var(--font-sans);
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;

@@ -10,7 +10,7 @@ import {
   type KeyboardEvent,
   type Ref,
 } from 'react'
-import { ChoiceOptions, searchChoices, type Choice } from '../ui/combobox'
+import { ChoiceOptions, searchChoices, useListClaimsEscape, type Choice } from '../ui/combobox'
 import { Sheet } from '../ui/sheet'
 import { useMobile } from '../ui/use-mobile'
 import type { Locale } from '../../lib/format'
@@ -107,9 +107,14 @@ export function RouteCard({
   const open = (end: RouteEnd) => {
     if (!disabled) pickEnd(end)
   }
-  // Desktop focuses the search once it renders; the mobile sheet focuses it through initialFocusRef.
+  const popover = useRef<HTMLDivElement>(null)
+  // Desktop focuses the search once it renders and brings the whole list into the scrolling panel; the mobile sheet focuses
+  // it through initialFocusRef.
   useEffect(() => {
-    if (picking && !mobile) searchRef.current?.focus()
+    if (picking && !mobile) {
+      searchRef.current?.focus()
+      popover.current?.scrollIntoView?.({ block: 'nearest' })
+    }
   }, [picking, mobile])
   useImperativeHandle(controlRef, () => ({ open }))
   const close = (focusEnd: RouteEnd | null) => {
@@ -117,6 +122,7 @@ export function RouteCard({
     setQuery('')
     if (focusEnd) requestAnimationFrame(() => buttons.current[focusEnd]?.focus())
   }
+  useListClaimsEscape(!!picking && !mobile, () => close(picking))
   const choose = (choice: Choice) => {
     if (!picking) return
     onPick(picking, choice.code)
@@ -271,7 +277,9 @@ export function RouteCard({
           ),
       )}
       {!mobile && picking && (
-        <div className="flight-search-popover flight-search-sheet route-picker">{picker}</div>
+        <div ref={popover} className="flight-search-popover flight-search-sheet route-picker">
+          {picker}
+        </div>
       )}
       {mobile && (
         <Sheet

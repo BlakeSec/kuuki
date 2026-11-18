@@ -1,6 +1,7 @@
 import type { OverviewScope } from '@kuuki/shared/overview/figures'
 import type { OverviewFilter } from '@kuuki/shared/overview/model'
-import { formatNumber, type Locale } from '../../../lib/format'
+import { formatDateOnly, formatMonthYear, formatNumber, type Locale } from '../../../lib/format'
+import { monthName } from '../page/scope-title'
 import { fill, t } from '../copy'
 import { CORPUS } from './corpus'
 import { TRIGGERS, type HeroRecord, type NarratorSlot, type Trigger } from './triggers'
@@ -35,13 +36,21 @@ function lineOf(
   turn = 0,
 ): string {
   const variant = (fnv1a32(`${seed}|${trigger.slot}|${canonicalFilter(scope.filter)}`) + turn) % 3
+  const words = trigger.words ?? {}
   const formatted = Object.fromEntries(
     Object.entries(params).map(([key, value]) => [
       key,
-      typeof value === 'number' ? formatNumber(locale, value) : value,
+      WORD_FORMATTERS[words[key]]?.(locale, value) ??
+        (typeof value === 'number' ? formatNumber(locale, value) : value),
     ]),
   )
   return fill(t(CORPUS[trigger.id][variant], locale), formatted)
+}
+
+const WORD_FORMATTERS: Record<string, (locale: Locale, value: string | number) => string> = {
+  month: (locale, value) => monthName(locale, Number(value)),
+  yearMonth: (locale, value) => formatMonthYear(locale, String(value)),
+  day: (locale, value) => formatDateOnly(locale, String(value)),
 }
 
 const byPriority = (a: Trigger, b: Trigger) => b.priority - a.priority

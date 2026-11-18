@@ -30,8 +30,8 @@
 }
 .passport-caption {
   margin: 0;
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
   color: var(--text-muted);
   overflow-wrap: break-word;
 }
@@ -96,6 +96,27 @@
 .passport-identity-actions .profile-share .ui-button {
   inline-size: auto;
 }
+/* Phones: the owner menu stays beside the name; visibility and Share take the next line, so a long Share label
+   (RU) never pushes the menu onto a row of its own. */
+@media (max-width: 700px) {
+  .passport-identity-text {
+    flex-basis: 0;
+  }
+  .passport-identity-actions {
+    display: contents;
+  }
+  .passport-identity-actions > * {
+    order: 2;
+  }
+  .passport-identity-actions > .ui-icon-button {
+    order: 0;
+  }
+  .passport-identity-row:has(.passport-identity-actions)::after {
+    content: '';
+    flex-basis: 100%;
+    order: 1;
+  }
+}
 .passport-bio {
   margin: 0;
   max-width: 60ch;
@@ -117,8 +138,8 @@
 /* ---------- Totals and found ---------- */
 .passport-total {
   margin: 0;
-  font-size: 22px;
-  line-height: 28px;
+  font-size: 1.375rem;
+  line-height: 1.75rem;
   font-weight: 600;
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
@@ -126,8 +147,8 @@
 }
 .passport-found {
   margin: 0;
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
   color: var(--text-muted);
   font-variant-numeric: tabular-nums;
 }
@@ -183,6 +204,20 @@
     flex: 1;
     min-width: 0;
   }
+  /* The scope's three cells share one row and never split a word. Beside Filters while its labels fit whole, else a
+     row of its own (RU at 320px); only very large text wraps a label, and then between words. */
+  .passport-toolbar > .passport-toolbar-row {
+    flex-wrap: wrap;
+  }
+  .passport-toolbar-row > .ui-segmented {
+    flex: 1 1 auto;
+    width: auto;
+    grid-template-columns: repeat(3, minmax(min-content, 1fr));
+  }
+  .passport-toolbar-row > .ui-segmented .ui-segment {
+    padding-inline: 8px;
+    overflow-wrap: normal;
+  }
   .passport-toolbar-row > .ui-button {
     flex: none;
     padding-inline: 13px;
@@ -195,8 +230,8 @@
 .passport-map-sources {
   margin: 0;
   color: var(--text-muted);
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
 }
 .passport-search-field {
   position: relative;
@@ -226,8 +261,8 @@
   border-radius: var(--radius-full);
   background: var(--accent);
   color: var(--accent-foreground);
-  font-size: 12px;
-  line-height: 16px;
+  font-size: 0.75rem;
+  line-height: 1rem;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
@@ -247,8 +282,8 @@
 .passport-filter-group legend {
   padding: 0;
   margin-block-end: var(--space-2);
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
   font-weight: 600;
   color: var(--text-muted);
 }
@@ -339,8 +374,8 @@
   min-width: 0;
 }
 .passport-undated-way {
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
   color: var(--text-muted);
 }
 .passport-undated-year {
@@ -418,8 +453,8 @@
   text-wrap: balance;
 }
 .passport-card-date {
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
   color: var(--text-muted);
   font-variant-numeric: tabular-nums;
 }
@@ -429,8 +464,8 @@
   color: var(--text-muted);
 }
 .passport-card-action {
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
   font-weight: 600;
   color: var(--accent-text);
 }
@@ -452,8 +487,8 @@
 }
 .passport-pending h2 {
   margin: 0;
-  font-size: 22px;
-  line-height: 28px;
+  font-size: 1.375rem;
+  line-height: 1.75rem;
   letter-spacing: -0.02em;
 }
 .passport-pending h2:focus-visible {
@@ -470,8 +505,8 @@
 }
 .passport-filtered-empty h2 {
   margin: 0;
-  font-size: 22px;
-  line-height: 28px;
+  font-size: 1.375rem;
+  line-height: 1.75rem;
 }
 .passport-filtered-empty p {
   margin: 0;
@@ -486,37 +521,11 @@
   display: grid;
   gap: var(--space-6);
   justify-items: start;
-  container-type: inline-size;
-}
-.passport-ghosts {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 104px));
-  gap: var(--space-4);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-@container (min-width: 720px) {
-  .passport-ghosts {
-    grid-template-columns: repeat(6, minmax(0, 120px));
-  }
-}
-.passport-ghost {
-  border: 2px dashed var(--control-border);
-}
-.passport-ghost[data-shape='round'] {
-  aspect-ratio: 1;
-  border-radius: var(--radius-full);
-}
-.passport-ghost[data-shape='rect'] {
-  aspect-ratio: 4/3;
-  border-radius: var(--radius-sm);
-  align-self: center;
 }
 .passport-empty h2 {
   margin: 0;
-  font-size: 22px;
-  line-height: 28px;
+  font-size: 1.375rem;
+  line-height: 1.75rem;
 }
 .passport-empty p {
   margin: 0;
@@ -542,8 +551,8 @@
 }
 .passport-sheet h3 {
   margin: 0;
-  font-size: 15px;
-  line-height: 24px;
+  font-size: 0.9375rem;
+  line-height: 1.5rem;
   font-weight: 600;
 }
 .passport-sheet dl {
@@ -553,8 +562,8 @@
   margin: 0;
 }
 .passport-sheet dt {
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
   color: var(--text-muted);
 }
 .passport-sheet dd {
@@ -585,6 +594,15 @@
   color: var(--accent-text);
   font-weight: 600;
 }
+/* A row is 44px but its link is only text-high: on touch the link takes the row's height (padding given back). */
+@media (pointer: coarse) {
+  .passport-list:not(.passport-timeline) a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    margin-block: calc(-1 * var(--space-2));
+  }
+}
 .passport-timeline a {
   display: grid;
   grid-template-columns: 28px minmax(0, 1fr);
@@ -611,8 +629,8 @@
 }
 .passport-note {
   margin: 0;
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
   color: var(--text-muted);
 }
 .passport-form {
@@ -750,7 +768,7 @@
 }
 .passport-country-list [data-collected='true'] span:last-child {
   color: var(--text-muted);
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 
 /* ---------- Stamp hero (stamp-hero.ts) ---------- */

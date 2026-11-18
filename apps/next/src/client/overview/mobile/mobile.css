@@ -19,7 +19,7 @@
 }
 .ov3-tile-title {
   min-width: 0;
-  font-size: 22px;
+  font-size: 1.375rem;
   line-height: calc(28 / 22);
   font-weight: 600;
   text-wrap: balance;
@@ -87,7 +87,7 @@
 }
 .ov3-sheet-position {
   color: var(--text-muted);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 400;
 }
 /* One accent bar travels over the slots. Where scroll-driven animations exist it is tied to the track's scroll position, so it moves
@@ -246,8 +246,8 @@
 .ov3-section-sheet .narrator {
   max-width: 60ch;
   color: var(--text-muted);
-  font-size: 15px;
-  line-height: 24px;
+  font-size: 0.9375rem;
+  line-height: 1.5rem;
 }
 .ov3-tile strong {
   overflow-wrap: anywhere;

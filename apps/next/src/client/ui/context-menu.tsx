@@ -61,8 +61,20 @@ export function ContextMenu({
   const [open, setOpen] = useState(false)
   const [point, setPoint] = useState<Point>({ x: 0, y: 0 })
   const pendingAction = useRef<(() => void) | null>(null)
+  const anchor = useRef<HTMLSpanElement>(null)
   const show = (at: Point) => {
-    setPoint(at)
+    // The anchor is position: fixed, but a contained ancestor (a ledger row's content-visibility) becomes its containing block,
+    // so viewport coordinates would land offset by the row's position. Measure where the anchor's origin really is.
+    const element = anchor.current
+    let origin = { left: 0, top: 0 }
+    if (element) {
+      const { left, top } = element.style
+      element.style.left = element.style.top = '0px'
+      origin = element.getBoundingClientRect()
+      // React diffs the style prop, not the DOM: put the old values back so an unchanged point is still applied.
+      Object.assign(element.style, { left, top })
+    }
+    setPoint({ x: at.x - origin.left, y: at.y - origin.top })
     pendingAction.current = null
     setOpen(true)
   }
@@ -96,6 +108,7 @@ export function ContextMenu({
         <DropdownMenu.Root open={open} onOpenChange={setOpen}>
           <DropdownMenu.Trigger asChild>
             <span
+              ref={anchor}
               className="arc-context-anchor"
               aria-hidden="true"
               style={{ left: point.x, top: point.y }}

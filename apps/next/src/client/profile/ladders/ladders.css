@@ -6,8 +6,8 @@
   place-items: center;
 }
 .ladder-figure[data-size='thumb'] {
-  width: 56px;
-  height: 56px;
+  width: var(--ladder-box, 56px);
+  height: var(--ladder-box, 56px);
   --iso-top: var(--ladder-bg, var(--surface));
   --iso-front: var(--ladder-bg, var(--surface));
   --iso-side: var(--ladder-bg, var(--surface));

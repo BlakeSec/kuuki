@@ -20,7 +20,7 @@ vi.mock('../capture/flight-writes', async (importOriginal) => ({
   ...(await importOriginal<typeof import('../capture/flight-writes')>()),
   createFlights: (...args: unknown[]) => createFlights(...args),
 }))
-vi.mock('../signature/stamp', () => ({ Stamp: () => null }))
+vi.mock('../stamps', () => ({ CountryStamp: () => null }))
 vi.mock('./import-api', async (importOriginal) => ({
   ...(await importOriginal<typeof import('./import-api')>()),
   confirmItems: (...args: unknown[]) => confirmItems(...args),

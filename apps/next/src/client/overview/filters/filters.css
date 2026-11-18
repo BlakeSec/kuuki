@@ -55,8 +55,16 @@
   flex: none;
   min-block-size: 32px;
   padding-block: 5px;
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 500;
+}
+/* The scope is one row in EN and RU: three equal cells as wide as the longest label, never the primitive's wrap
+   (it put "Ground" on a second line at 320px and in Fullscreen's narrow corner). */
+.ov-filter-controls > .ui-segmented {
+  grid-template-columns: repeat(3, minmax(max-content, 1fr));
+}
+.ov-filter-controls > .ui-segmented .ui-segment {
+  white-space: nowrap;
 }
 /* Over the map in Fullscreen the controls float on the canvas. */
 .globe-card :is(.ov-filter-period, .ov-filter-add, .ov-filter-overflow) {
@@ -87,12 +95,12 @@
 }
 .ov-filter-content h3 {
   margin: 12px 0 4px;
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
   color: var(--text-muted);
 }
 .ov-filter-search {
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 600;
 }
 .ov-filter-content > .ui-field-input {
@@ -135,8 +143,8 @@
   overflow-wrap: anywhere;
 }
 .ov-filter-option small {
-  font-size: 12px;
-  line-height: 16px;
+  font-size: 0.75rem;
+  line-height: 1rem;
   color: var(--text-muted);
   font-weight: 400;
 }
@@ -144,7 +152,7 @@
   margin-inline-start: auto;
   flex: none;
   font-family: var(--font-mono);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-variant-numeric: tabular-nums;
 }
 .ov-filter-check {
@@ -184,7 +192,7 @@
     min-block-size: 44px;
   }
   .ov-filter-content > .ui-field-input {
-    font-size: 16px;
+    font-size: 1rem;
   }
 }
 @media (hover: hover) and (pointer: fine) {
@@ -202,6 +210,9 @@
   .ov-filter-controls > .ui-segmented {
     grid-column: 1 / -1;
     inline-size: 100%;
+  }
+  .ov-filter-controls > .ui-segmented .ui-segment {
+    padding-inline: 8px;
   }
   .ov-filter-period,
   .ov-filter-add {

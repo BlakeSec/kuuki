@@ -19,13 +19,13 @@
   margin: 0;
 }
 .import-page h2 {
-  font-size: 22px;
-  line-height: 28px;
+  font-size: 1.375rem;
+  line-height: 1.75rem;
   text-wrap: balance;
 }
 .import-page h3 {
-  font-size: 17px;
-  line-height: 24px;
+  font-size: 1.0625rem;
+  line-height: 1.5rem;
 }
 .import-page h2:focus-visible,
 .import-page h3:focus-visible {
@@ -40,16 +40,16 @@
 .import-privacy,
 .import-empty {
   color: var(--text-muted);
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
 }
 .import-note:empty {
   display: none;
 }
 .import-problem {
   color: var(--danger-text);
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
   min-height: 20px;
 }
 .import-problem,
@@ -125,8 +125,8 @@
   align-items: center;
   gap: var(--space-2);
   color: var(--text-muted);
-  font-size: 15px;
-  line-height: 24px;
+  font-size: 0.9375rem;
+  line-height: 1.5rem;
 }
 .import-steps li:not(:last-child)::after {
   content: '';
@@ -153,7 +153,7 @@
   height: 24px;
   border: 1px solid var(--control-border);
   border-radius: var(--radius-full);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-variant-numeric: tabular-nums;
 }
 .import-steps li[aria-current='step'] .import-step-number,
@@ -169,13 +169,13 @@
   min-height: 120px;
   padding: var(--space-3);
   font: inherit;
-  line-height: 24px;
+  line-height: 1.5rem;
   resize: vertical;
 }
 .import-prompt {
   font-family: var(--font-mono);
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
 }
 .import-email-help {
   display: grid;
@@ -296,7 +296,7 @@
   flex: 1 1 auto;
 }
 .import-stage-state {
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--text-muted);
   font-weight: 400;
 }
@@ -319,7 +319,7 @@
   flex-wrap: wrap;
   gap: var(--space-2) var(--space-4);
   color: var(--text-muted);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-variant-numeric: tabular-nums;
 }
 
@@ -436,8 +436,8 @@
   min-width: 0;
 }
 .import-row-route {
-  font-size: 17px;
-  line-height: 24px;
+  font-size: 1.0625rem;
+  line-height: 1.5rem;
   font-weight: 600;
 }
 .import-row-meta {
@@ -445,8 +445,8 @@
   flex-wrap: wrap;
   gap: var(--space-1) var(--space-3);
   color: var(--text-muted);
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
 }
 .import-flags {
   display: flex;
@@ -461,8 +461,8 @@
   padding: 2px var(--space-3);
   border: 1px solid var(--hairline);
   border-radius: var(--radius-full);
-  font-size: 12px;
-  line-height: 16px;
+  font-size: 0.75rem;
+  line-height: 1rem;
   font-weight: 500;
   color: var(--text-muted);
   background: var(--surface-inset);
@@ -506,8 +506,8 @@
   gap: var(--space-2);
 }
 .import-manual-head h3 {
-  font-size: 15px;
-  line-height: 24px;
+  font-size: 0.9375rem;
+  line-height: 1.5rem;
 }
 .import-empty {
   padding: var(--space-4);
@@ -542,8 +542,8 @@
   background: var(--surface-inset);
   border-radius: var(--radius-sm);
   color: var(--text-muted);
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
 }
 .import-snippet span {
   font-family: var(--font-mono);
@@ -559,7 +559,7 @@
 .import-text-action {
   padding-inline: var(--space-3);
   margin-inline: calc(-1 * var(--space-3));
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .import-text-action[aria-disabled='true'] {
   background: transparent;
@@ -567,8 +567,8 @@
 }
 .import-lead {
   color: var(--text-muted);
-  font-size: 15px;
-  line-height: 24px;
+  font-size: 0.9375rem;
+  line-height: 1.5rem;
 }
 .import-bar-text {
   display: grid;
@@ -626,22 +626,22 @@
 }
 .import-question [data-question-heading] {
   margin: 0;
-  font-size: 17px;
-  line-height: 24px;
+  font-size: 1.0625rem;
+  line-height: 1.5rem;
   font-weight: 600;
   text-wrap: balance;
 }
 .import-question-count {
   flex: none;
   color: var(--warning-text);
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
   font-weight: 600;
 }
 .import-question-dates,
 .import-question-flights {
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
 }
 .import-question-dates {
   color: var(--text-muted);
@@ -673,20 +673,20 @@
 }
 .import-question-route {
   flex-basis: 100%;
-  font-size: 15px;
-  line-height: 22px;
+  font-size: 0.9375rem;
+  line-height: 1.375rem;
 }
 .import-question-meta {
   color: var(--text-muted);
-  font-size: 13px;
-  line-height: 18px;
+  font-size: 0.8125rem;
+  line-height: 1.125rem;
 }
 .import-question-meta[data-tone='warning'] {
   color: var(--warning-text);
 }
 .import-question-city {
-  font-size: 15px;
-  line-height: 22px;
+  font-size: 0.9375rem;
+  line-height: 1.375rem;
 }
 /* Answers are equal outlined secondary buttons, at least 8px apart. */
 .import-question-answers {
@@ -722,8 +722,8 @@
 }
 .import-airport-name {
   color: var(--text-muted);
-  font-size: 12px;
-  line-height: 16px;
+  font-size: 0.75rem;
+  line-height: 1rem;
   font-weight: 400;
 }
 .import-question .ui-button[aria-disabled='true'] {
@@ -741,7 +741,7 @@
   width: 8rem;
 }
 .import-question-year .ui-field-label {
-  line-height: 24px;
+  line-height: 1.5rem;
 }
 .import-question-year > .ui-button {
   margin-top: calc(24px + var(--space-1));
@@ -750,7 +750,7 @@
 .import-each {
   justify-self: start;
   color: var(--text);
-  font-size: 15px;
+  font-size: 0.9375rem;
 }
 .import-each[aria-disabled='true'] {
   color: var(--text-muted);
@@ -758,7 +758,7 @@
 .import-question .ui-disclosure-trigger {
   padding-inline: 0;
   color: var(--accent-text);
-  font-size: 15px;
+  font-size: 0.9375rem;
 }
 .import-question .ui-disclosure-trigger .ui-disclosure-chevron {
   color: inherit;
@@ -774,8 +774,8 @@
   padding: 0;
   display: grid;
   gap: var(--space-2);
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
   font-variant-numeric: tabular-nums;
 }
 .import-question-done > li {
@@ -869,29 +869,29 @@
   font-variant-numeric: tabular-nums;
 }
 .import-hero-count {
-  font-size: 80px;
-  line-height: 80px;
+  font-size: 5rem;
+  line-height: 5rem;
   font-weight: 600;
   letter-spacing: -0.04em;
 }
 .import-hero-label {
-  font-size: 22px;
-  line-height: 28px;
+  font-size: 1.375rem;
+  line-height: 1.75rem;
   font-weight: 600;
 }
 .import-summary {
-  font-size: 22px;
-  line-height: 28px;
+  font-size: 1.375rem;
+  line-height: 1.75rem;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
 .import-done-summary {
-  font-size: 17px;
-  line-height: 26px;
+  font-size: 1.0625rem;
+  line-height: 1.625rem;
 }
 .import-done-note {
-  font-size: 15px;
-  line-height: 24px;
+  font-size: 0.9375rem;
+  line-height: 1.5rem;
 }
 .import-stamps {
   display: grid;
@@ -915,6 +915,21 @@
     grid-template-columns: repeat(4, minmax(0, 1fr));
     column-gap: var(--space-4);
   }
+}
+.import-stamp {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+}
+.import-stamp-name {
+  max-width: 100%;
+  font-size: 0.8125rem;
+  line-height: 1.125rem;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+.import-stamps-more {
+  justify-self: start;
 }
 .import-final-actions {
   display: grid;
@@ -970,8 +985,8 @@
     grid-template-columns: minmax(0, 1fr);
   }
   .import-summary {
-    font-size: 17px;
-    line-height: 24px;
+    font-size: 1.0625rem;
+    line-height: 1.5rem;
   }
 }
 

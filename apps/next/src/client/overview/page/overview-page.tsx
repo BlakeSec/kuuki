@@ -265,8 +265,6 @@ function PageContent() {
         </>
       ) : (
         <>
-          {/* First run has no figures column, so a booked flight keeps its own line above the page. */}
-          {firstRun ? <NextStrip /> : null}
           {!payload.derivedReady ? (
             <p role="status" className="status-note">
               {t(S.countriesUpdating, locale)}
@@ -277,16 +275,13 @@ function PageContent() {
             {!firstRun ? (
               <div className="ov3-common-controls">{!fullscreen ? <FilterBar /> : null}</div>
             ) : null}
-            {firstRun ? <FirstRun /> : null}
             {/* On very wide screens CSS docks the country list as a third card (page.css); both it and the disclosure render, so the server's first paint is already final. */}
             <div className="ov3-globe-band">
-              {!firstRun ? (
-                <div data-region="figures">
-                  {/* The next flight heads the figures: what is coming over what has been. */}
-                  <NextStrip />
-                  <HeroPanel />
-                </div>
-              ) : null}
+              {/* The next flight heads the figures: what is coming over what has been. First run puts its card where the figures will be. */}
+              <div data-region="figures" data-first-run={firstRun ? '' : undefined}>
+                <NextStrip />
+                {firstRun ? <FirstRun /> : <HeroPanel />}
+              </div>
               <section
                 className="ov3-globe-region ov-globe"
                 aria-label={t(S.map, locale)}
@@ -300,7 +295,7 @@ function PageContent() {
               {!firstRun ? <CountryList /> : null}
             </div>
             {/* Under the band, not inside it, so the globe card and the figures end on one line. */}
-            <CountryTreemap key={ownerKey} />
+            {!firstRun ? <CountryTreemap key={ownerKey} /> : null}
           </div>
           {/* A phone the server took for a larger screen starts the fetch here. */}
           {mobile === false && chaptersShown ? <ChapterPreloads ids={visible} /> : null}

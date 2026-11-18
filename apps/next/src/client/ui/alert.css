@@ -40,16 +40,16 @@
 }
 .ui-alert-title {
   margin: 0;
-  font-size: 15px;
-  line-height: 24px;
+  font-size: 0.9375rem;
+  line-height: 1.5rem;
   font-weight: 500;
   color: var(--alert-text);
   overflow-wrap: anywhere;
 }
 .ui-alert-description {
   margin: var(--space-1) 0 0;
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
   color: var(--text-muted);
   overflow-wrap: anywhere;
 }

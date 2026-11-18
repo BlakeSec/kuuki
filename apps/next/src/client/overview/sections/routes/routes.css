@@ -14,7 +14,7 @@
   flex-wrap: wrap;
   gap: var(--space-2) var(--space-5);
   margin: 0;
-  font-size: 13px;
+  font-size: 0.8125rem;
 }
 .ov3-routes-legend span {
   display: inline-flex;

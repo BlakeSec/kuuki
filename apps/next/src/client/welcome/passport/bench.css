@@ -139,7 +139,7 @@
   fill: var(--anatomy-strong);
 }
 .wp-bench .pp-ghost {
-  font-size: 26px;
+  font-size: 1.625rem;
   font-weight: 700;
   letter-spacing: -0.02em;
   fill: color-mix(in oklab, var(--wp-guilloche) 75%, var(--wp-page));

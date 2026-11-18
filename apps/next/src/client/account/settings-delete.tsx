@@ -118,8 +118,43 @@ export function SettingsDelete({
       title={titles[step - 1]}
       description={ru ? 'Удаление аккаунта нельзя отменить.' : 'Account deletion cannot be undone.'}
       dismissible={!busy && !exporting}
-      closeLabel={ru ? 'Закрыть' : 'Close'}
+      closeButton={false}
       className="settings-delete-dialog"
+      footer={
+        <>
+          {step > 1 ? (
+            <Button
+              disabled={busy || exporting}
+              onClick={() => {
+                setStep((previous) => previous - 1)
+                setError('')
+              }}
+            >
+              {ru ? 'Назад' : 'Back'}
+            </Button>
+          ) : null}
+          <Button disabled={busy || exporting} onClick={close}>
+            {ru ? 'Отмена' : 'Cancel'}
+          </Button>
+          {step < 3 ? (
+            <Button variant="danger" disabled={exporting} onClick={() => setStep(step + 1)}>
+              {ru ? 'Продолжить' : 'Continue'}
+            </Button>
+          ) : null}
+          {step === 3 && hasPassword === true ? (
+            <Button
+              type="submit"
+              form="settings-delete-form"
+              variant="danger"
+              disabled={!password}
+              loading={busy}
+              loadingLabel={ru ? 'Удаляем аккаунт…' : 'Deleting account…'}
+            >
+              {ru ? 'Удалить навсегда' : 'Delete permanently'}
+            </Button>
+          ) : null}
+        </>
+      }
     >
       <ol className="settings-steps" aria-label={ru ? 'Шаги удаления' : 'Deletion steps'}>
         {titles.map((title, index) => (
@@ -181,9 +216,6 @@ export function SettingsDelete({
                 ),
               )}
             </dl>
-            <Button variant="primary" onClick={() => setStep(2)}>
-              {ru ? 'Продолжить' : 'Continue'}
-            </Button>
           </>
         ) : null}
         {step === 2 ? (
@@ -208,9 +240,6 @@ export function SettingsDelete({
             </div>
             <p role="status">{exportOutcome.message}</p>
             {exportOutcome.error ? <p role="alert">{exportOutcome.error}</p> : null}
-            <Button disabled={exporting} variant="primary" onClick={() => setStep(3)}>
-              {ru ? 'Продолжить' : 'Continue'}
-            </Button>
           </>
         ) : null}
         {step === 3 && hasPassword === false ? (
@@ -231,7 +260,7 @@ export function SettingsDelete({
           </p>
         ) : null}
         {step === 3 && hasPassword === true ? (
-          <form onSubmit={submit}>
+          <form id="settings-delete-form" onSubmit={submit}>
             <div className="settings-password-field">
               <Field
                 label={ru ? 'Текущий пароль' : 'Current password'}
@@ -268,15 +297,6 @@ export function SettingsDelete({
                 ? 'Подтверждая паролем, вы соглашаетесь удалить аккаунт и все его данные навсегда.'
                 : 'Confirming with your password permanently deletes your account and all its data.'}
             </p>
-            <Button
-              type="submit"
-              variant="danger"
-              disabled={!password}
-              loading={busy}
-              loadingLabel={ru ? 'Удаляем аккаунт…' : 'Deleting account…'}
-            >
-              {ru ? 'Удалить навсегда' : 'Delete permanently'}
-            </Button>
             <p role="status">
               {busy
                 ? ru
@@ -286,22 +306,6 @@ export function SettingsDelete({
             </p>
           </form>
         ) : null}
-      </div>
-      <div className="settings-delete-footer">
-        {step > 1 ? (
-          <Button
-            disabled={busy || exporting}
-            onClick={() => {
-              setStep((previous) => previous - 1)
-              setError('')
-            }}
-          >
-            {ru ? 'Назад' : 'Back'}
-          </Button>
-        ) : null}
-        <Button disabled={busy || exporting} onClick={close}>
-          {ru ? 'Отмена' : 'Cancel'}
-        </Button>
       </div>
     </Dialog>
   )

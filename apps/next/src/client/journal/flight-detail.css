@@ -24,8 +24,8 @@
   margin: 0;
   padding: 2px var(--space-2);
   border-radius: var(--radius-xs);
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
   font-weight: 500;
 }
 .jd-status::before {
@@ -85,16 +85,16 @@
 }
 .jd-clock {
   font-family: var(--font-mono);
-  font-size: 20px;
-  line-height: 28px;
+  font-size: 1.25rem;
+  line-height: 1.75rem;
   font-weight: 500;
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
 }
 .jd-offset,
 .jd-day {
-  font-size: 12px;
-  line-height: 16px;
+  font-size: 0.75rem;
+  line-height: 1rem;
   color: var(--text-muted);
 }
 /* Long day words wrap here instead of widening the time column for both stops. */
@@ -131,15 +131,15 @@
   min-width: 0;
 }
 .jd-city {
-  font-size: 20px;
-  line-height: 28px;
+  font-size: 1.25rem;
+  line-height: 1.75rem;
   font-weight: 500;
   letter-spacing: -0.02em;
   overflow-wrap: anywhere;
 }
 .jd-airport {
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
   color: var(--text-muted);
 }
 .jd-span {
@@ -147,8 +147,8 @@
   grid-row: 2;
   align-self: center;
   padding: var(--space-3) 0 var(--space-3) var(--space-4);
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
   color: var(--text-muted);
   font-variant-numeric: tabular-nums;
 }
@@ -159,8 +159,8 @@
   align-items: flex-start;
   gap: var(--space-2);
   margin: 0;
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
   color: var(--text-muted);
 }
 .jd-history svg {
@@ -186,15 +186,15 @@
   min-width: 0;
 }
 .jd-fact dt {
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
   color: var(--text-muted);
 }
 .jd-fact dd {
   margin: 0;
   min-width: 0;
-  font-size: 15px;
-  line-height: 24px;
+  font-size: 0.9375rem;
+  line-height: 1.5rem;
   overflow-wrap: anywhere;
 }
 .jd-stack {
@@ -204,8 +204,8 @@
 }
 /* The flight number keeps full size (it is the flight's identity); the ICAO type under a known aircraft name is quiet. */
 .jd-stack .jd-quiet {
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
 }
 /* The maker swatch sits beside the aircraft name, centred on its first 24px line, not on the two-line stack. */
 .jd-aircraft {
@@ -224,8 +224,8 @@
 }
 .jd-heading {
   margin: 0;
-  font-size: 15px;
-  line-height: 24px;
+  font-size: 0.9375rem;
+  line-height: 1.5rem;
   font-weight: 500;
 }
 .jd-leg {
@@ -235,8 +235,8 @@
   column-gap: var(--space-3);
 }
 .jd-leg-label {
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
   color: var(--text-muted);
 }
 .jd-leg > .jd-meta {
@@ -297,8 +297,8 @@
 .jd-form-error,
 .jd-discard p {
   margin: 0;
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
 }
 .jd-form-note {
   color: var(--text-muted);

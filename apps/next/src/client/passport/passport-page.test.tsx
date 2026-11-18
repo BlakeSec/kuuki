@@ -525,6 +525,9 @@ describe('states', () => {
     expect(screen.getByRole('heading', { name: '246 countries are waiting for you' })).toBeVisible()
     expect(screen.getByRole('button', { name: 'Add country' })).toBeVisible()
     expect(screen.getByRole('link', { name: 'Import flights' })).toBeVisible()
+    // The atlas stands in for the cards even in Cards view, stickers on, so a first country can be tapped in.
+    expect(screen.getByRole('list', { name: 'Atlas stand-in' })).toBeInTheDocument()
+    expect(screen.getByLabelText('Sticker stand-in')).toHaveTextContent('NO PT DE IT')
   })
 
   it('points a pending-only passport at the pending block instead of calling it empty', async () => {

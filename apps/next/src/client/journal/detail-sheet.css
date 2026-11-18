@@ -30,8 +30,8 @@
   min-width: 0;
   margin: 0;
   font-family: var(--font-mono);
-  font-size: 22px;
-  line-height: 28px;
+  font-size: 1.375rem;
+  line-height: 1.75rem;
   font-weight: 500;
   letter-spacing: 0;
   outline: none;
@@ -131,6 +131,23 @@
   display: none;
 }
 
+/* Edit's save notice and Save/Cancel in the footer (docked pane and Sheet), so they never scroll away. A footer holding only the
+   empty slot takes no room. */
+.jd-form-slot {
+  flex: 1 1 100%;
+  display: grid;
+  gap: var(--space-3);
+}
+.jd-form-slot:empty {
+  display: none;
+}
+.jd-form-slot .jd-form-actions {
+  justify-content: flex-end;
+}
+:is(.jd-footer, .journal-detail-sheet .ui-panel-footer):not(:has(> :not(.jd-form-slot:empty))) {
+  display: none;
+}
+
 /* The overlay detail panel opens in about 200ms and leaves in 160ms on the existing drawer curve, scoped to the Journal so other
    right sheets keep --dur-sheet. Reduced motion keeps the shared fade. */
 @media (prefers-reduced-motion: no-preference) {
@@ -147,8 +164,8 @@
 .jd-title-meta {
   display: block;
   font-family: var(--font-sans);
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
   font-weight: 400;
   color: var(--text-muted);
 }
