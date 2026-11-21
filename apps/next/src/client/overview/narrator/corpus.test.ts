@@ -99,6 +99,24 @@ const journals: Record<string, { payload: OverviewPayload; filter: OverviewFilte
     ),
     filter: {},
   },
+  'scenario:ground-share': {
+    payload: {
+      ...board,
+      ground: [
+        {
+          id: 'g1',
+          mode: 'rail',
+          status: 'completed',
+          startDate: '2025-05-01',
+          endDate: '2025-05-20',
+          runs: [],
+          countries: ['FR'],
+          distanceKm: 10_000_000,
+        },
+      ],
+    },
+    filter: {},
+  },
   'scenario:two-airline-split': {
     payload: shaped(counted.map((row, i) => ({ ...row, airline: i % 2 ? 'EK' : 'TK' }))),
     filter: {},

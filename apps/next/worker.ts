@@ -128,17 +128,22 @@ export default {
     const contentType = headers.get('Content-Type')
     const airportContent = immutableAirportAsset(request, response)
     const font = url.pathname.startsWith('/fonts/') && /\.(?:woff2|ttf)$/.test(url.pathname)
+    const artwork = /^\/(?:stamps|airlines|icons)\/.+\.(?:svg|png)$/.test(url.pathname)
     const built = url.pathname.startsWith('/_next/static/')
     if (
       (request.method === 'GET' || request.method === 'HEAD') &&
-      (cachedMapAssets.has(url.pathname) || font || built || airportContent) &&
+      (cachedMapAssets.has(url.pathname) || font || artwork || built || airportContent) &&
       (response.status === 200 || response.status === 304) &&
       !headers.has('Set-Cookie') &&
       (response.status === 304 || (contentType && !contentType.toLowerCase().includes('text/html')))
     ) {
       headers.set(
         'Cache-Control',
-        font ? 'public, max-age=3600, must-revalidate' : 'public, max-age=31536000, immutable',
+        font
+          ? 'public, max-age=3600, must-revalidate'
+          : artwork
+            ? 'public, max-age=86400, must-revalidate'
+            : 'public, max-age=31536000, immutable',
       )
     } else if (!built || response.status >= 400) {
       headers.set('Cache-Control', 'no-store')

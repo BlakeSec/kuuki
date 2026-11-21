@@ -1,8 +1,8 @@
 'use client'
 
 import { formatNumber, type Locale } from '../../lib/format'
-import { Stamp } from '../signature/stamp'
-import { catalogCountry } from '../passport/model'
+import Link from 'next/link'
+import { CountryStamp } from '../stamps'
 import { S } from './copy'
 
 export interface NewStamp {
@@ -13,18 +13,17 @@ export interface NewStamp {
 }
 
 export const MAX_STAMPS = 8
+const STAMP_SIZE = 104
 
 export function StampSection({
   locale,
   publication,
   stamps,
-  theme,
   hero,
 }: {
   locale: Locale
   publication: 'idle' | 'ready' | 'pending' | 'delayed'
   stamps: NewStamp[]
-  theme?: 'light' | 'dark'
   hero: boolean
 }) {
   const shown = stamps.slice(0, MAX_STAMPS)
@@ -55,26 +54,28 @@ export function StampSection({
             ) : null}
           </h3>
           <ul className="import-stamp-grid">
-            {shown.map((stamp) => {
-              const country = catalogCountry(stamp.code)
-              return (
-                <li key={stamp.code}>
-                  <Stamp
-                    countryCode={stamp.code}
-                    nativeName={country?.nativeName ?? shortName(stamp)}
-                    name={shortName(stamp)}
-                    firstYear={stamp.firstYear}
-                    color={country?.dominantColor ?? null}
-                    kind="air"
-                    theme={theme}
-                    locale={locale}
-                    pressEventId={stamp.eventId}
-                    heroExitKey={hero ? stamp.code : undefined}
+            {shown.map((stamp) => (
+              <li key={stamp.code} className="import-stamp">
+                <span data-hero-exit-key={hero ? stamp.code : undefined}>
+                  <CountryStamp
+                    iso2={stamp.code}
+                    status="inked"
+                    size={STAMP_SIZE}
+                    impressionId={stamp.eventId}
                   />
-                </li>
-              )
-            })}
+                </span>
+                <span className="import-stamp-name">{shortName(stamp)}</span>
+              </li>
+            ))}
           </ul>
+          {stamps.length > shown.length ? (
+            <Link className="ui-button import-stamps-more" data-variant="ghost" href="/passport">
+              {S.moreStamps[locale].replace(
+                '{count}',
+                formatNumber(locale, stamps.length - shown.length),
+              )}
+            </Link>
+          ) : null}
         </div>
       ) : null}
     </>

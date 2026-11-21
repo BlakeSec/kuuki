@@ -1,5 +1,6 @@
 'use client'
 import { useId, useState, type Ref } from 'react'
+import { CircleAlert } from '@keyline-icons/react'
 import { Calendar } from '../ui/calendar'
 import type { Locale } from '../../lib/format'
 
@@ -136,7 +137,8 @@ export function DateTiles({
       ) : (
         error && (
           <p id={errorId} role="alert">
-            {error}
+            <CircleAlert size={16} strokeWidth={2} aria-hidden="true" />
+            <span>{error}</span>
           </p>
         )
       )}

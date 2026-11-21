@@ -390,6 +390,14 @@ export function JournalDetail({
   const paneTitle = useRef<HTMLHeadingElement | null>(null)
   const [actionSlot, setActionSlot] = useState<HTMLElement | null>(null)
   const actions = <span ref={setActionSlot} className="jd-actions" />
+  const [footerSlot, setFooterSlot] = useState<HTMLElement | null>(null)
+  const footerContent =
+    flight && !idle ? (
+      <>
+        <div ref={setFooterSlot} className="jd-form-slot" />
+        {footer}
+      </>
+    ) : undefined
   const body = useRef<HTMLDivElement | null>(null)
   const swapFromInside = useRef(false)
   const previousId = useRef<number | null>(null)
@@ -486,6 +494,7 @@ export function JournalDetail({
         onOpenFlight={swap}
         guardRef={guard}
         actionSlot={actionSlot}
+        footerSlot={footerSlot}
       />
     </Crossfade>
   ) : (
@@ -556,7 +565,7 @@ export function JournalDetail({
             </>
           )}
         </div>
-        {footer && flight && !idle && <div className="jd-footer">{footer}</div>}
+        {footerContent && <div className="jd-footer">{footerContent}</div>}
       </aside>
     )
   }
@@ -576,7 +585,7 @@ export function JournalDetail({
       side={mobile ? 'bottom' : 'right'}
       className={mobile ? 'journal-detail-sheet flight-full-sheet' : 'journal-detail-sheet'}
       closeLabel={t.close}
-      footer={footer && flight && !idle ? footer : undefined}
+      footer={footerContent}
       onCloseAutoFocus={(event) => {
         const row = shownId !== null ? rowFor(shownId) : null
         if (row) {

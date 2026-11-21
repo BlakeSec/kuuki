@@ -16,6 +16,7 @@ import {
 import { LazyChart } from '../../charts/lazy-chart'
 import { useOverview } from '../../store/overview-context'
 import { copy, filterLabel, number, flights } from '../rankings/display'
+import { formatMonthYear } from '../../../../lib/format'
 import { HEAT_MISSING, heatBucket, measuredMonths, monthStart } from './helpers'
 import { HeatKey, type HeatKeyEntry } from './heat-key'
 import './rhythm.css'
@@ -74,35 +75,34 @@ export function YearByMonth({ metric, setMetric, showAll, setShowAll, reading }:
       : heatBucket(row[metric], max)
   const valueOf = (row: (typeof rows)[number]) =>
     metric === 'durationMinutes' ? row[metric] / 60 : row[metric]
+  const withUnit = (value: number) =>
+    metric === 'flights'
+      ? flights(locale, value)
+      : `${number(locale, value)} ${metric === 'distanceKm' ? copy(locale, 'km', 'км') : copy(locale, 'h', 'ч')}`
   const gridPoints = rows
     .filter((row) => row.key <= today)
     .map((row) => ({
       key: row.key,
       datum: row,
-      label: `${row.key} · ${bucketOf(row) === HEAT_MISSING ? noData : number(locale, valueOf(row))}`,
+      label: `${formatMonthYear(locale, row.key)} · ${bucketOf(row) === HEAT_MISSING ? noData : withUnit(valueOf(row))}`,
     }))
   const pointOf = new Map(gridPoints.map((point) => [point.key, point]))
   const cellY = (year: number) => 8 + years.indexOf(year) * 36
   const gridCaption = copy(locale, 'Year by month', 'Год по месяцам')
-  const baseText =
-    metric === 'flights'
-      ? flights(locale, max)
-      : metric === 'distanceKm'
-        ? `${number(locale, max)} ${copy(locale, 'km', 'км')}`
-        : `${number(locale, max / 60)} ${copy(locale, 'h', 'ч')}`
+  const baseText = withUnit(metric === 'durationMinutes' ? max / 60 : max)
   const monthlyBase = `${
     metric === 'flights'
-      ? copy(locale, 'Share of busiest month', 'Доля от самого активного месяца')
+      ? copy(locale, 'Share of your record month', 'Доля от вашего рекордного месяца')
       : metric === 'distanceKm'
         ? copy(
             locale,
-            'Share of busiest month by distance',
-            'Доля от самого активного месяца по расстоянию',
+            'Share of your record month by distance',
+            'Доля от вашего рекордного месяца по расстоянию',
           )
         : copy(
             locale,
-            'Share of busiest month by hours',
-            'Доля от самого активного месяца по часам',
+            'Share of your record month by hours',
+            'Доля от вашего рекордного месяца по часам',
           )
   }: ${baseText}`
   const monthlyKey: HeatKeyEntry[] = [
@@ -161,7 +161,7 @@ export function YearByMonth({ metric, setMetric, showAll, setShowAll, reading }:
                   },
                 ],
                 rows: rows.map((row) => ({
-                  key: row.key,
+                  key: formatMonthYear(locale, row.key),
                   value: bucketOf(row) === HEAT_MISSING ? noData : valueOf(row),
                 })),
               }}
@@ -258,15 +258,15 @@ export function YearByMonth({ metric, setMetric, showAll, setShowAll, reading }:
           )}
         </LazyChart>
       </div>
-      <div className="ov3-heat-year-totals">
+      <ul className="sr-only" aria-label={copy(locale, 'Flights by year', 'Перелёты по годам')}>
         {scope.figures.byYear
           .filter((row) => years.includes(row.year))
           .map((row) => (
-            <span key={row.key}>
+            <li key={row.key}>
               {row.year}: {flights(locale, row.flights)}
-            </span>
+            </li>
           ))}
-      </div>
+      </ul>
       <div className="ov3-rhythm-key">
         <p className="ov3-chart-caption">{monthlyBase}</p>
         <HeatKey entries={monthlyKey} />

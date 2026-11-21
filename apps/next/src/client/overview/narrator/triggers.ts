@@ -12,6 +12,7 @@ export interface Trigger {
   slot: NarratorSlot
   priority: number
   record?: HeroRecord
+  words?: Record<string, 'month' | 'yearMonth' | 'day'>
   when(scope: OverviewScope, all: OverviewScope): Record<string, string | number> | null
 }
 
@@ -62,6 +63,7 @@ export const TRIGGERS: Trigger[] = [
     id: 'records:busiest-day',
     slot: 'records',
     priority: 80,
+    words: { date: 'day' },
     when: (scope) => {
       if (scope.records.status !== 'ready') return null
       const v = scope.records.value
@@ -599,6 +601,7 @@ export const TRIGGERS: Trigger[] = [
     id: 'rhythm:gap',
     slot: 'rhythm',
     priority: 70,
+    words: { from: 'yearMonth', to: 'yearMonth' },
     when: (scope) => {
       if (scope.rhythm.status !== 'ready') return null
       const v = scope.rhythm.value
@@ -652,6 +655,7 @@ export const TRIGGERS: Trigger[] = [
     id: 'rhythm:pooled-month',
     slot: 'rhythm',
     priority: 60,
+    words: { month: 'month' },
     when: (scope) => {
       if (scope.rhythm.status !== 'ready') return null
       const v = scope.rhythm.value
@@ -795,6 +799,29 @@ export const TRIGGERS: Trigger[] = [
     record: 'flights',
     priority: 40,
     when: (scope) => (scope.figures.flights >= 25 ? { flights: scope.figures.flights } : null),
+  },
+  {
+    id: 'hero:ground-share',
+    slot: 'hero',
+    record: 'km',
+    priority: 75,
+    when: (scope) => {
+      const f = scope.figures
+      const ground = f.travelKm - f.distanceKm
+      return f.scope === 'all' &&
+        f.groundJourneys > 0 &&
+        f.travelKm > 0 &&
+        ground >= f.travelKm * 0.1
+        ? { percent: Math.round((ground / f.travelKm) * 100) }
+        : null
+    },
+  },
+  {
+    id: 'hero:flights-cost',
+    slot: 'hero',
+    record: 'flights',
+    priority: 42,
+    when: (scope) => (scope.figures.flights >= 100 ? { flights: scope.figures.flights } : null),
   },
   {
     id: 'hero:km-belt',

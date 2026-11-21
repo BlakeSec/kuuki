@@ -205,7 +205,14 @@ export function KuukiesNotice({
   useLayoutEffect(() => {
     const node = layerRef.current
     if (!node) return
-    const read = () => setLayerWidth(node.clientWidth)
+    const read = () => {
+      const style = getComputedStyle(node)
+      setLayerWidth(
+        node.clientWidth -
+          parseFloat(style.paddingLeft || '0') -
+          parseFloat(style.paddingRight || '0'),
+      )
+    }
     read()
     if (typeof ResizeObserver === 'undefined') return
     const observer = new ResizeObserver(read)

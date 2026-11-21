@@ -90,10 +90,6 @@ function Stepper({ locale, step }: { locale: Locale; step: Step }) {
   )
 }
 
-const themeNow = (): 'light' | 'dark' =>
-  typeof document !== 'undefined' && document.documentElement.dataset.theme === 'dark'
-    ? 'dark'
-    : 'light'
 const writeUrl = (batchId: string | null) =>
   window.history.replaceState(
     window.history.state,
@@ -949,7 +945,6 @@ export function ImportClient({
           expiresAt={batch.batch?.expiresAt ?? null}
           aircraftTargets={aircraftTargets}
           aircraftApi={aircraftApi}
-          theme={themeNow()}
           onRetry={onRetry}
           onReview={() => {
             setShowDone(false)

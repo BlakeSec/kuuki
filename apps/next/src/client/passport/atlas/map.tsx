@@ -124,7 +124,13 @@ const pointFeatures = (points: Iterable<[string, [number, number]]>): PointData 
 })
 const pointData = pointFeatures(Object.entries(SMALL_STATE_POINTS))
 
-type LabelProperties = { id: string; label: string; rank: number; micro: 0 | 1 }
+type LabelProperties = {
+  id: string
+  label: string
+  rank: number
+  micro: 0 | 1
+  edge: 'left' | 'right' | 'center'
+}
 type LabelData = GeoJSON.FeatureCollection<GeoJSON.Point, LabelProperties>
 const emptyLabels: LabelData = { type: 'FeatureCollection', features: [] }
 
@@ -186,12 +192,17 @@ function memberBounds(codes: string[], shapes: ReadonlyMap<string, Shape>): Boun
     : null
 }
 
+const EDGE_ZOOM = 3
+const EDGE_LON = 160
 const labelFeature = (
   point: [number, number],
-  properties: LabelProperties,
+  properties: Omit<LabelProperties, 'edge'>,
 ): GeoJSON.Feature<GeoJSON.Point, LabelProperties> => ({
   type: 'Feature',
-  properties,
+  properties: {
+    ...properties,
+    edge: point[0] > EDGE_LON ? 'right' : point[0] < -EDGE_LON ? 'left' : 'center',
+  },
   geometry: { type: 'Point', coordinates: point },
 })
 
@@ -240,7 +251,7 @@ function AtlasLayers({
   tap.current = (id, polygon) => {
     const handle = sticker.current
     handle?.finish()
-    if (cover && paging) {
+    if (cover && paging && paging.pages.length > 1) {
       handle?.dismiss()
       const index = paging.pages.findIndex((page) => page.id !== 'world' && page.codes.includes(id))
       if (index > 0) paging.onPage(index)
@@ -415,7 +426,11 @@ function AtlasLayers({
       id: ATLAS_LAYERS.labels,
       type: 'symbol',
       source: 'atlas-labels',
-      layout: { ...text, 'text-max-width': 7 } as never,
+      layout: {
+        ...text,
+        'text-max-width': 7,
+        'text-anchor': ['step', ['zoom'], ['get', 'edge'], EDGE_ZOOM, 'center'],
+      } as never,
       paint: textPaint,
     })
     map.addLayer({

@@ -145,7 +145,7 @@ test('a wrong password keeps the email, shows the error with an icon and offers 
     await expect(error.locator('svg')).toBeVisible()
     await expect(c.email).toHaveValue(email)
     await expect(c.password).toHaveAttribute('aria-invalid', 'true')
-    await expect(c.heading).toBeFocused()
+    await expect(c.password).toBeFocused()
     await expect(
       page.getByRole('button', { name: 'Email me a link to get back in', exact: true }),
     ).toBeVisible()

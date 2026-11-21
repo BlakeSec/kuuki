@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { SECTION_GATES } from '@kuuki/shared/overview/goals'
-import { formatCount, type CountForms } from '../../../../lib/format'
+import { formatCount, formatMonthYear, type CountForms } from '../../../../lib/format'
 import { Button } from '../../../ui/button'
 import { SegmentedControl } from '../../../ui/segmented-control'
 import { StageColumns, type StageTick } from '../../charts/stage-columns'
@@ -183,8 +183,8 @@ export function Section({ span }: { span: Span }) {
     caption = r.isHeadline
       ? copy(
           locale,
-          'Busiest shown month · by flights',
-          'Самый активный месяц на графике · по перелётам',
+          'Record month on the chart · by flights',
+          'Рекордный месяц на графике · по перелётам',
         )
       : copy(locale, `${share} of shown flights`, `${share} перелётов на графике`)
   }
@@ -219,11 +219,11 @@ export function Section({ span }: { span: Span }) {
     ? [
         {
           value: busiestMonth ? monthName(locale, busiestMonth.month) : '—',
-          label: copy(locale, 'Busiest month', 'Самый активный месяц'),
+          label: copy(locale, 'Busiest month · all years', 'Самый активный месяц · все годы'),
         },
         {
           value: gap ? `${gap.months} ${copy(locale, 'mo', 'мес.')}` : '—',
-          label: `${copy(locale, 'Longest gap', 'Самый длинный перерыв')}${gap ? ` · ${gap.from}–${gap.to}` : ''}`,
+          label: `${copy(locale, 'Longest gap', 'Самый длинный перерыв')}${gap ? ` · ${formatMonthYear(locale, gap.from)} – ${formatMonthYear(locale, gap.to)}` : ''}`,
         },
       ]
     : []

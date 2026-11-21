@@ -8,8 +8,8 @@
 }
 .ui-empty-title {
   margin: 0;
-  font-size: 17px;
-  line-height: 24px;
+  font-size: 1.0625rem;
+  line-height: 1.5rem;
   font-weight: 500;
   color: var(--text);
   text-wrap: balance;
@@ -17,8 +17,8 @@
 .ui-empty-description {
   max-width: 24rem;
   margin: var(--space-1) 0 0;
-  font-size: 15px;
-  line-height: 24px;
+  font-size: 0.9375rem;
+  line-height: 1.5rem;
   color: var(--text-muted);
   text-wrap: balance;
 }

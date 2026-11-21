@@ -101,7 +101,7 @@ it('names the daily scale and the monthly base in both languages, and tells a kn
   for (const label of ['0', '1', '2', '3', '4+'])
     expect(screen.getAllByText(label).length).toBeGreaterThan(0)
   expect(screen.getByText('No data (before the journal or after today)')).toBeInTheDocument()
-  expect(screen.getByText(/^Share of busiest month: \d+ flights?$/)).toBeInTheDocument()
+  expect(screen.getByText(/^Share of your record month: \d+ flights?$/)).toBeInTheDocument()
   const calendar = screen.getByRole('group', { name: /^Completed flights by day/ })
   const days = [...calendar.querySelectorAll('[data-kc-key]')]
   const before = days[0].getAttribute('aria-label')!
@@ -110,7 +110,7 @@ it('names the daily scale and the monthly base in both languages, and tells a kn
   context.current = { ...context.current, locale: 'ru' }
   view.rerender(<Section span="full" />)
   expect(screen.getByText('Завершённых перелётов в день')).toBeInTheDocument()
-  expect(screen.getByText(/^Доля от самого активного месяца: \d+ перелёт/)).toBeInTheDocument()
+  expect(screen.getByText(/^Доля от вашего рекордного месяца: \d+ перелёт/)).toBeInTheDocument()
 }, 15_000)
 
 it('never reads a missing monthly measurement as zero: unmeasured and future months say no data, empty months stay 0', () => {
@@ -126,17 +126,17 @@ it('never reads a missing monthly measurement as zero: unmeasured and future mon
   const grid = screen.getByRole('group', { name: 'Year by month' })
   const label = (key: string) =>
     grid.querySelector(`[data-kc-key="${key}"]`)?.getAttribute('aria-label')
-  expect(label('2020-01')).toContain('No data')
-  expect(label('2020-03')).toMatch(/ 0$/)
-  expect(label('2020-02')).toMatch(/13.766$/)
+  expect(label('2020-01')).toBe('January 2020 · No data')
+  expect(label('2020-03')).toBe('March 2020 · 0 km')
+  expect(label('2020-02')).toMatch(/^February 2020 · 13.766 km$/)
   const table = [...document.querySelectorAll('table')].find(
     (candidate) => candidate.caption?.textContent === 'Year by month',
   )!
   const row = (key: string) =>
     [...table.querySelectorAll('tr')].find((tr) => tr.cells[0]?.textContent === key)!
-  expect(row('2020-01')).toHaveTextContent('No data')
-  expect(row('2020-03')).toHaveTextContent(/0$/)
-  expect(row('2020-12')).toHaveTextContent('No data')
+  expect(row('January 2020')).toHaveTextContent('No data')
+  expect(row('March 2020')).toHaveTextContent(/0$/)
+  expect(row('December 2020')).toHaveTextContent('No data')
   expect(screen.getAllByText('No data').length).toBeGreaterThan(0)
 })
 
@@ -189,9 +189,9 @@ it('History selects a dated month for the hero and stamper and filters only thro
   const view = render(<Section span="full" />)
   expect(stage().getByRole('radio', { name: 'History' })).toHaveAttribute('aria-checked', 'true')
   expect(hero(view)).toHaveTextContent('March 2022')
-  fireEvent.click(stage().getByRole('button', { name: /^2021-03 ·/ }))
+  fireEvent.click(stage().getByRole('button', { name: /^March 2021 · \d+ flights?$/ }))
   expect(hero(view)).toHaveTextContent('March 2021')
-  expect(stage().getByRole('button', { name: /^2021-03 ·/ })).toHaveAttribute(
+  expect(stage().getByRole('button', { name: /^March 2021 · \d+ flights?$/ })).toHaveAttribute(
     'aria-current',
     'true',
   )

@@ -139,7 +139,7 @@ test('a country is added from search, claimed, visited by sea, and removed with 
   await expect(
     data.getByRole('heading', { name: '246 countries are waiting for you' }),
   ).toBeVisible()
-  await expect(data.locator('.passport-ghost')).toHaveCount(6)
+  await expect(data.getByRole('region', { name: 'Map of visited countries' })).toBeVisible()
 
   const opener = data.getByRole('button', { name: 'Add country', exact: true })
   await opener.click()

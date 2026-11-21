@@ -26,7 +26,7 @@
 }
 .name-address-url {
   min-width: 0;
-  font: 400 12px/18px var(--font-mono);
+  font: 400 0.75rem/1.125rem var(--font-mono);
   overflow-wrap: anywhere;
 }
 .name-address-edit {
@@ -50,7 +50,7 @@
   flex: none;
   max-width: 55%;
   overflow: hidden;
-  font: 400 12px/18px var(--font-mono);
+  font: 400 0.75rem/1.125rem var(--font-mono);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -61,7 +61,7 @@
   border: 0;
   background: transparent;
   color: var(--text);
-  font: 400 12px/18px var(--font-mono);
+  font: 400 0.75rem/1.125rem var(--font-mono);
 }
 .name-address-input:focus {
   outline: none;
@@ -76,7 +76,7 @@
   border-radius: var(--radius-sm);
   background: color-mix(in srgb, var(--warning-fill) 14%, var(--surface));
   color: var(--warning-text);
-  font: 400 14px/20px var(--font-sans);
+  font: 400 0.875rem/1.25rem var(--font-sans);
 }
 @media (hover: hover) and (pointer: fine) {
   .name-address:hover {
@@ -95,8 +95,8 @@
   }
   .name-address-prefix,
   .name-address-input {
-    font-size: 16px;
-    line-height: 24px;
+    font-size: 1rem;
+    line-height: 1.5rem;
   }
 }
 @media (prefers-reduced-motion: reduce) {

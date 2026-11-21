@@ -72,8 +72,8 @@
   overflow: hidden;
   text-overflow: ellipsis;
   color: var(--text-muted);
-  font-size: 22px;
-  line-height: 28px;
+  font-size: 1.375rem;
+  line-height: 1.75rem;
   font-weight: 500;
   letter-spacing: 0;
 }
@@ -81,8 +81,8 @@
   margin: 0;
   overflow: hidden;
   color: var(--text-muted);
-  font-size: 15px;
-  line-height: 24px;
+  font-size: 0.9375rem;
+  line-height: 1.5rem;
   display: -webkit-box;
   -webkit-box-orient: vertical;
 }
@@ -126,8 +126,8 @@
   min-width: 0;
   container-type: inline-size;
   color: var(--text-muted);
-  font-size: 13px;
-  line-height: 18px;
+  font-size: 0.8125rem;
+  line-height: 1.125rem;
   font-weight: 600;
 }
 .ov3-card-chart-caption-text {
@@ -173,14 +173,14 @@
 .ov3-card-heading {
   margin: 0;
   color: var(--text);
-  font-size: 15px;
-  line-height: 24px;
+  font-size: 0.9375rem;
+  line-height: 1.5rem;
   font-weight: 600;
 }
 .ov3-card-more {
   color: var(--text);
-  font-size: 15px;
-  line-height: 24px;
+  font-size: 0.9375rem;
+  line-height: 1.5rem;
   font-weight: 500;
 }
 .ov3-card-details .ui-disclosure-trigger {
@@ -214,22 +214,22 @@
 .ov3-card-columns dd {
   margin: 0;
   color: var(--text);
-  font-size: 22px;
-  line-height: 28px;
+  font-size: 1.375rem;
+  line-height: 1.75rem;
   font-weight: 600;
   letter-spacing: -0.01em;
   font-variant-numeric: tabular-nums;
 }
 .ov3-card-columns dt {
   color: var(--text-muted);
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
 }
 .ov3-card-coverage {
   margin: 0;
   color: var(--text-muted);
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
 }
 
 .ov3-card[data-span='sheet'] .ov3-card-hero {
@@ -238,8 +238,8 @@
 .ov3-card[data-span='sheet'] .ov3-card-value {
   height: 44px;
   margin-top: 4px;
-  font-size: 40px;
-  line-height: 44px;
+  font-size: 2.5rem;
+  line-height: 2.75rem;
   gap: 4px;
 }
 .ov3-card[data-span='sheet'] .ov3-card-caption {
@@ -292,8 +292,8 @@
 }
 .ov3-card[data-span='full'] .ov3-card-value {
   height: 52px;
-  font-size: 48px;
-  line-height: 52px;
+  font-size: 3rem;
+  line-height: 3.25rem;
   gap: 6px;
 }
 .ov3-card[data-span='full'] .ov3-card-caption {
@@ -408,8 +408,8 @@
 }
 .ov3-card[data-wide] .ov3-card-value {
   height: 60px;
-  font-size: 56px;
-  line-height: 60px;
+  font-size: 3.5rem;
+  line-height: 3.75rem;
 }
 .ov3-card[data-wide] .ov3-card-caption {
   height: 48px;

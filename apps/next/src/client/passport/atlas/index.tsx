@@ -128,6 +128,7 @@ export function PassportAtlas({
     [entries],
   )
   const pendingCodes = useMemo(() => pending.map((entry) => entry.code), [pending])
+  const marked = entries.length + pending.length > 0
   const firsts = useMemo(
     () => new Map([...entries, ...pending].map((entry) => [entry.code, entry.first])),
     [entries, pending],
@@ -204,7 +205,7 @@ export function PassportAtlas({
           </Suspense>
         )}
       </section>
-      {mobile ? (
+      {!marked ? null : mobile ? (
         <AtlasPagesList
           locale={locale}
           axis={axis}

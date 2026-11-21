@@ -44,12 +44,6 @@
   outline: 2px solid var(--focus);
   outline-offset: 2px;
 }
-.ov3-heat-year-totals {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-3);
-  font: 12px var(--font-mono);
-}
 
 .ov3-activity-year {
   display: flex;

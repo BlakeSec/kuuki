@@ -26,8 +26,8 @@
   min-width: 0;
   margin: 0;
   font-family: var(--font-mono);
-  font-size: 22px;
-  line-height: 28px;
+  font-size: 1.375rem;
+  line-height: 1.75rem;
   font-weight: 500;
   letter-spacing: 0;
   outline: none;
@@ -123,6 +123,21 @@
   display: none;
 }
 
+.jd-form-slot {
+  flex: 1 1 100%;
+  display: grid;
+  gap: var(--space-3);
+}
+.jd-form-slot:empty {
+  display: none;
+}
+.jd-form-slot .jd-form-actions {
+  justify-content: flex-end;
+}
+:is(.jd-footer, .journal-detail-sheet .ui-panel-footer):not(:has(> :not(.jd-form-slot:empty))) {
+  display: none;
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .journal-detail-sheet.ui-sheet[data-side='right'][data-state='open'] {
     animation-duration: var(--dur-base);
@@ -135,8 +150,8 @@
 .jd-title-meta {
   display: block;
   font-family: var(--font-sans);
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
   font-weight: 400;
   color: var(--text-muted);
 }

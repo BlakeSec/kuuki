@@ -109,7 +109,7 @@ export function Section({ span }: { span: Span }) {
     row.flights > 0 && row.firstYear !== null ? Math.max(1, year - row.firstYear + 1) : 0
   const chartCaption = firsts
     ? copy(locale, 'First reached', 'Впервые на континенте')
-    : copy(locale, 'Flights by continent', 'Перелёты по континентам')
+    : copy(locale, 'Flights to or from', 'Перелёты туда или оттуда')
   const visible = order.filter((row) => row.flights > 0 || row.id === r.reading)
   const unflown = order.filter((row) => row.flights === 0).length
   const omitted = order.length - visible.length

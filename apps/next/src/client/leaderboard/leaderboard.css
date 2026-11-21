@@ -31,8 +31,8 @@
 }
 .leaderboard-group-label {
   margin: 0 0 var(--space-1);
-  font-size: 12px;
-  line-height: 16px;
+  font-size: 0.75rem;
+  line-height: 1rem;
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -134,7 +134,7 @@
   min-block-size: 32px;
 }
 .lane-place {
-  font: 500 15px/20px var(--font-mono);
+  font: 500 0.9375rem/1.25rem var(--font-mono);
   font-variant-numeric: tabular-nums;
   color: var(--text-muted);
 }
@@ -186,13 +186,13 @@
 }
 .lane-name small {
   font-weight: 400;
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
   color: var(--text-muted);
 }
 .lane-name .lane-type {
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 0.75rem;
 }
 .lane-type {
   position: relative;
@@ -251,13 +251,13 @@
   margin-block-end: var(--space-2);
 }
 .lane-spotter-name {
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-weight: 600;
-  line-height: 20px;
+  line-height: 1.25rem;
   color: var(--text);
 }
 .lane-spotter-size {
-  font: 400 13px/20px var(--font-mono);
+  font: 400 0.8125rem/1.25rem var(--font-mono);
   font-variant-numeric: tabular-nums;
   color: var(--text-muted);
 }
@@ -305,12 +305,12 @@
   font-variant-numeric: tabular-nums;
 }
 .lane-value strong {
-  font: 600 15px/20px var(--font-mono);
+  font: 600 0.9375rem/1.25rem var(--font-mono);
 }
 .lane-value small {
   display: block;
   max-inline-size: 16ch;
-  font-size: 13px;
+  font-size: 0.8125rem;
   white-space: normal;
   color: var(--text-muted);
 }
@@ -322,6 +322,9 @@
   block-size: var(--veh-h);
   overflow-x: clip;
   mask-image: linear-gradient(to right, transparent, currentcolor var(--space-4));
+  mask-size: 100% 100%;
+  mask-repeat: repeat-y;
+  mask-clip: no-clip;
 }
 .lane-track::before {
   --deck-slant: calc(var(--deck-h) * -0.5 * tan(var(--lane-skew)));
@@ -414,7 +417,7 @@
   border: 1.5px solid currentcolor;
   border-radius: 50%;
   background: var(--background);
-  font: 600 12px/1 var(--font-mono);
+  font: 600 0.75rem/1 var(--font-mono);
 }
 .lane[data-own] .lane-medal {
   background: var(--surface-inset);
@@ -427,8 +430,8 @@
   grid-column: 1 / -1;
   grid-row: 3;
   padding-inline-start: calc(40px + var(--space-2));
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
   color: var(--text-muted);
 }
 .lanes-gap {
@@ -474,8 +477,8 @@
 }
 .leaderboard-updated {
   margin: var(--space-8) 0 0;
-  font-size: 12px;
-  line-height: 16px;
+  font-size: 0.75rem;
+  line-height: 1rem;
   color: var(--text-muted);
 }
 
@@ -510,7 +513,6 @@
     gap: var(--space-6);
     overflow-x: auto;
     overscroll-behavior-x: contain;
-    scroll-snap-type: x mandatory;
     scrollbar-width: none;
     padding: var(--space-1);
     margin: calc(var(--space-1) * -1);
@@ -550,7 +552,6 @@
   .leaderboard-group-tiles > .gate-tile {
     flex: none;
     min-inline-size: 112px;
-    scroll-snap-align: start;
   }
   .leaderboard-group-tiles > .ui-skeleton {
     flex: none;
@@ -598,8 +599,8 @@
     grid-row: 1;
   }
   .lane-value strong {
-    font-size: 23px;
-    line-height: 28px;
+    font-size: 1.4375rem;
+    line-height: 1.75rem;
     font-variant-numeric: tabular-nums;
   }
   .lane-value small {
@@ -634,8 +635,8 @@
     padding-inline: var(--space-2);
     margin-block-end: var(--space-1);
     color: var(--text-muted);
-    font-size: 12px;
-    line-height: 16px;
+    font-size: 0.75rem;
+    line-height: 1rem;
   }
   .lane-ruler-track {
     position: relative;
@@ -647,7 +648,7 @@
     inset-block-start: 2px;
     translate: -50% 0;
     white-space: nowrap;
-    font: 400 11px/16px var(--font-mono);
+    font: 400 0.6875rem/1rem var(--font-mono);
     font-variant-numeric: tabular-nums;
   }
   .lane-ruler-mark::after {
@@ -693,7 +694,7 @@
     --lane-finish: 30px;
   }
   .lane-place {
-    font-size: 13px;
+    font-size: 0.8125rem;
   }
   .lane {
     padding-inline: var(--space-1);

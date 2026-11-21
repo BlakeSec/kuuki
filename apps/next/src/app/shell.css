@@ -77,8 +77,8 @@
   border-radius: var(--radius-sm);
   background: var(--accent);
   color: var(--accent-foreground);
-  font-size: 15px;
-  line-height: 20px;
+  font-size: 0.9375rem;
+  line-height: 1.25rem;
   font-weight: 600;
   white-space: nowrap;
   transition: transform var(--dur-press) var(--ease-out);
@@ -115,7 +115,7 @@
   gap: 12px;
   padding-inline: 12px;
   font-weight: 500;
-  line-height: 20px;
+  line-height: 1.25rem;
 }
 
 .avatar-button {
@@ -191,8 +191,8 @@ a.ui-menu-item {
   display: flex;
   justify-content: space-between;
   gap: 12px;
-  font-size: 11px;
-  line-height: 14px;
+  font-size: 0.6875rem;
+  line-height: 0.875rem;
 }
 .account-stub .ui-menu-item {
   min-height: 0;
@@ -213,8 +213,8 @@ a.ui-menu-item {
 }
 .account-name {
   overflow: hidden;
-  font-size: 22px;
-  line-height: 28px;
+  font-size: 1.375rem;
+  line-height: 1.75rem;
   font-weight: 600;
   letter-spacing: -0.01em;
   text-overflow: ellipsis;
@@ -223,8 +223,8 @@ a.ui-menu-item {
 .account-handle {
   overflow: hidden;
   font-family: var(--font-mono);
-  font-size: 13px;
-  line-height: 18px;
+  font-size: 0.8125rem;
+  line-height: 1.125rem;
   font-weight: 500;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -241,15 +241,15 @@ a.ui-menu-item {
   align-content: start;
 }
 .account-field-key {
-  font-size: 10.5px;
-  line-height: 14px;
+  font-size: 0.65625rem;
+  line-height: 0.875rem;
 }
 .account-field-value {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 15px;
-  line-height: 20px;
+  font-size: 0.9375rem;
+  line-height: 1.25rem;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
@@ -334,14 +334,14 @@ a.ui-menu-item {
   border-radius: 6px;
   background: var(--accent-tint);
   color: var(--accent-on-tint);
-  font-size: 13px;
-  line-height: 18px;
+  font-size: 0.8125rem;
+  line-height: 1.125rem;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
 .queue-unavailable {
-  font-size: 13px;
-  line-height: 18px;
+  font-size: 0.8125rem;
+  line-height: 1.125rem;
   color: var(--warning-text);
 }
 
@@ -430,8 +430,8 @@ a.ui-menu-item {
     border-radius: 18px;
     color: var(--text-muted);
     text-decoration: none;
-    font-size: 12px;
-    line-height: 16px;
+    font-size: 0.75rem;
+    line-height: 1rem;
     font-weight: 500;
     transition:
       color var(--dur-fast) var(--ease-out),
@@ -504,8 +504,8 @@ a.ui-menu-item {
   .add-card-title {
     margin: 0;
     padding: 12px 14px 8px;
-    font-size: 17px;
-    line-height: 24px;
+    font-size: 1.0625rem;
+    line-height: 1.5rem;
     font-weight: 600;
     letter-spacing: -0.01em;
   }
@@ -515,7 +515,7 @@ a.ui-menu-item {
     padding-inline: 14px;
     border-radius: 18px;
     font-weight: 500;
-    line-height: 20px;
+    line-height: 1.25rem;
   }
   :root:has(.tab-bar) {
     --tabbar-offset: calc(var(--rail-bottom) + var(--rail-h));
@@ -570,8 +570,8 @@ a.ui-menu-item {
 .mobile-page-title {
   display: none;
   margin: 0;
-  font-size: 17px;
-  line-height: 24px;
+  font-size: 1.0625rem;
+  line-height: 1.5rem;
   font-weight: 600;
 }
 @media (max-width: 700px) {

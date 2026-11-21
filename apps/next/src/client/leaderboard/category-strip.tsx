@@ -45,9 +45,18 @@ export function CategoryStrip({
   useEffect(() => {
     const element = scroller.current
     const selected = element?.querySelector<HTMLElement>('[aria-current="page"]')
-    if (element && selected && element.scrollWidth > element.clientWidth)
-      element.scrollLeft = selected.offsetLeft - (element.clientWidth - selected.offsetWidth) / 2
-  }, [])
+    if (!element || !selected || element.scrollWidth <= element.clientWidth) return
+    const edge = 28
+    const box = element.getBoundingClientRect()
+    const tile = selected.getBoundingClientRect()
+    const group = selected.closest<HTMLElement>('.leaderboard-group')?.getBoundingClientRect()
+    if (tile.left < box.left + edge) {
+      const target = group && tile.right - group.left <= box.width - edge ? group.left : tile.left
+      element.scrollLeft += target - box.left - edge
+    } else if (tile.right > box.right - edge) {
+      element.scrollLeft += tile.right - box.right + edge
+    }
+  }, [category])
   useScrollFade(scroller)
   useEffect(() => {
     let active = true

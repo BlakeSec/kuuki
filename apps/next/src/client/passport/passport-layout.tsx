@@ -152,6 +152,12 @@ export function PassportLayout(props: PassportLayoutProps) {
   const next = isOwner ? nearestRung(props.badges, props.stats) : null
   const hiddenCount = hiddenCodes.length
 
+  const blank =
+    !!owner &&
+    entries.length === 0 &&
+    pending.length === 0 &&
+    hiddenCount === 0 &&
+    props.derivedState === 'ready'
   let collection: ReactNode
   if (entries.length === 0) {
     if (!owner) {
@@ -255,7 +261,7 @@ export function PassportLayout(props: PassportLayoutProps) {
       recording: owner.quickWrites.recording,
     }
   }, [owner, mode, draft, state.region, state.sources, entries, pending, hiddenCodes])
-  if (state.view === 'map' && filtered.length + filteredPending.length > 0) {
+  if (blank || (state.view === 'map' && filtered.length + filteredPending.length > 0)) {
     const atlas = (
       <PassportAtlas
         locale={locale}

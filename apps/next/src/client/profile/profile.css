@@ -26,9 +26,9 @@
   border-radius: var(--radius-sm);
   background: var(--surface-inset);
   color: var(--text-muted);
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 500;
-  line-height: 18px;
+  line-height: 1.125rem;
   text-decoration: none;
   flex-shrink: 0;
   transition:
@@ -69,14 +69,14 @@
 }
 .profile-block-head h2 {
   margin: 0;
-  font-size: 22px;
-  line-height: 28px;
+  font-size: 1.375rem;
+  line-height: 1.75rem;
   letter-spacing: -0.02em;
 }
 .profile-block-aside {
   margin: 0;
-  font-size: 14px;
-  line-height: 18px;
+  font-size: 0.875rem;
+  line-height: 1.125rem;
   color: var(--text-muted);
 }
 .profile-inline-link {
@@ -84,7 +84,7 @@
   align-items: center;
   min-block-size: 44px;
   margin-block: -13px;
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 500;
 }
 .profile-quiet {
@@ -100,6 +100,7 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+  container-type: inline-size;
 }
 .profile-distance p {
   margin: 0;
@@ -111,21 +112,21 @@
   column-gap: var(--space-3);
 }
 .profile-distance-value > span:first-child {
-  font-size: 80px;
-  line-height: 84px;
+  font-size: min(5rem, 18cqi);
+  line-height: 1.05;
   font-weight: 600;
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
 }
 .profile-distance-unit {
-  font-size: 20px;
-  line-height: 26px;
+  font-size: 1.25rem;
+  line-height: 1.625rem;
   font-weight: 500;
   color: var(--text-muted);
 }
 .profile-earth {
-  font-size: 15px;
-  line-height: 18px;
+  font-size: 0.9375rem;
+  line-height: 1.125rem;
   color: var(--text-muted);
 }
 .profile-totals {
@@ -141,15 +142,15 @@
 }
 .profile-totals dd {
   margin: 0;
-  font-size: 36px;
-  line-height: 44px;
+  font-size: 2.25rem;
+  line-height: 2.75rem;
   font-weight: 600;
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
 }
 .profile-totals dt {
-  font-size: 14px;
-  line-height: 18px;
+  font-size: 0.875rem;
+  line-height: 1.125rem;
   color: var(--text-muted);
 }
 
@@ -193,15 +194,15 @@
   outline-offset: 2px;
 }
 .profile-badge strong {
-  font-size: 16px;
-  line-height: 20px;
+  font-size: 1rem;
+  line-height: 1.25rem;
   font-weight: 600;
   text-wrap: balance;
 }
 .profile-badge small {
   margin-block-start: -6px;
-  font-size: 14px;
-  line-height: 18px;
+  font-size: 0.875rem;
+  line-height: 1.125rem;
   color: var(--text-muted);
 }
 .profile-badge-mark {
@@ -235,8 +236,8 @@
   border-radius: var(--radius-full);
   background: var(--accent);
   color: var(--accent-foreground);
-  font-size: 11px;
-  line-height: 14px;
+  font-size: 0.6875rem;
+  line-height: 0.875rem;
   font-weight: 700;
   letter-spacing: 0.04em;
 }
@@ -301,13 +302,28 @@
   border-radius: 16px;
   background: var(--surface-inset);
 }
+.ladder-strip[data-fade-end] {
+  mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent);
+}
+.ladder-strip[data-fade-start] {
+  mask-image: linear-gradient(to left, #000 calc(100% - 40px), transparent);
+}
+.ladder-strip[data-fade-start][data-fade-end] {
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 40px,
+    #000 calc(100% - 40px),
+    transparent
+  );
+}
 .ladder-slot {
   display: flex;
   flex: none;
   flex-direction: column;
   align-items: center;
   gap: var(--space-1);
-  min-inline-size: 64px;
+  min-inline-size: 88px;
   scroll-snap-align: start;
   text-align: center;
 }
@@ -316,23 +332,23 @@
 }
 .ladder-slot-name {
   max-inline-size: 96px;
-  font-size: 12px;
-  line-height: 16px;
+  font-size: 0.75rem;
+  line-height: 1rem;
   color: var(--text-muted);
 }
 .ladder-slot[data-state='next'] .ladder-slot-name {
   max-inline-size: none;
 }
 .ladder-slot-togo {
-  font-size: 12px;
-  line-height: 16px;
+  font-size: 0.75rem;
+  line-height: 1rem;
   font-weight: 600;
   text-wrap: balance;
 }
 .ladder-top {
   margin-block-start: var(--space-3);
   color: var(--text-muted);
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 .profile-badge-earned {
   color: var(--text-muted);
@@ -358,8 +374,8 @@
 }
 .profile-join h2 {
   margin: 0;
-  font-size: 24px;
-  line-height: 30px;
+  font-size: 1.5rem;
+  line-height: 1.875rem;
   letter-spacing: -0.02em;
   text-wrap: balance;
 }
@@ -403,8 +419,8 @@
   --cover-ink: var(--background);
 }
 .profile-cover-title {
-  font-size: 12px;
-  line-height: 16px;
+  font-size: 0.75rem;
+  line-height: 1rem;
   font-weight: 500;
   letter-spacing: 0.2em;
 }
@@ -425,16 +441,16 @@
   fill: var(--cover-fill);
 }
 .profile-cover-kana {
-  font: 500 44px/52px var(--font-kana);
+  font: 500 2.75rem/3.25rem var(--font-kana);
 }
 .profile-cover-foot {
-  font: 12px/16px var(--font-mono);
+  font: 0.75rem/1rem var(--font-mono);
   letter-spacing: 0.2em;
 }
 .profile-closed h1 {
   margin: 0 0 var(--space-2);
-  font-size: 22px;
-  line-height: 28px;
+  font-size: 1.375rem;
+  line-height: 1.75rem;
 }
 .profile-closed p {
   margin: 0 0 var(--space-6);
@@ -484,12 +500,12 @@
 
 @media (max-width: 700px) {
   .profile-distance-value > span:first-child {
-    font-size: 56px;
-    line-height: 62px;
+    font-size: min(3.5rem, 18cqi);
+    line-height: 1.1071;
   }
   .profile-distance-unit {
-    font-size: 18px;
-    line-height: 22px;
+    font-size: 1.125rem;
+    line-height: 1.375rem;
   }
   .profile-numbers {
     gap: 28px;
@@ -498,8 +514,8 @@
     gap: var(--space-4) var(--space-6);
   }
   .profile-totals dd {
-    font-size: 28px;
-    line-height: 34px;
+    font-size: 1.75rem;
+    line-height: 2.125rem;
   }
   .profile-badges {
     gap: var(--space-5) 0;

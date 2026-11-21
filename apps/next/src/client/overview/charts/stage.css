@@ -68,13 +68,13 @@
   gap: 8px;
   height: 100%;
   color: var(--text);
-  font: 400 15px/20px var(--font-sans);
+  font: 400 0.9375rem/1.25rem var(--font-sans);
 }
 .stage-label[data-mono] {
   font-family: var(--font-mono);
 }
 .kc-svg .stage[data-span='full'] .stage-label[data-mono] {
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 .kc-svg .stage[data-span='full'] .stage-value {
   font-size: 15px;

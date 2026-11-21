@@ -282,10 +282,10 @@ export function AuthCard({
       if (error instanceof NoJournal) return go({ step: 'create', email: address }, 'primary')
       const code = codeOf(error)
       if (code === 'INVALID_CREDENTIALS' || code === 'INVALID_EMAIL_OR_PASSWORD')
-        return go({ step: 'form', error: 'invalid' })
+        return go({ step: 'form', error: 'invalid' }, 'password')
       if (code === 'INVALID_EMAIL' || code === 'MISSING_CREDENTIALS')
-        return go({ step: 'form', error: 'email' })
-      if (code === 'MISSING_PASSWORD') return go({ step: 'form', error: 'password' })
+        return go({ step: 'form', error: 'email' }, 'email-selected')
+      if (code === 'MISSING_PASSWORD') return go({ step: 'form', error: 'password' }, 'password')
       go({ step: 'form', error: statusOf(error) === 429 ? 'rate' : 'network' })
     }
   }

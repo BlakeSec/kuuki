@@ -185,22 +185,15 @@ const WAITING_FORMS = {
     other: '{count} страны ждут вас',
   },
 }
-const GHOSTS = ['round', 'rect', 'round', 'round', 'rect', 'round'] as const
-
 export function EmptyPassport({ locale, onAdd }: { locale: Locale; onAdd: () => void }) {
   const ru = locale === 'ru'
   return (
     <section className="passport-empty" aria-labelledby="passport-empty-title">
-      <ul className="passport-ghosts" aria-hidden="true">
-        {GHOSTS.map((shape, index) => (
-          <li key={index} className="passport-ghost" data-shape={shape} />
-        ))}
-      </ul>
       <h2 id="passport-empty-title">{formatCount(locale, CATALOG_TOTAL, WAITING_FORMS)}</h2>
       <p>
         {ru
-          ? 'Добавьте страну, где вы были, или импортируйте перелёты: штампы появятся здесь.'
-          : 'Add a country you have visited or import your flights, and the stamps appear here.'}
+          ? 'Нажмите на карте страну, где вы были, или импортируйте перелёты.'
+          : 'Tap a country you have visited on the map, or import your flights.'}
       </p>
       <p>
         {ru

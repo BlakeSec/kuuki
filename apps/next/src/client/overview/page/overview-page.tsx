@@ -258,7 +258,6 @@ function PageContent() {
         </>
       ) : (
         <>
-          {firstRun ? <NextStrip /> : null}
           {!payload.derivedReady ? (
             <p role="status" className="status-note">
               {t(S.countriesUpdating, locale)}
@@ -268,14 +267,11 @@ function PageContent() {
             {!firstRun ? (
               <div className="ov3-common-controls">{!fullscreen ? <FilterBar /> : null}</div>
             ) : null}
-            {firstRun ? <FirstRun /> : null}
             <div className="ov3-globe-band">
-              {!firstRun ? (
-                <div data-region="figures">
-                  <NextStrip />
-                  <HeroPanel />
-                </div>
-              ) : null}
+              <div data-region="figures" data-first-run={firstRun ? '' : undefined}>
+                <NextStrip />
+                {firstRun ? <FirstRun /> : <HeroPanel />}
+              </div>
               <section
                 className="ov3-globe-region ov-globe"
                 aria-label={t(S.map, locale)}
@@ -288,7 +284,7 @@ function PageContent() {
               </section>
               {!firstRun ? <CountryList /> : null}
             </div>
-            <CountryTreemap key={ownerKey} />
+            {!firstRun ? <CountryTreemap key={ownerKey} /> : null}
           </div>
           {mobile === false && chaptersShown ? <ChapterPreloads ids={visible} /> : null}
           {zero ? (
