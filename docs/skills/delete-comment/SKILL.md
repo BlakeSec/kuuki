@@ -5,7 +5,7 @@ description: Sweep code comments out of Kuuki source. Classify each one, move de
 
 # Delete comments
 
-Kuuki bans code comments. `node scripts/comments.mjs check` (part of `pnpm lint` and the pre-commit hook) fails when a file has more comments than `scripts/comment-baseline.json` allows. New files start at zero. The baseline only goes down.
+Kuuki bans code comments. `node scripts/comments.mjs check` (part of `pnpm lint` and the pre-commit hook) fails when a file has more comments than `scripts/comment-baseline.json` allows. It and `pnpm comments:ratchet` count the staged content (the Git index), so another owner's unstaged or untracked edits never block a commit; stage your files before ratcheting. New files start at zero. The baseline only goes down.
 
 Tool directives are not comments and stay: `oxlint-disable…`, `eslint-…`, `@ts-expect-error`, `@ts-ignore`, `@ts-nocheck`, `/// <reference`, `@vitest-environment`, `@jsx…`, `#__PURE__`, `webpack…`, `@vite-ignore`, `prettier-ignore`, `oxfmt-ignore`, `c8`/`istanbul`/`v8 ignore`, `#region`, `@license`, `/*!`, and verbatim `Copyright (c)` notices on adapted third-party code. `DIRECTIVE` in `scripts/comments.mjs` owns that list.
 

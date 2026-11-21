@@ -150,16 +150,45 @@ export function sourceFiles() {
     encoding: 'utf8',
   })
   return [...new Set(listed.split('\n'))]
-    .filter((path) => SCOPE.test(path) && SOURCE.test(path))
-    .filter((path) => !EXCLUDED.some((pattern) => pattern.test(path)))
+    .filter(inScope)
     .filter((path) => existsSync(join(root, path)))
     .sort()
 }
 
-function countAll() {
+function inScope(path) {
+  return SCOPE.test(path) && SOURCE.test(path) && !EXCLUDED.some((pattern) => pattern.test(path))
+}
+
+export function stagedSources() {
+  const listed = execFileSync('git', ['ls-files', '--stage', '-z'], { cwd: root, encoding: 'utf8' })
+  const entries = listed
+    .split('\0')
+    .filter(Boolean)
+    .map((line) => {
+      const [meta, path] = line.split('\t')
+      return { path, blob: meta.split(' ')[1], stage: meta.split(' ')[2] }
+    })
+    .filter(({ path, stage }) => stage === '0' && inScope(path))
+  const batch = execFileSync('git', ['cat-file', '--batch'], {
+    cwd: root,
+    input: entries.map(({ blob }) => blob).join('\n') + '\n',
+    maxBuffer: 1 << 30,
+  })
+  const sources = new Map()
+  let offset = 0
+  for (const { path } of entries) {
+    const header = batch.indexOf(10, offset)
+    const size = Number(batch.toString('utf8', offset, header).split(' ')[2])
+    sources.set(path, batch.toString('utf8', header + 1, header + 1 + size))
+    offset = header + 1 + size + 1
+  }
+  return sources
+}
+
+function countAll(sources) {
   const counts = {}
-  for (const path of sourceFiles()) {
-    const count = findComments(path, readFileSync(join(root, path), 'utf8')).length
+  for (const [path, text] of sources) {
+    const count = findComments(path, text).length
     if (count) counts[path] = count
   }
   return counts
@@ -176,7 +205,8 @@ function writeBaseline(counts) {
 
 function check() {
   const baseline = readBaseline()
-  const counts = countAll()
+  const sources = stagedSources()
+  const counts = countAll(sources)
   const grown = []
   const stale = []
   for (const [path, count] of Object.entries(counts)) {
@@ -187,7 +217,7 @@ function check() {
     if ((counts[path] ?? 0) < allowed) stale.push(path)
   }
   for (const { path, count, allowed } of grown) {
-    const text = readFileSync(join(root, path), 'utf8')
+    const text = sources.get(path)
     console.error(`${path}: ${count} comments, ${allowed} allowed`)
     for (const comment of findComments(path, text)) {
       console.error(
@@ -213,7 +243,7 @@ function check() {
 
 function ratchet() {
   const baseline = readBaseline()
-  const counts = countAll()
+  const counts = countAll(stagedSources())
   const next = {}
   for (const [path, allowed] of Object.entries(baseline)) {
     const count = Math.min(counts[path] ?? 0, allowed)
