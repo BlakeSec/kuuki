@@ -12,5 +12,8 @@
   "apps/next/src/client/journal/toolbar.tsx": 9,
   "apps/next/src/client/journal/use-journal-keys.ts": 9,
   "apps/next/src/client/ui/multi-select.tsx": 8,
+  "apps/next/src/lib/airport-models/geometry.ts": 2,
+  "scripts/airport-models/normalize.ts": 6,
+  "scripts/airport-models/prepare.ts": 1,
   "scripts/smoke-next-runtime.ts": 10
 }

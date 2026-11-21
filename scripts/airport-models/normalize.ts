@@ -229,8 +229,13 @@ function reconcileBuildingVolumes(buildings: BuildingFeature[]) {
       if (child.id === parent.id) return false
       const c = bounds.get(child.id)!
       if (c[0]! >= p[2]! || c[2]! <= p[0]! || c[1]! >= p[3]! || c[3]! <= p[1]!) return false
+      // Parts can be represented by several overlapping semantic outlines. Their
+      // explicit parent ID remains intact, but none of those outlines may cover them.
       if (child.isPart) return true
+      // One strict total order prevents tolerance-based cycles between near-equal footprints.
       if (rank.get(child.id)! >= rank.get(parent.id)!) return false
+      // A contained, separately mapped building replaces an aggregate envelope;
+      // unrelated partial overlaps retain their original physical representation.
       return (
         area(
           fromClip(polygonClipping.difference(toClip(child.polygons), toClip(parent.polygons))),
@@ -458,6 +463,7 @@ export function normalize(elements: Element[], config: Config, extractSha256: st
       diagnostics.push({ id, reason })
     }
   }
+  // Preserve source identities; only the physical extrusion remainder is reconciled.
   const buildings = features.filter(
     (f): f is Extract<AirportFeature, { type: 'building' }> => f.type === 'building',
   )

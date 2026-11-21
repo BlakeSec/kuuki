@@ -51,3 +51,26 @@ test('strips CSS comments but not comment markers inside strings', () => {
   )
   assert.equal(stripComments('x.css', source), 'a { content: "/* keep */"; }\nb { color: red; }\n')
 })
+
+test('keeps token boundaries, line breaks and code braces when stripping', () => {
+  const strip = (path, source) => stripComments(path, source)
+  assert.equal(
+    strip('a.ts', 'function f() {\n  return /* why\n  */ 7\n}\n'),
+    'function f() {\n  return\n7\n}\n',
+  )
+  assert.equal(strip('a.ts', 'const k = a/*note*/in obj\n'), 'const k = a in obj\n')
+  assert.equal(strip('a.ts', 'const n = a +/*x*/+b\n'), 'const n = a + +b\n')
+  assert.equal(strip('a.ts', 'function noop(){/* no work */}\n'), 'function noop(){}\n')
+  assert.equal(strip('a.tsx', 'const v = <a>{/* one */ /* two */}</a>\n'), 'const v = <a></a>\n')
+  assert.equal(
+    strip('x.css', '.parent/* note */ .child {}\n.a/*x*/.b {}\n'),
+    '.parent .child {}\n.a.b {}\n',
+  )
+})
+
+test('keeps directives inside star-prefixed docblocks', () => {
+  assert.deepEqual(
+    findComments('a.test.ts', '/**\n * @vitest-environment jsdom\n */\nexport {}\n'),
+    [],
+  )
+})

@@ -17,10 +17,18 @@ const EXCLUDED = [
 ]
 
 const DIRECTIVE =
-  /^(?:\/\/\/?|\/\*\*?|\/\*!)\s*(?:eslint-|oxlint-|@ts-(?:expect-error|ignore|nocheck|check)\b|<reference\s|@vitest-environment\b|@jsx|[#@]__(?:PURE|NO_SIDE_EFFECTS)__|webpack[A-Z]|@vite-ignore|prettier-ignore|oxfmt-ignore|c8\s|istanbul\s|v8\s+ignore|@refresh\b|biome-ignore|#(?:end)?region\b|@license\b|@preserve\b|Copyright \(c\))|^\/\*!/
+  /^(?:eslint-|oxlint-|@ts-(?:expect-error|ignore|nocheck|check)\b|<reference\s|@vitest-environment\b|@jsx|[#@]__(?:PURE|NO_SIDE_EFFECTS)__|webpack[A-Z]|@vite-ignore|prettier-ignore|oxfmt-ignore|c8\s|istanbul\s|v8\s+ignore|@refresh\b|biome-ignore|#(?:end)?region\b|@license\b|@preserve\b|Copyright \(c\))/
 
 export function isDirective(text) {
-  return DIRECTIVE.test(text)
+  if (text.startsWith('/*!')) return true
+  const body = text.startsWith('//')
+    ? text.replace(/^\/\/\/?/, '')
+    : text
+        .slice(2, -2)
+        .split('\n')
+        .map((line) => line.replace(/^\s*\*+/, ''))
+        .join('\n')
+  return DIRECTIVE.test(body.trimStart())
 }
 
 function scriptKind(path) {
@@ -33,6 +41,7 @@ function scriptKind(path) {
 function scriptComments(path, text) {
   const file = ts.createSourceFile(path, text, ts.ScriptTarget.Latest, false, scriptKind(path))
   const ranges = new Map()
+  const emptyJsx = []
   const collect = (list) => {
     for (const range of list ?? []) {
       const head = text.slice(range.pos, range.pos + 2)
@@ -42,6 +51,9 @@ function scriptComments(path, text) {
   const visit = (node) => {
     if (node.kind >= ts.SyntaxKind.FirstJSDocNode && node.kind <= ts.SyntaxKind.LastJSDocNode)
       return
+    if (node.kind === ts.SyntaxKind.JsxExpression && !node.expression) {
+      emptyJsx.push({ start: node.getStart(file), end: node.end })
+    }
     if (node.kind !== ts.SyntaxKind.JsxText) {
       collect(ts.getLeadingCommentRanges(text, node.pos))
       collect(ts.getTrailingCommentRanges(text, node.end))
@@ -49,7 +61,11 @@ function scriptComments(path, text) {
     for (const child of node.getChildren(file)) visit(child)
   }
   visit(file)
-  return [...ranges].map(([start, end]) => ({ start, end }))
+  return [...ranges].map(([start, end]) => ({
+    start,
+    end,
+    braces: emptyJsx.find((span) => span.start < start && end < span.end),
+  }))
 }
 
 function cssComments(text) {
@@ -87,21 +103,31 @@ function lineOf(text, index) {
   return line
 }
 
+function separator(css, comment, left, right) {
+  if (css) return /[ \t]$/.test(left) || /^[ \t]/.test(right) ? ' ' : ''
+  if (comment.includes('\n')) return '\n'
+  const a = left.trimEnd().at(-1)
+  const b = right.trimStart()[0]
+  const word = /[\w$]/
+  if (word.test(a) && word.test(b)) return ' '
+  if (a === b && '+-/'.includes(a)) return ' '
+  if (a === '/' && b === '*') return ' '
+  return ''
+}
+
 export function stripComments(path, text) {
+  const css = path.endsWith('.css')
   let out = text
+  let cut = Infinity
   for (const comment of findComments(path, text).reverse()) {
-    let { start, end } = comment
+    let { start, end } = comment.braces ?? comment
+    if (end > cut) continue
+    cut = start
     const lineStart = out.lastIndexOf('\n', start - 1) + 1
     let lineEnd = out.indexOf('\n', end)
     if (lineEnd === -1) lineEnd = out.length
-    let before = out.slice(lineStart, start)
-    let after = out.slice(end, lineEnd)
-    if (/\{\s*$/.test(before) && /^\s*\}/.test(after)) {
-      start = lineStart + before.replace(/\{\s*$/, '').length
-      end = end + after.indexOf('}') + 1
-      before = out.slice(lineStart, start)
-      after = out.slice(end, lineEnd)
-    }
+    const before = out.slice(lineStart, start)
+    const after = out.slice(end, lineEnd)
     if (before.trim() === '' && after.trim() === '') {
       out = out.slice(0, lineStart) + out.slice(Math.min(lineEnd + 1, out.length))
     } else if (after.trim() === '') {
@@ -109,7 +135,10 @@ export function stripComments(path, text) {
     } else if (before.trim() === '') {
       out = out.slice(0, start) + out.slice(end).replace(/^[ \t]+/, '')
     } else {
-      out = out.slice(0, start).replace(/[ \t]+$/, ' ') + out.slice(end).replace(/^[ \t]+/, '')
+      const left = out.slice(0, start)
+      const right = out.slice(end)
+      const gap = separator(css, out.slice(start, end), left, right)
+      out = left.replace(/[ \t]+$/, '') + gap + right.replace(/^[ \t]+/, '')
     }
   }
   return out

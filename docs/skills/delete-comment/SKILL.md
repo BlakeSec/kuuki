@@ -13,7 +13,7 @@ Scope: JS, TS and CSS under `apps/next`, `functions`, `packages`, `workers`, `sc
 
 ## Input
 
-A path, a list of files, or nothing for every file in the baseline. In a shared checkout, skip files with another owner's uncommitted changes (`git diff --name-only`). They stay in the baseline for a later sweep.
+A path, a list of files, or nothing for every file in the baseline. In a shared checkout, skip files with another owner's uncommitted changes (`git diff --name-only`). They stay in the baseline for a later sweep. Also skip files whose source text a generator hashes, unless you mean to regenerate and ship its artifacts: `generatorCodeSha256` in `scripts/airport-models/prepare.ts` hashes four files, so stripping them fails `pnpm airport-models:check`.
 
 ## Steps
 
@@ -29,7 +29,7 @@ A path, a list of files, or nothing for every file in the baseline. In a shared 
    - Excuses: one file per hack at `.scratch/comment-debt/issues/NN-slug.md` (see `docs/agents/issue-tracker.md`), with `Status: needs-triage`, the file and symbol, the original comment, what is hacky and the proper fix.
 4. **Strip.** `node scripts/comments.mjs strip <files>`, then `pnpm exec oxfmt <files>`. It removes whole-line comments with their line, trailing comments, inline block comments and JSX `{/* … */}` with its braces, and leaves directives, strings, regexes and JSX text alone. A strip that leaves an empty `catch {}` has removed the only reason the failure was safe to ignore; add the location to `.scratch/comment-debt/issues/31-name-ignored-failures-in-empty-catches.md`.
 5. **Ratchet.** `pnpm comments:ratchet` lowers the baseline to the new counts and drops files that reach zero. Then run `pnpm lint:comments`.
-6. **Verify.** `pnpm typecheck`, `pnpm typecheck:api`, `pnpm lint`, `pnpm format:check`, `pnpm test`, and `node --test scripts/comments.test.mjs` if you touched the tool.
+6. **Verify.** `pnpm airport-models:check`, `pnpm check:airport-catalog`, `pnpm typecheck`, `pnpm typecheck:api`, `pnpm lint`, `pnpm format:check`, `pnpm test`, and `node --test scripts/comments.test.mjs` if you touched the tool.
 
 ## When `lint:comments` fails
 

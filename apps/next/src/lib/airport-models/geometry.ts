@@ -15,9 +15,11 @@ export function buildingVolumes(
   )
 }
 
+/** Plan [east,north] maps to Three world (east,height,-north). */
 export function worldPoint(point: PointM, height = 0): [number, number, number] {
   return [point[0], height, -point[1]]
 }
+/** Orthographic camera plane, metres; azimuth 0 places the camera south; positive angles move west. */
 export function projectPoint(point: PointM, height: number, camera: CameraPose): PointM {
   const east = point[0] - camera.targetM[0]
   const north = point[1] - camera.targetM[1]
