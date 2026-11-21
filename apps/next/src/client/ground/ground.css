@@ -1,4 +1,3 @@
-/* Ground travel list, totals, cards and detail sheet. Tokens only. No divider lines between rows: space groups. */
 .gt-page {
   display: grid;
   gap: var(--space-5);
@@ -40,7 +39,6 @@
   color: var(--accent-on-tint);
   font-weight: 600;
 }
-/* The transport chip with no value reads as a quiet "Transport" prompt, as the Journal's empty facet chips do. */
 .gt-chip {
   display: contents;
 }
@@ -61,7 +59,6 @@
   gap: var(--space-2) var(--space-3);
 }
 
-/* A compact summary of the modes with completed journeys. */
 .gt-totals {
   display: grid;
   gap: var(--space-2);
@@ -110,7 +107,6 @@
   overflow-wrap: anywhere;
 }
 
-/* Sections and cards. */
 .gt-list-section {
   display: grid;
   gap: var(--space-3);
@@ -124,7 +120,6 @@
 }
 .gt-list {
   display: grid;
-  /* Two cards a row once each keeps its wide layout: 480px of content plus the card's padding and border. */
   grid-template-columns: repeat(
     auto-fill,
     minmax(min(100%, calc(480px + 2 * var(--space-5) + 2px)), 1fr)
@@ -152,7 +147,6 @@
   font-weight: 600;
   overflow-wrap: anywhere;
 }
-/* The title link spans the card, so the whole card is one 44px+ target and one tab stop. */
 .gt-card-link {
   color: var(--text);
   text-decoration: none;
@@ -191,7 +185,6 @@
   line-height: 20px;
   color: var(--text-muted);
 }
-/* Distance is secondary to the route: body size, quieter unit; other facts read "label value" in metadata size. */
 .gt-card-facts {
   display: flex;
   flex-wrap: wrap;
@@ -250,7 +243,6 @@
   font-size: 13px;
   line-height: 20px;
 }
-/* The route leads: departure left, destination right, each wrapping in its own half instead of truncating. */
 .gt-card .gt-card-title {
   margin-top: var(--space-3);
   font-size: 20px;
@@ -284,7 +276,6 @@
   letter-spacing: 0;
   color: var(--text-muted);
 }
-/* The schematic sits between the two cities, level with their names, with the via cities under it. */
 .gt-card-path {
   display: grid;
   align-content: start;
@@ -300,7 +291,6 @@
   font-weight: 400;
   letter-spacing: 0;
 }
-/* Stop-order schematic: neutral line, accent endpoints, an arrowhead into the destination. Gaps stay gaps. */
 .gt-route-line {
   --route-line: color-mix(in oklch, var(--text-muted) 45%, transparent);
   display: flex;
@@ -411,7 +401,6 @@
   color: var(--text);
   font-weight: 500;
 }
-/* Status is a word first; the tint only backs it. */
 .gt-status {
   padding: 0 var(--space-2);
   border-radius: var(--radius-full);
@@ -430,7 +419,6 @@
   font-weight: 500;
 }
 
-/* Detail sheet. */
 .gt-detail {
   display: grid;
   gap: var(--space-4);
@@ -500,7 +488,6 @@
   gap: var(--space-2);
 }
 
-/* Loading skeleton: static bars at the final card size. */
 .gt-skeleton {
   display: grid;
   gap: var(--space-3);
@@ -555,7 +542,6 @@
   border-radius: var(--radius-md);
 }
 @media (max-width: 700px) {
-  /* Four actions do not fit one row: wrap whole labels and let each row fill, instead of the full sheet's equal flex: 1 columns. */
   .flight-full-sheet .ui-panel-footer .gt-list-actions {
     flex: 1;
   }
@@ -605,7 +591,6 @@
   stroke-linecap: round;
   stroke-linejoin: round;
 }
-/* Pins and the route list share one mark: start ring, numbered stops as a soft tint disc, filled end. */
 .gt-map-pin circle {
   fill: var(--surface);
   stroke: var(--map-route);
@@ -633,7 +618,6 @@
 .gt-map-pin[data-role='end'] text {
   fill: var(--accent-foreground);
 }
-/* Names sit on the map with a halo in the water colour instead of a box. */
 .gt-map-label {
   fill: var(--text);
   font-size: 12px;
@@ -645,8 +629,6 @@
   paint-order: stroke;
 }
 
-/* The card's map: beside the text on a wide card, under the route on a narrow one. Its strokes stay 2px at any size. */
-/* A card stretched to its row neighbour keeps the totals row at the bottom. */
 .gt-card-body {
   display: grid;
   grid-template-rows: 1fr;
@@ -672,7 +654,6 @@
 .gt-card-map .gt-map-dot {
   vector-effect: non-scaling-stroke;
 }
-/* A short text column: the cities share the first row and the schematic drops under them. */
 @container gt-card-main (max-width: 479.98px) {
   .gt-card .gt-card-link {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -684,7 +665,6 @@
     padding-top: var(--space-2);
   }
 }
-/* Narrow card: the map sits under the route and replaces the schematic line. */
 @container gt-card (max-width: 479.98px) {
   .gt-card-body:has(> .gt-card-map) .gt-route-line {
     display: none;
@@ -712,7 +692,6 @@
   font-weight: 500;
 }
 
-/* The route list: one row per city, the connection that reaches it on the line above. */
 .gt-route {
   --route-line: color-mix(in oklch, var(--text-muted) 45%, transparent);
   display: grid;
@@ -788,7 +767,6 @@
   background: var(--accent);
   color: var(--accent-foreground);
 }
-/* A place without coordinates has no pin, so no number either. */
 .gt-stop-mark[data-role='none'] {
   border-style: dashed;
   border-color: var(--text-muted);

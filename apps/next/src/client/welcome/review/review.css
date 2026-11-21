@@ -1,7 +1,3 @@
-/*
- * The compact review (boards 15.5, 15.9, 18.x). Tokens only. No hairlines between rows: space does the grouping.
- * The save bar bleeds to the panel edge with the frame's `--welcome-bleed`.
- */
 .review-step {
   --review-warn-bg: color-mix(in srgb, var(--warning-fill) 12%, var(--surface));
   display: flex;
@@ -13,7 +9,6 @@
   gap: 6px;
 }
 
-/* ---------- Unsure cards ---------- */
 .review-unsure {
   display: flex;
   flex-direction: column;
@@ -81,7 +76,6 @@
   display: none;
 }
 
-/* Up to four chips share one row; more wrap into three columns. Never a horizontal scroll. */
 .review-chips {
   display: grid;
   grid-auto-flow: column;
@@ -202,7 +196,6 @@
   font: 400 13px/20px var(--font-sans);
 }
 
-/* ---------- Looks right / left out ---------- */
 .review-group {
   display: flex;
   flex-direction: column;
@@ -267,7 +260,6 @@
 .review-line[data-kind='left'] .review-route {
   color: var(--text-muted);
 }
-/* The expanded list scrolls inside a capped region; the card never grows to the full list. */
 .review-scroll {
   max-block-size: min(70vh, 480px);
   overflow-y: auto;
@@ -300,7 +292,6 @@
   opacity: 0.6;
 }
 
-/* ---------- Sticky save bar ---------- */
 .review-bar {
   position: sticky;
   inset-block-end: 0;
@@ -348,7 +339,6 @@
   gap: 12px;
 }
 
-/* ---------- Loading ---------- */
 .review-skeleton {
   display: flex;
   flex-direction: column;
@@ -362,7 +352,6 @@
   background: var(--surface-inset);
 }
 
-/* ---------- Phone: a sheet, header over meta, chips 44 high ---------- */
 @media (max-width: 700px) {
   .review-step {
     gap: 20px;
@@ -465,8 +454,6 @@
   }
 }
 
-/* Rows with other problems reuse the import page's ReviewRow. Inside the card an unsure row is outlined in the
-   warning ink all round, like the unsure cards' tint, and its inner hints sit on the inset. */
 .review-step .import-row[data-low='true'] {
   border-color: var(--warning-fill);
 }

@@ -6,13 +6,11 @@ import { calendarDay } from '@kuuki/shared/overview/next'
 import type { SectionId } from '@kuuki/shared/overview/prefs'
 
 export type NarratorSlot = SectionId | 'globe' | 'hero' | 'heroSmall' | 'firstRun' | 'zero'
-/** The hero card's five records, in card order. */
 export type HeroRecord = 'flights' | 'km' | 'air' | 'countries' | 'airports'
 export interface Trigger {
   id: string
   slot: NarratorSlot
   priority: number
-  /** Hero triggers name the record whose takeover shows their line. */
   record?: HeroRecord
   when(scope: OverviewScope, all: OverviewScope): Record<string, string | number> | null
 }
@@ -21,7 +19,6 @@ const EQUATOR_KM = EARTH_CIRCUMFERENCE_KM,
   WEEK_MINUTES = 7 * 24 * 60
 
 export const TRIGGERS: Trigger[] = [
-  // Ready Records; longestDuration destination AKL and positive minutes. Hours rounded to one decimal, explicitly approximate.
   {
     id: 'records:auckland-duration',
     slot: 'records',
@@ -35,7 +32,6 @@ export const TRIGGERS: Trigger[] = [
         : null
     },
   },
-  // Ready Records; non-null longest with positive distance witness. Null aggregate flightId does not erase distance evidence.
   {
     id: 'records:longest-distance',
     slot: 'records',
@@ -49,7 +45,6 @@ export const TRIGGERS: Trigger[] = [
         : null
     },
   },
-  // Ready Records; busiestYear with positive flights; year label from actual year, not locale-grouped count.
   {
     id: 'records:busiest-year',
     slot: 'records',
@@ -63,7 +58,6 @@ export const TRIGGERS: Trigger[] = [
         : null
     },
   },
-  // Ready Records; non-null busiestDay with flights greater than one. Aggregate day absence is not a quiet day.
   {
     id: 'records:busiest-day',
     slot: 'records',
@@ -75,7 +69,6 @@ export const TRIGGERS: Trigger[] = [
       return day && day.flights > 1 ? { date: day.date, count: day.flights } : null
     },
   },
-  // Ready Records; longestStreakMonths greater than one. This is months with flight evidence, not flight frequency.
   {
     id: 'records:streak',
     slot: 'records',
@@ -134,9 +127,6 @@ export const TRIGGERS: Trigger[] = [
         : null
     },
   },
-  // The crossings slot shows Continents; its time-zone and line facts sit in the card's Details, so both kinds of line belong here.
-  // Ready Continents; two or more continents flown and the most-flown one is on at least 75% of every scoped flight (unplaced
-  // flights stay in the denominator). A flight counts for each continent it starts or ends on, as the tray does. No name: the hero prints it.
   {
     id: 'crossings:continent-majority',
     slot: 'crossings',
@@ -151,9 +141,6 @@ export const TRIGGERS: Trigger[] = [
         : null
     },
   },
-  // Ready Continents; two or more continents flown, each with a dated first flight, and scoped flights at least two calendar years
-  // after the newest first year. Every later flight touched only continents already reached. Below the line facts: the hero already
-  // prints the newest continent's year, so this adds only the drought after it.
   {
     id: 'crossings:no-new-continent',
     slot: 'crossings',
@@ -167,7 +154,6 @@ export const TRIGGERS: Trigger[] = [
       return latest !== undefined && latest >= newest + 2 ? { year: String(newest) } : null
     },
   },
-  // Ready Continents; two or more continents flown and no flight starts or ends in Antarctica. A fallback: true of nearly every journal.
   {
     id: 'crossings:no-antarctica',
     slot: 'crossings',
@@ -179,8 +165,6 @@ export const TRIGGERS: Trigger[] = [
       return v.flown >= 2 && antarctica === 0 ? { flown: v.flown } : null
     },
   },
-  // Ready Crossings; antimeridian count zero, with complete coordinate coverage.
-  // A fallback: Crossings often ends the page, and an absence is a weak last line when the clocks did move.
   {
     id: 'crossings:no-date-line',
     slot: 'crossings',
@@ -193,7 +177,6 @@ export const TRIGGERS: Trigger[] = [
         : null
     },
   },
-  // Ready Crossings; dateLine positive. Count is route crossing total, not distinct flights or dates.
   {
     id: 'crossings:date-line',
     slot: 'crossings',
@@ -204,7 +187,6 @@ export const TRIGGERS: Trigger[] = [
       return v.dateLine > 0 ? { count: v.dateLine } : null
     },
   },
-  // Ready Crossings; forwardHours strictly exceeds backHours. Rounded engine clock changes, not time spent in flight.
   {
     id: 'crossings:forward',
     slot: 'crossings',
@@ -235,7 +217,6 @@ export const TRIGGERS: Trigger[] = [
       return count >= 1 ? { count } : null
     },
   },
-  // Ready Crossings; the modeled arc crossed the equator at least once. Count is crossings, not flights.
   {
     id: 'crossings:equator',
     slot: 'crossings',
@@ -246,7 +227,6 @@ export const TRIGGERS: Trigger[] = [
       return count >= 1 ? { count } : null
     },
   },
-  // Ready Crossings; between 4 and 22 of the 24 hourly endpoint UTC bins occupied, so both counts are plural in EN. `left` is what the globe still shows unlit.
   {
     id: 'crossings:zones',
     slot: 'crossings',
@@ -257,7 +237,6 @@ export const TRIGGERS: Trigger[] = [
       return zones >= 4 && zones <= 22 ? { zones, left: 24 - zones } : null
     },
   },
-  // Ready Crossings; no estimated equator crossing, with complete coordinate coverage. Fallback below the date-line lines.
   {
     id: 'crossings:no-equator',
     slot: 'crossings',
@@ -270,7 +249,6 @@ export const TRIGGERS: Trigger[] = [
         : null
     },
   },
-  // Ready Makers; Airbus positive, strictly above every other known maker; Boeing positive. Unknown excluded only from leader comparison, not recast as known.
   {
     id: 'manufacturers:airbus-boeing',
     slot: 'aircraft',
@@ -287,7 +265,6 @@ export const TRIGGERS: Trigger[] = [
         : null
     },
   },
-  // Ready Makers; unknown maker row positive; total denominator includes every scoped flight.
   {
     id: 'manufacturers:unknown',
     slot: 'aircraft',
@@ -299,7 +276,6 @@ export const TRIGGERS: Trigger[] = [
       return unknown > 0 ? { unknown, total: v.totals.flights } : null
     },
   },
-  // Ready Makers; Boeing strictly above Airbus, both positive. Comparison only, no general leader assertion.
   {
     id: 'manufacturers:boeing-airbus',
     slot: 'aircraft',
@@ -312,7 +288,6 @@ export const TRIGGERS: Trigger[] = [
       return airbus > 0 && boeing > airbus ? { boeing, airbus } : null
     },
   },
-  // Ready Fleet; actual byBodyType narrowbody count exceeds half of all classified body-type counts. Unknown/untyped not classified; total explicitly separate. Regional bands do not prove narrowbody.
   {
     id: 'fleet:narrow-majority',
     slot: 'aircraft',
@@ -329,7 +304,6 @@ export const TRIGGERS: Trigger[] = [
       return narrow > known / 2 ? { narrow, known, total: v.total } : null
     },
   },
-  // Ready Fleet; non-null positive topFamily. Engine selects stable ties; wording avoids unique leadership.
   {
     id: 'fleet:top-family',
     slot: 'aircraft',
@@ -341,7 +315,6 @@ export const TRIGGERS: Trigger[] = [
       return family && family.flights > 0 ? { family: family.family, count: family.flights } : null
     },
   },
-  // Ready Fleet; untyped positive. total is all scoped flights, untyped is absence of aircraft designation, not unknown body type.
   {
     id: 'fleet:untyped',
     slot: 'aircraft',
@@ -352,7 +325,6 @@ export const TRIGGERS: Trigger[] = [
       return v.untyped > 0 ? { untyped: v.untyped, total: v.total } : null
     },
   },
-  // Ready Fleet; untyped flights outnumber half of all scoped flights, so the fleet is a sample. No numbers: the caption prints "Based on N of M".
   {
     id: 'aircraft:sample',
     slot: 'aircraft',
@@ -363,7 +335,6 @@ export const TRIGGERS: Trigger[] = [
       return v.untyped > v.total / 2 ? {} : null
     },
   },
-  // Ready Fleet; no untyped flights and at least five scoped flights. Every flight has its aircraft; no numbers.
   {
     id: 'aircraft:full',
     slot: 'aircraft',
@@ -374,7 +345,6 @@ export const TRIGGERS: Trigger[] = [
       return v.untyped === 0 && v.total >= 5 ? {} : null
     },
   },
-  // Ready Fleet; at most two distinct types across at least five typed flights. types is distinct ICAO types, typed is flights with a type.
   {
     id: 'fleet:few-types',
     slot: 'aircraft',
@@ -385,7 +355,6 @@ export const TRIGGERS: Trigger[] = [
       return v.types <= 2 && v.typed >= 5 ? { types: v.types, typed: v.typed } : null
     },
   },
-  // Ready Fleet; at least one widebody flight, but under 20% of typed flights. wide is the byBodyType widebody count, typed excludes untyped.
   {
     id: 'fleet:widebody-minority',
     slot: 'aircraft',
@@ -397,7 +366,6 @@ export const TRIGGERS: Trigger[] = [
       return wide >= 1 && wide < v.typed * 0.2 ? { wide, typed: v.typed } : null
     },
   },
-  // Ready Fleet; topFamily flights are at least half of typed flights. percent is a whole number of typed, not all scoped, flights.
   {
     id: 'fleet:family-majority',
     slot: 'aircraft',
@@ -411,8 +379,6 @@ export const TRIGGERS: Trigger[] = [
         : null
     },
   },
-  // Ready Routes; commuter (distinct/flights <= 0.5) or explorer (>= 0.8) profile with at least two distinct routes, so counts stay plural.
-  // Flights are weighted; routes undirected. Says how often routes repeat, not why.
   ...(['commuter', 'explorer'] as const).map((profile): Trigger => ({
     id: `routes:${profile}`,
     slot: 'routes',
@@ -425,7 +391,6 @@ export const TRIGGERS: Trigger[] = [
         : null
     },
   })),
-  // Ready Routes; a most-flown undirected route flown at least twice (the engine returns null below two). Both directions together.
   {
     id: 'routes:top-repeat',
     slot: 'routes',
@@ -436,7 +401,6 @@ export const TRIGGERS: Trigger[] = [
       return top && top.count > 1 ? { route: routeArrow(top.key), count: top.count } : null
     },
   },
-  // Ready Routes; a home airport is set and at least half of the flights start or end there.
   {
     id: 'routes:home',
     slot: 'routes',
@@ -447,7 +411,6 @@ export const TRIGGERS: Trigger[] = [
       return share !== null && share >= 0.5 ? { percent: Math.round(share * 100) } : null
     },
   },
-  // Ready Routes; share includes every flight on routes used at least twice, including their first flight.
   {
     id: 'routes:repeat-share',
     slot: 'routes',
@@ -468,7 +431,6 @@ export const TRIGGERS: Trigger[] = [
       return v.profile === 'mixed' ? { flights: v.flights, distinct: v.distinct } : null
     },
   },
-  // Latest active scoped year only; a lone flight does not send the search back to an older year.
   {
     id: 'routes:all-new-year',
     slot: 'routes',
@@ -503,7 +465,6 @@ export const TRIGGERS: Trigger[] = [
       return share !== null && share < 0.25 ? { percent: Math.round(share * 100) } : null
     },
   },
-  // Ready Clock; actual positive peakHour matches its bucket and is strictly greater than every other departure bucket. Timed denominator is withDepartureTime.
   {
     id: 'clock:unique-peak',
     slot: 'clock',
@@ -524,7 +485,6 @@ export const TRIGGERS: Trigger[] = [
         : null
     },
   },
-  // Ready Clock; beforeNoonShare greater than one half, withDepartureTime positive. Denominator excludes missing departure times.
   {
     id: 'clock:morning-majority',
     slot: 'clock',
@@ -537,7 +497,6 @@ export const TRIGGERS: Trigger[] = [
         : null
     },
   },
-  // Ready Clock; redEyes positive. Producer means departure in night band, not overnight flight or poor sleep.
   {
     id: 'clock:night',
     slot: 'clock',
@@ -548,7 +507,6 @@ export const TRIGGERS: Trigger[] = [
       return v.redEyes > 0 ? { count: v.redEyes, timed: v.withDepartureTime } : null
     },
   },
-  // Missing departure times outnumber known times; the caption carries the counts.
   {
     id: 'clock:sample',
     slot: 'clock',
@@ -593,7 +551,6 @@ export const TRIGGERS: Trigger[] = [
       return short >= v.total * 0.6 ? { percent: Math.round((short / v.total) * 100) } : null
     },
   },
-  // The arrival winner must be unique; a tied hour does not establish a peak.
   {
     id: 'clock:arrival-peak',
     slot: 'clock',
@@ -620,7 +577,6 @@ export const TRIGGERS: Trigger[] = [
       return speed !== null ? { speed: Math.round(speed) } : null
     },
   },
-  // Ready Rhythm; at least two consecutive included years; each has an actual positive July cell. Span is scoped rhythm.years, not all-time or pooled busiest month.
   {
     id: 'rhythm:every-july',
     slot: 'rhythm',
@@ -639,7 +595,6 @@ export const TRIGGERS: Trigger[] = [
         : null
     },
   },
-  // Ready Rhythm; longestGap positive. Empty intervening months in current view, not proof of no all-time travel.
   {
     id: 'rhythm:gap',
     slot: 'rhythm',
@@ -672,7 +627,6 @@ export const TRIGGERS: Trigger[] = [
         : null
     },
   },
-  // Measure the observed archive span; aggregate replay has no exact latest flight date.
   {
     id: 'rhythm:archive-depth',
     slot: 'rhythm',
@@ -694,7 +648,6 @@ export const TRIGGERS: Trigger[] = [
         : null
     },
   },
-  // Ready Rhythm; unique pooled winner with at least two flights; no annual recurrence implied.
   {
     id: 'rhythm:pooled-month',
     slot: 'rhythm',
@@ -711,7 +664,6 @@ export const TRIGGERS: Trigger[] = [
         : null
     },
   },
-  // Ungated Rankings; matching TBS airport endpoint row count times two equals positive scope.figures.flights. Endpoint occurrences compared to flight total; never airport topShare.
   {
     id: 'rankings:tbilisi-half',
     slot: 'rankings',
@@ -723,7 +675,6 @@ export const TRIGGERS: Trigger[] = [
         : null
     },
   },
-  // Ungated Rankings; positive displayed top airport and airport leader total. Stable ties admitted, endpoint denominator includes both ends.
   {
     id: 'rankings:airport-leader',
     slot: 'rankings',
@@ -736,7 +687,6 @@ export const TRIGGERS: Trigger[] = [
         : null
     },
   },
-  // Ungated Rankings; displayed top airline exceeds half of known-airline flights. Denominator only flights with airline recorded, not all flights.
   {
     id: 'rankings:airline-leader',
     slot: 'rankings',
@@ -752,7 +702,6 @@ export const TRIGGERS: Trigger[] = [
         : null
     },
   },
-  // Latest active scoped year; annual and all-time airline leaders must both be unique.
   {
     id: 'rankings:new-airline-leader',
     slot: 'rankings',
@@ -765,7 +714,6 @@ export const TRIGGERS: Trigger[] = [
       const top = leaders[0]
       const allTime = all.rankings.airlines[0]
       const unrepresented = year.flights - annual.reduce((sum, row) => sum + row.count, 0)
-      // shortcut: the bump chart omits some airlines; skip uncertain leaders until full annual counts are exposed.
       return leaders.length === 1 &&
         top.count > 0 &&
         top.count > unrepresented &&
@@ -779,7 +727,6 @@ export const TRIGGERS: Trigger[] = [
         : null
     },
   },
-  // Shares use every scoped flight, including those without an airline.
   {
     id: 'rankings:two-airline-split',
     slot: 'rankings',
@@ -797,7 +744,6 @@ export const TRIGGERS: Trigger[] = [
         : null
     },
   },
-  // Ungated Rankings; displayed top route exceeds half of route flights, with repeated flights. Undirected route key, both directions together.
   {
     id: 'rankings:route-leader',
     slot: 'rankings',
@@ -810,7 +756,6 @@ export const TRIGGERS: Trigger[] = [
         : null
     },
   },
-  // Ungated Globe; semantically nonempty filter; positive scope flights strictly below all flights. Explicit current-view versus all-time flight counts.
   {
     id: 'globe:filtered-total',
     slot: 'globe',
@@ -823,7 +768,6 @@ export const TRIGGERS: Trigger[] = [
         : null
     },
   },
-  // Ungated Globe; positive flights and more than one scoped route. Route count distinct undirected pairs, airport count scoped endpoints; not passport countries.
   {
     id: 'globe:route-footprint',
     slot: 'globe',
@@ -845,9 +789,6 @@ export const TRIGGERS: Trigger[] = [
     },
   },
 
-  // The hero card: one trigger per record that clears its bar. The footer shows the winner; a record's takeover shows its own
-  // trigger's line, or its `heroSmall` line when no hero trigger of that record fires. Nothing fires on a filtered zero.
-  // Under 25 flights the spike holds its smallest stack, so the bar sits there.
   {
     id: 'hero:flights',
     slot: 'hero',
@@ -855,7 +796,6 @@ export const TRIGGERS: Trigger[] = [
     priority: 40,
     when: (scope) => (scope.figures.flights >= 25 ? { flights: scope.figures.flights } : null),
   },
-  // A timing belt is due at roughly 100,000 km on most cars; the line states no number, so the bar carries it.
   {
     id: 'hero:km-belt',
     slot: 'hero',
@@ -863,7 +803,6 @@ export const TRIGGERS: Trigger[] = [
     priority: 70,
     when: (scope) => (scope.figures.travelKm >= 100_000 ? {} : null),
   },
-  // Travel total (flights plus ground) of at least one equator, in equators to one decimal.
   {
     id: 'hero:km-equators',
     slot: 'hero',
@@ -876,7 +815,6 @@ export const TRIGGERS: Trigger[] = [
         : null
     },
   },
-  // At least a week aloft, in days to one decimal. Estimated durations count, as in the hero's own total.
   {
     id: 'hero:air-days',
     slot: 'hero',
@@ -902,7 +840,6 @@ export const TRIGGERS: Trigger[] = [
     priority: 45,
     when: (scope) => (scope.figures.airports >= 10 ? { airports: scope.figures.airports } : null),
   },
-  // Below each bar: a deadpan line about the small number. Never a footer; only the record's own takeover reads it.
   {
     id: 'heroSmall:flights',
     slot: 'heroSmall',
@@ -913,7 +850,6 @@ export const TRIGGERS: Trigger[] = [
       return flights > 0 && flights < 25 ? { flights } : null
     },
   },
-  // Percent of one equator, floored, so a total just short of it never reads 100.
   {
     id: 'heroSmall:km',
     slot: 'heroSmall',

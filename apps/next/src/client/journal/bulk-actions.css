@@ -1,6 +1,3 @@
-/* Journal selection bar on the shared FloatingActionBar (Arc floating-button-group, adapted in ui/). The wrapper adds no box,
-   so the bar stays a sticky item of the page grid: it sits above the tab bar on phones (--action-bar-bottom) and, being in
-   flow, never covers the last row at the end of the list. Weights 400 and 500 only; space groups, no rules between items. */
 .journal-bulk {
   display: contents;
 }

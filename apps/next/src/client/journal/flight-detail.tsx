@@ -1,8 +1,4 @@
 'use client'
-// The detail sheet's content: one flight read as a journey (cities, local times, the time between them), a compact block of
-// supporting facts and one quiet history fact. Edit (in the sheet header) switches the same panel to labeled fields that save
-// together.
-// Presentational: the container (detail-sheet.tsx) owns writes, Undo, the lazily loaded editor catalogue and the layout.
 import { CircleAlert, MapPin, TriangleAlert } from '@keyline-icons/react'
 import { makerOf } from '@kuuki/data/aircraft-makers'
 import { createPortal } from 'react-dom'
@@ -32,14 +28,8 @@ import type { Changes, Drafts, EditableField, EditOutcome, FieldErrors } from '.
 import { flightCode, type JournalFlight, type JournalPayload } from './model'
 import './flight-detail.css'
 
-/** The lazily loaded write module (flight-edits.ts). Only its types are imported here, so the catalogues stay out of the page bundle. */
 export type FlightEditor = typeof import('./flight-edits')
 
-/**
- * Asked by the container before Escape, a close request or opening another flight (`swap`: in-sheet navigation, a ledger row,
- * the keyboard) ends this edit. True: the content handled it (left Edit, or is asking whether to discard changes and will call
- * `proceed` on Discard).
- */
 export type CloseGuard = (kind: 'escape' | 'close' | 'swap', proceed: () => void) => boolean
 
 const ordinalRules = new Intl.PluralRules('en', { type: 'ordinal' })
@@ -149,8 +139,6 @@ const copy = {
 
 type Copy = (typeof copy)[Locale]
 
-// ---- Read-first formatting ----
-
 const regionNames = new Map<Locale, Intl.DisplayNames>()
 function countryName(locale: Locale, code: string | null): string | null {
   if (!code) return null
@@ -166,7 +154,6 @@ function countryName(locale: Locale, code: string | null): string | null {
   }
 }
 
-/** "UTC+4", "UTC+5:30", "UTC" for the zone at that instant, or null when the zone is unknown. */
 export function utcOffset(timeZone: string | null, at: Date): string | null {
   if (!timeZone || Number.isNaN(at.getTime())) return null
   try {
@@ -179,7 +166,6 @@ export function utcOffset(timeZone: string | null, at: Date): string | null {
   }
 }
 
-/** The calendar day of an instant in a zone, YYYY-MM-DD. */
 function localDay(timeZone: string, at: Date): string | null {
   try {
     const parts = new Intl.DateTimeFormat('en-CA', {
@@ -221,7 +207,6 @@ const linkIndexes = new WeakMap<
   }
 >()
 
-/** The previous and next leg of the flight's connection chain, over the whole journal. */
 function connectionOf(
   payload: JournalPayload,
   flight: JournalFlight,
@@ -270,8 +255,6 @@ function connectionOf(
   }
 }
 
-// ---- Reading ----
-
 type ReadingProps = {
   flight: JournalFlight
   payload: JournalPayload
@@ -302,7 +285,6 @@ function JourneyReading({ flight, payload, locale, t, onOpenFlight }: ReadingPro
   }
   const departure = time(flight.departure_time, flight.origin_tz, flight.departure_utc)
   const arrival = time(flight.arrival_time, flight.dest_tz, flight.arrival_utc)
-  // The arrival's local day, when it is not the flight's date (overnight, or a date-line crossing).
   const arrivalDay =
     arrival?.day && arrival.day !== flight.date
       ? arrival.day === nextDay(flight.date)
@@ -403,7 +385,6 @@ function JourneyReading({ flight, payload, locale, t, onOpenFlight }: ReadingPro
         </p>
         {stop('arrival', destination, flight.destination, arrival, arrivalDay)}
       </div>
-      {/* The header carries the date; the flight number lives here, beside its airline. Absent facts are omitted. */}
       {(airlineName || code || flight.airline_iata || distance || flight.aircraft_icao) && (
         <dl className="jd-facts" aria-label={t.facts}>
           {(airlineName || code || flight.airline_iata) && (
@@ -456,9 +437,6 @@ function JourneyReading({ flight, payload, locale, t, onOpenFlight }: ReadingPro
   )
 }
 
-// ---- Editing ----
-
-/** Which control edits the field: a typeable date, a catalogue picker, or plain text (times and the flight number). */
 type InputKind =
   | { kind: 'date' }
   | { kind: 'choices'; choices: Choice[] }
@@ -527,7 +505,6 @@ function FieldInput({
   )
 }
 
-/** A focused picker or calendar owns Escape first: it closes its list, the form stays. */
 const pickerOwnsEscape = () =>
   !!(document.activeElement as Element | null)?.closest(
     '[aria-expanded="true"], .flight-calendar-popover, .flight-search-sheet',
@@ -565,7 +542,6 @@ function FlightEditForm({
   onDone,
   guardRef,
 }: EditFormProps) {
-  // Changes are measured against the flight as it was when Edit started, so a refresh that lands meanwhile is never reverted.
   const [base] = useState(flight)
   const [drafts, setDrafts] = useState<Drafts>(() => editor.draftsOf(flight))
   const [errors, setErrors] = useState<FieldErrors>({})
@@ -603,7 +579,6 @@ function FlightEditForm({
   const [focusField] = useState(initialField)
   useEffect(() => {
     mounted.current = true
-    // Opened on a field (the ledger's "Add aircraft"); otherwise the heading keeps focus, so no picker list opens unasked.
     if (focusField) inputs.current.get(focusField)?.focus()
     return () => {
       mounted.current = false
@@ -612,7 +587,6 @@ function FlightEditForm({
   useEffect(() => {
     if (discarding) keepEditing.current?.focus()
   }, [discarding])
-  // An unknown outcome reconciled by the refetch: the flight now holds every sent value, so the edit is done.
   useEffect(() => {
     if (problem?.kind !== 'unknown' || saving) return
     const sent = Object.entries(changes) as [EditableField, string | null][]
@@ -624,7 +598,6 @@ function FlightEditForm({
       if (inFlight.current) return true
       if (kind === 'escape' && pickerOwnsEscape()) return true
       if (discarding) {
-        // A second Escape answers the question with "Keep editing".
         if (kind === 'escape') setDiscarding(null)
         return true
       }
@@ -665,7 +638,7 @@ function FlightEditForm({
     if (!dirty) {
       onDone()
       return
-    } // nothing changed on purpose: no request
+    }
     const found = editor.validateDrafts(base, drafts, locale)
     const first = ORDER.find((field) => found[field])
     if (first) {
@@ -821,29 +794,20 @@ function FlightEditForm({
   )
 }
 
-// ---- Content ----
-
 export type FlightDetailProps = {
   flight: JournalFlight
   payload: JournalPayload
   locale: Locale
-  /** False: Edit is unavailable and points at `offlineNoteId`. */
   online: boolean
   offlineNoteId: string
-  /** The loaded write module, or null while it loads. */
   editor: FlightEditor | null
   editorState: 'idle' | 'loading' | 'ready' | 'failed'
   loadEditor: () => void
   onSave: (flight: JournalFlight, changes: Changes) => Promise<EditOutcome>
-  /** A save or Undo of this flight is in flight: Edit cannot start. */
   busy: boolean
-  /** Open in Edit with this field focused (the ledger's "Add aircraft"). */
   initialField?: EditableField | null
-  /** Swap the sheet to another flight (a connection leg). */
   onOpenFlight: (id: number) => void
-  /** Filled while editing; the container asks it before Escape or a close request. */
   guardRef: RefObject<CloseGuard | null>
-  /** The sheet header's action slot: Edit sits beside Close there. Without it, Edit stays at the top of the content. */
   actionSlot?: HTMLElement | null
 }
 
@@ -868,7 +832,6 @@ export function FlightDetail({
   const editButton = useRef<HTMLButtonElement | null>(null)
   const editHeading = useRef<HTMLHeadingElement | null>(null)
   const returnFocus = useRef(false)
-  // Edit started from the button: the heading takes focus and names the mode.
   const focusHeading = useRef(false)
   useEffect(() => {
     if (editing && !editor && editorState !== 'loading' && editorState !== 'failed') loadEditor()
@@ -884,7 +847,6 @@ export function FlightDetail({
   }, [editing])
 
   const done = useCallback(() => {
-    // Focus returns to Edit only when it was inside Edit; a close or swap moves it elsewhere.
     const active = document.activeElement
     returnFocus.current = !active || active === document.body || !!active.closest('.jd-content')
     setEditing(false)

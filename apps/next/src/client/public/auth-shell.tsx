@@ -20,7 +20,6 @@ export function AuthBrand({ locale }: { locale: Locale }) {
   )
 }
 
-/** A panel's heading and body. Inside the (auth) layout the card, brand and panel come from the layout. */
 export function AuthPanel({
   title,
   description,
@@ -39,7 +38,6 @@ export function AuthPanel({
   )
 }
 
-/** A standalone entry page outside the (auth) layout. EntryLayout supplies the single wordmark and the shared language/theme controls. */
 export function AuthShell({
   locale,
   title,

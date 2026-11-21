@@ -19,7 +19,6 @@ export default async function ManagePassport({
     searchParams,
   ])
   const identity = { id: own.ownerId }
-  // Countries are managed in Passport's sheets; a legacy link carrying a catalogue code lands on that country's sheet.
   if (typeof params.countryCode === 'string' && Object.hasOwn(countries, params.countryCode))
     redirect(`/passport?country=${params.countryCode}`)
   return (

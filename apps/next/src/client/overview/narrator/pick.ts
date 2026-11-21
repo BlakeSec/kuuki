@@ -53,7 +53,6 @@ export function pickLine(
   seed: string,
   locale: Locale,
 ): string | null {
-  // Every line is about flights; По земле has no narrator.
   if (scope.figures.scope === 'ground') return null
   for (const trigger of TRIGGERS.filter((trigger) => trigger.slot === slot).sort(byPriority)) {
     const params = trigger.when(scope, all)
@@ -62,8 +61,6 @@ export function pickLine(
   return null
 }
 
-/** A hero record's takeover line: its best firing `hero` trigger, else its `heroSmall` one. `turn` counts the record's openings, so
- * the first opening reads the footer's line when this record won it, and each later one steps to the next line of the triple. */
 export function recordLine(
   record: HeroRecord,
   scope: OverviewScope,

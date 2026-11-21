@@ -1,4 +1,3 @@
-/* The leaderboard: a race. Category strip (compact gate tiles), narrator, one lane per participant on a shared scale. Tokens only; space does the grouping, no lines between lanes. */
 .editorial-leaderboard {
   container: leaderboard / inline-size;
 }
@@ -15,7 +14,6 @@
   margin: 0;
 }
 
-/* Both category groups share one band when the labels fit; narrower containers scroll just the strip. */
 .leaderboard-strip {
   container: strip / inline-size;
 }
@@ -54,7 +52,6 @@
   gap: var(--space-3);
   margin: var(--space-4) 0 var(--space-6);
 }
-/* Reserve two lines for the observer, so changing category does not jump the field. */
 .leaderboard-narrator {
   min-block-size: 48px;
   margin: 0;
@@ -83,8 +80,6 @@
   transition: none;
 }
 
-/* Race lanes: one shared scale, a lane per participant; the vehicle's nose stands at the value. The vehicle drawings
-   are <use> clones of generated symbols (lanes/), sized from one unit: the drawn length of a 100-unit vehicle. */
 .leaderboard-lanes {
   overflow-x: clip;
   overflow-clip-margin: var(--space-1);
@@ -112,7 +107,6 @@
   padding: var(--space-2);
   border-radius: var(--radius-sm);
 }
-/* Paint on the strip is one step off its paper, whichever paper the lane gives it. */
 .lane {
   --deck-paper: var(--surface-inset);
   --deck-paint: color-mix(in oklab, var(--deck-paper), var(--text) 16%);
@@ -176,7 +170,6 @@
   color: inherit;
   text-decoration: none;
 }
-/* One link per lane, stretched over the whole lane. */
 .lane-name a::after {
   content: '';
   position: absolute;
@@ -221,10 +214,6 @@
   outline-offset: 2px;
   border-radius: var(--radius-xs);
 }
-/* The spotter card: hovering the type, or focusing the lane's link from the keyboard, opens a close-up of the
-   airliner with its name and measured size. The type sits above the stretched link so it can take the pointer, and
-   the card stays open while the pointer crosses onto it (WCAG 1.4.13); Escape hides it until focus or the pointer
-   leaves the lane. */
 .lane-type-anchor {
   position: relative;
   z-index: 1;
@@ -251,7 +240,6 @@
     scale 120ms var(--ease-out),
     visibility 0s 120ms;
 }
-/* Bridges the gap down to the type, so the pointer can reach the card. */
 .lane-spotter::after {
   content: '';
   position: absolute;
@@ -327,10 +315,6 @@
   color: var(--text-muted);
 }
 
-/* The track: a strip of ground along the lane's centreline, the vehicle standing on it. Drawn above the name and
-   value, so each lane's label sits right under its own strip; the DOM keeps the name first. Zero is the track's start
-   edge, where the label starts too: a small value leaves the vehicle's tail behind that edge, entering under a short
-   fade. Clipped sideways only, so a tall tail and the shadow under the wheels stay visible. */
 .lane-track {
   position: relative;
   grid-column: 1 / -1;
@@ -339,10 +323,6 @@
   overflow-x: clip;
   mask-image: linear-gradient(to right, transparent, currentcolor var(--space-4));
 }
-/* The strip is drawn flat and slanted with the lane camera's across-lane axis, so its paint lies on the ground: the
-   scale's distance markers across it and a dashed centre line ahead of the nose. It enters from behind the start
-   edge, so the slant is hidden under the fade, and ends on a slanted edge inside the track. Background lengths are
-   in the strip's own box, which is exactly as wide as the track; --deck-slant is the scale's zero in that box. */
 .lane-track::before {
   --deck-slant: calc(var(--deck-h) * -0.5 * tan(var(--lane-skew)));
   --deck-nose: calc(var(--deck-slant) + var(--lane-at) * (100% - var(--lane-finish)));
@@ -361,7 +341,6 @@
       repeat-x,
     var(--deck-paper);
 }
-/* A locomotive runs on a ballast bed with two rails at its gauge, one track from end to end, so no centre line. */
 .lane-track:has([data-vehicle='rail'])::before {
   --deck-h: calc(var(--veh-h) * var(--lane-rail-deck) * 2);
   --rail-y: calc(var(--veh-h) * var(--lane-rail));
@@ -390,8 +369,6 @@
   position: relative;
   --lane-halo-blur: 2px;
 }
-/* The viewer's own airliner is the one live thing on the board: its anti-collision beacon flashes about once a
-   second, a short bright blink as on the real aircraft. Reduced motion leaves it lit. */
 .lane-beacon {
   position: absolute;
   inline-size: 4px;
@@ -412,7 +389,6 @@
     opacity: 0.15;
   }
 }
-/* The distance run: from the start edge to the nose, so its length is the value on the shared scale. */
 .lane-run {
   position: absolute;
   inset-inline-start: 0;
@@ -426,7 +402,6 @@
 .lane[data-own] .lane-run {
   background: var(--mark-peak);
 }
-/* Medals sit at the finish of the top three lanes, not on the vehicle. */
 .lane-medal {
   position: absolute;
   inset-inline-start: calc(100% * var(--lane-nose) + 6px);
@@ -510,7 +485,6 @@
   }
 }
 
-/* Loading: the strip's and the first lanes' geometry, so nothing shifts when the board arrives. */
 .lane-skeleton {
   display: block;
   block-size: calc(var(--veh-h) + 64px);
@@ -524,13 +498,11 @@
   .lane-spotter {
     scale: 1;
   }
-  /* Rank up keeps its meaning without movement: the new number fades in. */
   .leaderboard-tiles .split-flap-digit[data-flip] {
     animation: leaderboard-fade 150ms linear backwards;
   }
 }
 
-/* Eight compact labels share one band only while both languages fit. */
 @container strip (max-width: 1000px) {
   .leaderboard-tiles {
     display: flex;
@@ -540,7 +512,6 @@
     overscroll-behavior-x: contain;
     scroll-snap-type: x mandatory;
     scrollbar-width: none;
-    /* Room for the focus ring inside the scroller. */
     padding: var(--space-1);
     margin: calc(var(--space-1) * -1);
   }
@@ -565,7 +536,6 @@
   .leaderboard-group {
     flex: none;
   }
-  /* Keep each group heading over its tiles; both have a Countries category. */
   .leaderboard-group {
     display: grid;
   }
@@ -633,7 +603,6 @@
     font-variant-numeric: tabular-nums;
   }
   .lane-value small {
-    /* The common unit is on the ruler; each profile link still describes its exact value and unit. */
     position: absolute;
     inline-size: 1px;
     block-size: 1px;

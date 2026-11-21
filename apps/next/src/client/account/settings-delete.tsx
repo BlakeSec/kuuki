@@ -108,7 +108,6 @@ export function SettingsDelete({
     ? ['Что будет удалено', 'Сохранить данные?', 'Подтвердите паролем']
     : ['What will be deleted', 'Keep your data?', 'Confirm with your password']
   if (hasPassword === false) titles[2] = ru ? 'Задайте пароль' : 'Set a password'
-  // Arc Stepper/password-field presentation (uiarc.dev, MIT; docs/research/2026-10-08-arc-source-inventory.md), driven by the existing three-step deletion.
   return (
     <Dialog
       open={open}

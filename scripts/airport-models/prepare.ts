@@ -104,7 +104,6 @@ for (const code of ['TBS', 'BER']) {
   const source = readFileSync(`scripts/airport-models/sources/${code}.osm.json`, 'utf8'),
     doc = JSON.parse(source)
   const { model, diagnostics, physicalRunways } = normalize(doc.elements, config, hash(source))
-  // No revision or hash-bearing path occurs in this preimage. Estimates, poses and projection are included.
   const revision = hash(
     canonical({
       generatorVersion: GENERATOR_VERSION,

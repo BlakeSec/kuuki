@@ -56,8 +56,6 @@ async function api(request: Request, env: RuntimeEnv, ctx: ExecutionContext): Pr
     })
   const capture = captureHandler(request, env, ctx)
   if (capture) return capture()
-  // Pages' generated handler may call ASSETS on a miss. It must never return HTML
-  // for an API URL, even if its internal route table changes.
   const apiEnv = {
     ...env,
     ASSETS: { fetch: async () => jsonError(404, 'Not found', 'NOT_FOUND') },
@@ -119,7 +117,6 @@ export default {
     const headers = new Headers(response.headers)
     headers.set('X-Frame-Options', 'DENY')
     headers.set('X-Content-Type-Options', 'nosniff')
-    // Report-only until enforcement is decided; with no report endpoint, violations show in the browser console.
     headers.set(
       'Content-Security-Policy-Report-Only',
       "object-src 'none'; base-uri 'self'; frame-ancestors 'none'",
@@ -131,8 +128,6 @@ export default {
     const contentType = headers.get('Content-Type')
     const airportContent = immutableAirportAsset(request, response)
     const font = url.pathname.startsWith('/fonts/') && /\.(?:woff2|ttf)$/.test(url.pathname)
-    // Build output: every chunk, stylesheet and media file is content-hashed and every manifest sits under its build
-    // ID, so a returning visit runs them from cache instead of revalidating each one before first paint.
     const built = url.pathname.startsWith('/_next/static/')
     if (
       (request.method === 'GET' || request.method === 'HEAD') &&

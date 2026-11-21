@@ -5,9 +5,7 @@ import { LADDER_FIGURES } from './figures'
 import type { LadderId, LadderLod } from './figures/types'
 import './ladders.css'
 
-/** The sheet's hero box, k capped so a small object (a paper plane) is not blown up past its drawing. */
 const HERO = { width: 320, height: 200, maxK: 2.2 }
-/** Thumbnails fill a 56px square inside the 72px mark. */
 const THUMB = 56
 
 export type RungState = 'earned' | 'next' | 'later'
@@ -22,7 +20,6 @@ const fitOf = (ladder: LadderId, rung: number, lod: LadderLod, initials?: string
     : fitBox(THUMB, THUMB, (k) => build(k, { rung, lod, initials }))
 }
 
-/** One k for every thumbnail of a ladder's rung strip: the smallest any rung needs, so the object visibly grows along the strip. */
 export function useStripK(ladder: LadderId) {
   return useMemo(() => {
     const { rungs } = LADDER_FIGURES[ladder]
@@ -30,10 +27,6 @@ export function useStripK(ladder: LadderId) {
   }, [ladder])
 }
 
-/**
- * One ladder's object at one rung. `thumb` is line-only (ladders.css) and fits 56px unless the strip passes a shared `k`;
- * `hero` is the full drawing for the sheet. Decorative: the rung name and state are always written beside it.
- */
 export function LadderFigure({
   ladder,
   rung,

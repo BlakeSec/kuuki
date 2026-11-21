@@ -21,7 +21,6 @@ import { HeatKey, type HeatKeyEntry } from './heat-key'
 import './rhythm.css'
 
 export type Metric = 'flights' | 'distanceKm' | 'durationMinutes'
-// Month grid in CSS pixels: 12 month bands after a year gutter. Bands grow with the card up to BAND_MAX; below BAND_MIN the card scrolls.
 const GUTTER = 36,
   BAND_MIN = 24,
   BAND_MAX = 76,
@@ -36,7 +35,6 @@ type HeatState = {
   setShowAll: (showAll: boolean) => void
   reading?: { key: string | null; pick: (key: string) => void }
 }
-/** The year × month heat grid with its metric control. */
 export function YearByMonth({ metric, setMetric, showAll, setShowAll, reading }: HeatState) {
   const { scope, all, payload, filter, locale, actions, isCurrent } = useOverview()
   if (!scope || !all || !payload) return null
@@ -59,7 +57,6 @@ export function YearByMonth({ metric, setMetric, showAll, setShowAll, reading }:
   const max = baseline.max[metric],
     gridHeight = years.length * 36 + 48
   const noData = copy(locale, 'No data', 'Нет данных')
-  // Totals read a missing distance or duration as 0; a month with flights but no measurement is unknown, not a zero.
   const measured =
     metric === 'flights'
       ? null
@@ -189,7 +186,6 @@ export function YearByMonth({ metric, setMetric, showAll, setShowAll, reading }:
                       />
                     ))}
                     {rows.map((row) => {
-                      // A future month, an unmeasured one, or a value the scale cannot place is missing: a dashed empty outline, never a zero.
                       const point = pointOf.get(row.key),
                         bucket = bucketOf(row),
                         text = bucket === HEAT_MISSING ? '–' : number(locale, valueOf(row))
@@ -211,25 +207,22 @@ export function YearByMonth({ metric, setMetric, showAll, setShowAll, reading }:
                             }
                             strokeDasharray={bucket === HEAT_MISSING ? '3 3' : undefined}
                           />
-                          {
-                            /* Values that cannot fit the band stay in the tooltip and table. */ cellW >=
-                              text.length * 7 + 8 && (
-                              <text
-                                x={cellX(row.month) + cellW / 2}
-                                y={cellY(row.year) + 23}
-                                textAnchor="middle"
-                                fill={
-                                  bucket === HEAT_MISSING
-                                    ? 'var(--text-muted)'
-                                    : `var(--heat-${bucket}-text)`
-                                }
-                                fontSize={12}
-                                data-sans
-                              >
-                                {text}
-                              </text>
-                            )
-                          }
+                          {cellW >= text.length * 7 + 8 && (
+                            <text
+                              x={cellX(row.month) + cellW / 2}
+                              y={cellY(row.year) + 23}
+                              textAnchor="middle"
+                              fill={
+                                bucket === HEAT_MISSING
+                                  ? 'var(--text-muted)'
+                                  : `var(--heat-${bucket}-text)`
+                              }
+                              fontSize={12}
+                              data-sans
+                            >
+                              {text}
+                            </text>
+                          )}
                         </g>
                       )
                     })}
@@ -292,7 +285,6 @@ type DailyState = {
   activityYear: number | null
   setActivityYear: (year: number) => void
 }
-/** The completed-flights-by-day grid of one calendar year. */
 export function DailyActivity({ activityYear, setActivityYear }: DailyState) {
   const { all, payload, filter, locale, actions, isCurrent } = useOverview()
   if (!all || !payload) return null
@@ -307,7 +299,6 @@ export function DailyActivity({ activityYear, setActivityYear }: DailyState) {
     activityYear !== null && baseline.years.includes(activityYear)
       ? activityYear
       : baseline.years[0]
-  // Days are known from the first dated flight of the whole journal (not the filter) through today; outside that range the journal has no evidence either way.
   const dated = payload.rows
     .filter((row) => row.state !== 'upcoming' && dayToEpoch(row.date) !== null)
     .map((row) => row.date)

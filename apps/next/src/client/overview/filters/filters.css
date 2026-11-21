@@ -1,4 +1,3 @@
-/* One row of scope, period and Filter, all 44px tall, then the applied conditions in a row of their own. */
 .ov-filter-bar {
   position: relative;
   display: grid;
@@ -58,7 +57,6 @@
   font-size: 13px;
   font-weight: 500;
 }
-/* Over the map in Fullscreen the controls float on the canvas. */
 .globe-card :is(.ov-filter-period, .ov-filter-add, .ov-filter-overflow) {
   background: var(--surface-floating);
   box-shadow: var(--shadow-floating), var(--ring-floating);
@@ -193,7 +191,6 @@
   }
 }
 
-/* Phones: scope across the row, then period and Filter as two stable halves. */
 @media (max-width: 700px) {
   .ov-filter-controls {
     display: grid;

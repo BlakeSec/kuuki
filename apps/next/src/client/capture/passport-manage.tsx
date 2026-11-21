@@ -52,9 +52,7 @@ export function PassportManage({
       : 'Saved. Totals may update later.'
     : ''
   const [outcomes, setOutcomes] = useState<Map<number, AircraftOutcome>>(new Map())
-  // Counts for the submission that just finished only; cleared when the next one starts so every completion is announced.
   const [last, setLast] = useState<AircraftRunCounts | null>(null)
-  // Flights seen so far and the type sent for each, so a saved row keeps its label after the reload and a retry resends the same type.
   const [seen, setSeen] = useState(() => new Map<number, Flight>())
   const [sent, setSent] = useState(() => new Map<number, string>())
   const flightRequest = useRef<{ controller: AbortController; release: () => void } | null>(null)
@@ -118,14 +116,12 @@ export function PassportManage({
         return next
       })
       setLast(countAircraftRun(run.rows.values()))
-      // Anything not saved stays selected, so one press retries exactly those.
       setSelected(items.map((item) => item.id).filter((id) => run.rows.get(id)?.status !== 'saved'))
       const ack = run.acks.filter((item) => item.derived_state).at(-1)
       if ([...run.rows.values()].some((outcome) => outcome.status === 'saved') && ack) {
         feedback.acknowledge(ack)
         setSavedNotice(true)
       }
-      // Saved rows leave the eligible set; an uncertain row may or may not have, so the list is read again after every outcome.
       loadFlights(true)
     } finally {
       if (current(controller, generation)) setBusy(false)

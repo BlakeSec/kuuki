@@ -45,10 +45,8 @@ export function DoneStep({
 }: {
   locale: Locale
   savedCount: number
-  /** Rows the member asked to save in this session (0 when the page was resumed on a finished batch). */
   requested: number
   totalKm: number
-  /** null while unknown (totals not published yet, or the page was resumed): the line is left out rather than guessed. */
   newCountries: number | null
   stamps: NewStamp[]
   publication: 'idle' | 'ready' | 'pending' | 'delayed'
@@ -57,14 +55,11 @@ export function DoneStep({
   retrying: boolean
   checking: boolean
   checkFailed: boolean
-  /** Flights (rows in review and manual rows) still waiting after this save; the member can return to them. */
   remaining: number
-  /** When the stored batch is removed; the line about it is left out without it. */
   expiresAt?: string | null
   aircraftTargets: AircraftTarget[]
   aircraftApi?: AircraftApi
   theme: 'light' | 'dark'
-  /** Why the retry is held back (corrections on the review page are not saved yet); shown beside the button. */
   retryBlocked?: ReactNode
   onRetry: () => void
   onReview: () => void
@@ -76,7 +71,6 @@ export function DoneStep({
     heading.current?.focus()
   }, [])
   const partial = failures.length > 0
-  // The Passport hero carries at most MAX_STAMPS stamps; with more, Passport opens without it.
   const hero = stamps.length > 0 && stamps.length <= MAX_STAMPS
   const total = requested || savedCount + failures.length
   const km =
@@ -88,7 +82,6 @@ export function DoneStep({
   const summary = [km, countries].filter(Boolean).join(` ${S.summaryAnd[locale]} `)
   return (
     <section className="import-done" aria-labelledby="import-done-title">
-      {/* Static results as saved, with no count-up. */}
       <h2
         id="import-done-title"
         ref={heading}
@@ -168,7 +161,6 @@ export function DoneStep({
       ) : null}
 
       <div className="import-actions import-final-actions">
-        {/* Stamps appear only after the write refreshed the router, and every later write refreshes it again, so a full prefetch from here stays fresh. */}
         <Link
           className="ui-button"
           data-variant="primary"

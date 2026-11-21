@@ -1,4 +1,3 @@
-/* Arc-derived tooltip. Level-2 surface, tokens only; opacity is the only thing that animates. */
 .ui-tooltip-anchor {
   display: contents;
 }

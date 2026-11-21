@@ -1,5 +1,3 @@
-// Isolated activation page script (the only script its CSP allows). This parser-blocking script captures and erases
-// the one-use fragment before DOM setup or async work, and applies theme, accent and language before first paint.
 let token = new URLSearchParams(window.location.hash.slice(1)).get('token')
 window.history.replaceState(null, '', '/activate')
 if (!token || !/^[A-Za-z0-9_-]{43}$/.test(token)) token = null
@@ -51,7 +49,6 @@ const words = {
   },
 }
 const accents = ['shu', 'ai', 'matcha', 'asagi', 'sakura']
-// Same names as NAMES in client/ui/swatch-picker.tsx.
 const accentNames = {
   shu: { en: 'Shu', ru: 'Шу' },
   ai: { en: 'Ai', ru: 'Ай' },
@@ -59,9 +56,7 @@ const accentNames = {
   asagi: { en: 'Asagi', ru: 'Асаги' },
   sakura: { en: 'Sakura', ru: 'Сакура' },
 }
-// The endonym names the language to someone who cannot read the page; the code is what the button shows.
 const languages = { en: { code: 'EN', name: 'English' }, ru: { code: 'RU', name: 'Русский' } }
-// Retired names land on their successors, as resolveAccent in lib/theme-colors.ts does; anything else is Shu.
 const retiredAccents = {
   terracotta: 'shu',
   kincha: 'shu',
@@ -92,7 +87,6 @@ let locale =
 let theme = readCookie('kuuki_theme')
 if (!['system', 'light', 'dark'].includes(theme)) theme = 'system'
 const media = matchMedia('(prefers-color-scheme: dark)')
-// The theme in effect: the stored choice, or the device setting until someone picks one.
 const applyTheme = () => {
   root.dataset.theme = theme === 'system' ? (media.matches ? 'dark' : 'light') : theme
   root.style.colorScheme = root.dataset.theme
@@ -176,7 +170,6 @@ function setup() {
     $('expired-heading').focus()
   }
 
-  // Reuse the card's lap calculation; SVG placement stays unchanged under reduced motion.
   document.querySelectorAll('.planes').forEach((svg) => {
     const width = Number(svg.getAttribute('width'))
     const height = Number(svg.getAttribute('height'))
@@ -200,14 +193,11 @@ function setup() {
   let motionPaused = false
   try {
     motionPaused = localStorage.getItem('kuuki-auth-motion-paused') === 'true'
-  } catch {
-    // Storage may be blocked; the pause still lasts for this page.
-  }
+  } catch {}
   let onScreen = false
   const syncPlanes = () => {
     field.dataset.running = String(onScreen && !document.hidden && !motionPaused)
     pause.setAttribute('aria-pressed', String(motionPaused))
-    // Keyline Play/Pause geometry, matching the auth card's static state icons.
     pause
       .querySelector('path')
       .setAttribute(
@@ -221,9 +211,7 @@ function setup() {
     motionPaused = !motionPaused
     try {
       localStorage.setItem('kuuki-auth-motion-paused', String(motionPaused))
-    } catch {
-      // Keep the explicit pause even when its saved choice cannot be written.
-    }
+    } catch {}
     syncPlanes()
   })
   syncPlanes()
@@ -239,23 +227,18 @@ function setup() {
     writeCookie('kuuki_locale', locale)
     render()
   })
-  // The swatch tray under the drop: arrows and clicks apply the accent at once, as in the sign-in card's menu.
   const accentMenu = $('accent-menu')
   const cells = [...accentMenu.querySelectorAll('[data-accent-option]')]
   const pickAccent = (name) => {
     root.dataset.accent = name
     writeCookie('kuuki_accent', name)
     try {
-      // Same key as rememberSignedOutPick in client/appearance.tsx: the next signed-in shell saves this pick.
       sessionStorage.setItem('kuuki-accent-pick', name)
-    } catch {
-      // The device keeps the accent; the profile's wins after sign-in.
-    }
+    } catch {}
     render()
   }
   accentMenu.addEventListener('beforetoggle', (event) => {
     if (event.newState !== 'open') return
-    // Under the drop, right edges aligned, as the card's menu opens (align end, 6px off).
     const box = $('accent').getBoundingClientRect()
     accentMenu.style.top = `${box.bottom + 6}px`
     accentMenu.style.right = `${Math.max(8, document.documentElement.clientWidth - box.right)}px`
@@ -315,7 +298,6 @@ function setup() {
         body: JSON.stringify({ password: password.value }),
       })
       if (response.ok) {
-        // No automatic sign-in: the card on the main origin shows the password-saved notice. Nothing secret travels.
         token = null
         password.value = ''
         window.location.replace($('saved').href)

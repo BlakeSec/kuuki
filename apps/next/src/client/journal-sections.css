@@ -1,4 +1,3 @@
-/* Flights · Ground: the segmented look on page links. The current section is the raised segment, never color alone. */
 .journal-sections {
   display: inline-flex;
   justify-self: start;

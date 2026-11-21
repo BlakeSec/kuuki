@@ -1,4 +1,3 @@
-/* The name step (boards 15.1, 15.7, 16.x): the address line under the field, its inline editor and the notes. */
 .name-fields {
   display: flex;
   flex-direction: column;
@@ -89,7 +88,6 @@
     min-height: 44px;
   }
 }
-/* Mobile: the editor is a full 48px input (spec; board 16.13 drew 36px), and 16px text keeps iOS from zooming. */
 @media (max-width: 700px) {
   .name-address-edit {
     min-height: 48px;

@@ -8,7 +8,6 @@ const flights: [Line, Line, Line] = [
   },
   { en: 'Flight total for this view: {flights}.', ru: 'В обзоре перелётов: {flights}.' },
 ]
-// Factual fallbacks for the slots and the six section gates.
 export const CORPUS: Record<string, [Line, Line, Line]> = {
   records: flights,
   crossings: flights,
@@ -886,7 +885,6 @@ export const CORPUS: Record<string, [Line, Line, Line]> = {
       ru: '{route} возглавляет список: перелётов {count}, туда и обратно.',
     },
   ],
-  // Hero card: the footer reads the winning `hero` trigger; a record's takeover rotates through its own triple.
   'hero:flights': [
     {
       en: '{flights} flights. The spike has stopped taking new stubs gracefully.',

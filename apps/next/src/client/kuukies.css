@@ -1,5 +1,3 @@
-/* Kuukie notice (client/kuukies.tsx). The layer spans the bottom edge and lets clicks through; only the surface takes input.
-   Phones: full width above the tab rail, where toasts sit. From 701px: bottom-left, clear of the bottom-right toast stack. */
 .kuukies-layer {
   position: fixed;
   z-index: 45;
@@ -18,7 +16,6 @@
   }
 }
 
-/* One surface whose height springs between the bar and the panel; faces sit on its bottom edge so it grows upward. */
 .kuukies-surface {
   position: absolute;
   bottom: 0;
@@ -90,7 +87,6 @@
   outline-offset: 2px;
   border-radius: var(--radius-xs);
 }
-/* Space groups the rows; no dividers. */
 .kuukies-list {
   display: grid;
   gap: var(--space-3);

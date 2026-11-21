@@ -1,4 +1,3 @@
-/* Review mode inside the Journal detail sheet. Tokens only, weights 400/500, no divider lines: space groups the blocks. */
 .journal-review-status {
   display: grid;
   gap: var(--space-3);

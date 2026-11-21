@@ -22,7 +22,6 @@ export function NextStrip() {
   }, [isCurrent])
   useEffect(() => {
     return () => {
-      // Retired owners must not notify consumers; a newer preview owns its own cleanup.
       if (current.current() && bus.getSnapshot().hoverGhost === id) bus.setHoverGhost(null)
     }
   }, [bus, id])

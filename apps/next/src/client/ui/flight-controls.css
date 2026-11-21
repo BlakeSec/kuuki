@@ -2,7 +2,6 @@
 .flight-calendar {
   position: relative;
   display: grid;
-  /* Stretched by a taller row neighbour, the field keeps its label and input at content height. */
   align-content: start;
   gap: var(--space-2);
   min-width: 0;
@@ -96,7 +95,6 @@
   background: var(--surface-inset);
   color: var(--info-text);
 }
-/* Codes stay muted mono even when they match; only names take the match colour. */
 .flight-choice-code mark {
   background: none;
   color: inherit;
@@ -130,7 +128,6 @@
   color: var(--text);
   cursor: pointer;
 }
-/* Free Arc calendar: quiet header, round transparent days, the selected day an accent disc and today a dot under its number. */
 .flight-calendar-popover {
   width: min(100%, 344px);
   min-width: 280px;
@@ -156,7 +153,6 @@
   margin-block-end: var(--space-2);
   padding-inline-start: var(--space-2);
 }
-/* Old and new titles share one cell while they cross. */
 .flight-calendar-title > [aria-hidden] {
   display: grid;
 }
@@ -199,7 +195,6 @@
   font-size: 12px;
   line-height: 24px;
 }
-/* Months sit on one strip inside a clipped window; every pane has six weeks, so the height never changes. */
 .flight-calendar-viewport {
   display: grid;
   overflow: hidden;
@@ -344,13 +339,11 @@
   .flight-full-sheet .ui-panel-footer .ui-button-wrap .ui-button {
     width: 100%;
   }
-  /* Field width, not wider: the field can sit 16px from the screen edge, so any bleed pushes the month buttons off screen. */
   .flight-calendar-popover {
     min-width: 0;
     padding-inline: var(--space-2);
   }
 }
-/* Free Arc calendar/search presentation, retaining local typed input and mobile Sheet behavior. */
 .flight-combobox > label,
 .flight-calendar > label {
   font-weight: 600;
@@ -372,7 +365,6 @@
   outline: 2px solid var(--focus);
   outline-offset: 2px;
 }
-/* The month strip clips its overflow, so a day's ring sits inside the cell; neutral, so it reads on the accent disc too. */
 .flight-calendar .flight-calendar-grid button:focus-visible {
   outline-color: var(--text);
   outline-offset: -2px;
@@ -381,8 +373,6 @@
 .flight-calendar-popover {
   border: 1px solid var(--hairline);
 }
-/* Enter from the trigger, like .ui-popover: the list hangs from the whole field, the calendar from its end button.
-   Both unmount on close, so they leave at once. */
 @media (prefers-reduced-motion: no-preference) {
   .flight-search-popover,
   .flight-calendar-popover {
@@ -451,7 +441,6 @@
   }
 }
 
-/* Inline actions inside a search list ("Retry", "Add a place manually"): a text button at the 44px target. */
 .flight-combobox-action {
   min-height: 44px;
   margin: 0 var(--space-2);
@@ -474,13 +463,11 @@
     background: var(--hover-surface);
   }
 }
-/* A result kept on screen while the next query loads: visible, not choosable. */
 .flight-combobox li[aria-disabled='true'],
 .flight-search-sheet li[aria-disabled='true'] {
   cursor: default;
 }
 
-/* Neutral input focus stays distinct from the danger border and the selected accent. */
 .flight-combobox input:focus-visible,
 .flight-calendar input:focus-visible,
 .flight-search-input input:focus-visible {

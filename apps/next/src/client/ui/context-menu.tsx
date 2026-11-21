@@ -15,15 +15,10 @@ import {
 import { MenuItem } from './menu'
 import './arc-interactions.css'
 
-// Adapted from Arc "context-menu" (uiarc.dev, MIT, see ARC-LICENSE.txt): open at the pointer, keep inside the viewport, and the row action list.
-// Arc draws its own portal and focus handling; here the existing Radix dropdown (already behind Menu) owns collision, focus, typeahead and
-// dismissal, and a zero-size anchor puts it at the pointer, the focused element or the "more" button.
-
 export type ContextMenuItem = {
   id: string
   label: string
   onSelect: () => void
-  /** Radix skips disabled items in keyboard navigation, so pair this with `reason`. */
   disabled?: boolean
   danger?: boolean
 }
@@ -36,20 +31,13 @@ export type ContextMenuProps = Omit<
   HTMLAttributes<HTMLDivElement>,
   'children' | 'onContextMenu' | 'onKeyDown'
 > & {
-  /** Names the menu for assistive technology: "Actions: TBS to IST, April 3, 2025". */
   label: string
   items: ContextMenuItem[]
-  /** Visible explanation for disabled items (offline, another deletion pending). */
   reason?: ReactNode
-  /** Where focus goes when the menu closes without an action; an action that opens something places focus itself. */
   returnFocus?: () => HTMLElement | null | undefined
   children: ReactNode
 }
 
-/**
- * Wraps a region (a row) so a right-click, the Menu key or Shift+F10 opens the item list without activating or selecting the row.
- * `ContextMenuButton` inside the region opens the same list from a visible control, which is the touch and keyboard path.
- */
 export function ContextMenu({
   label,
   items,
@@ -77,7 +65,7 @@ export function ContextMenu({
         'input, textarea, select, [contenteditable], [data-native-menu]',
       )
     )
-      return // the browser's own menu stays reachable
+      return
     event.preventDefault()
     show({ x: event.clientX, y: event.clientY })
   }
@@ -118,7 +106,6 @@ export function ContextMenu({
                 else returnFocus?.()?.focus()
               }}
             >
-              {/* Grows from the pointer or the button even when the list is shifted to stay on screen (see menu.tsx). */}
               <DropdownMenu.Arrow width={0} height={0} aria-hidden="true" />
               {items.map((item) => (
                 <MenuItem
@@ -143,7 +130,6 @@ export function ContextMenu({
   )
 }
 
-/** The visible "more actions" control. It opens the surrounding ContextMenu's list, anchored to itself. */
 export function ContextMenuButton({ label, className }: { label: string; className?: string }) {
   const menu = useContext(MenuContext)
   if (!menu) throw new Error('ContextMenuButton must sit inside a ContextMenu')

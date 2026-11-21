@@ -30,7 +30,6 @@ function realDate(value: string) {
     : ('missing' as const)
 }
 
-/** One specific, localized message per invalid field. Empty optional fields are valid. */
 export function validateFlightValues(
   values: FlightValues,
   locale: Locale,
@@ -71,7 +70,6 @@ export function validateFlightValues(
   return errors
 }
 
-/** Localized, calm copy for a failed load, save or delete. Never shows raw error text, class names or English developer messages. */
 export function flightErrorMessage(
   cause: unknown,
   locale: Locale,

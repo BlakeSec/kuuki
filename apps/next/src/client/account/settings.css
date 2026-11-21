@@ -1,5 +1,3 @@
-/* Arc form/textarea/password-field and Stepper presentation (uiarc.dev, MIT;
-   docs/research/2026-10-08-arc-source-inventory.md). House tokens and the existing save/delete state machines. */
 .settings-editor {
   max-width: 640px;
   margin-inline: auto;
@@ -92,7 +90,6 @@
   display: flex;
   gap: var(--space-3);
 }
-/* The faces are the choice: a still 40px face per character, the selected one ringed. */
 .settings-face {
   position: relative;
   display: block;
@@ -193,7 +190,6 @@
   margin: 0;
   font-variant-numeric: tabular-nums;
 }
-/* A read-only vertical Stepper: completed markers do not submit or skip deletion stages. */
 .settings-steps {
   list-style: none;
   margin: 0;

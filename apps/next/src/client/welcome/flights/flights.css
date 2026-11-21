@@ -1,11 +1,9 @@
-/* The first-flight step (boards 15.2–15.4, 15.8, 17.x). Tokens only. */
 .flights-step {
   display: flex;
   flex-direction: column;
   gap: 24px;
 }
 
-/* ---------- Prompt tray (15.2) ---------- */
 .flights-tray {
   display: flex;
   flex-direction: column;
@@ -53,7 +51,6 @@
   gap: 8px;
 }
 
-/* ---------- Quiet links and rows ---------- */
 .flights-links {
   display: flex;
   flex-wrap: wrap;
@@ -126,7 +123,6 @@
   pointer-events: none;
 }
 
-/* ---------- Paste target (15.3, 17.x) ---------- */
 .flights-target {
   display: flex;
   flex-direction: column;
@@ -180,7 +176,6 @@
   outline-offset: 2px;
 }
 
-/* ---------- Notices (17.x) ---------- */
 .flights-notice {
   display: flex;
   align-items: flex-start;
@@ -217,7 +212,6 @@
   overflow-wrap: anywhere;
 }
 
-/* ---------- Reading (15.4, 17.5–17.7) ---------- */
 .flights-live {
   display: flex;
   flex-direction: column;
@@ -234,7 +228,6 @@
   font: 500 15px/24px var(--font-mono);
   font-variant-numeric: tabular-nums;
 }
-/* Four rows always take their room, so the card does not jump as rows arrive. */
 .flights-list {
   display: flex;
   flex-direction: column;
@@ -284,7 +277,6 @@
   margin-block-start: 2px;
 }
 
-/* ---------- Drop target: the whole card ---------- */
 .flights-drop {
   position: fixed;
   inset: 0;
@@ -305,14 +297,11 @@
 }
 .flights-step:not([data-dropping='true']) .flights-drop {
   visibility: hidden;
-  /* Hide only once the fade-out has run. */
   transition:
     opacity var(--dur-fast) var(--ease-out),
     visibility 0s linear var(--dur-fast);
 }
 
-/* The newest rows sit on top and the older ones fade down the list. A row that arrives presses in from just above
-   (@starting-style runs once, when it mounts); the rows it pushes down ease to their dimmer step. */
 .flights-list li:nth-child(3) {
   opacity: 0.6;
 }
@@ -359,7 +348,6 @@
     min-block-size: 48px;
   }
 }
-/* Reduced motion keeps the fades and drops the movement. */
 @media (prefers-reduced-motion: reduce) {
   .flights-list li:not(.flights-skeleton) {
     transition: opacity var(--dur-fast) linear;

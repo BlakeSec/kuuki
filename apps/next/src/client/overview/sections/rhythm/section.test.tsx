@@ -7,7 +7,6 @@ import type { OverviewFilter, OverviewPayload } from '@kuuki/shared/overview/mod
 import fixture from '../../../../../../../packages/shared/src/overview/__fixtures__/n10.json'
 import { Section } from './section'
 
-// Queries scoped to the card's bands: whole-card role queries walk every Details node and are slow in jsdom.
 const stage = () => within(document.querySelector('.ov3-card-chart') as HTMLElement)
 const top = () => within(document.querySelector('.ov3-card-top') as HTMLElement)
 
@@ -46,7 +45,6 @@ const open = (name: string) => {
 }
 const hero = (view: { container: HTMLElement }) =>
   view.container.querySelector('.ov3-card-value-text')
-// Ten flights, one a month through 2020, plus two more Marches: March is the busiest month and 2020 the busiest year.
 function marches() {
   const payload = structuredClone(fixture) as OverviewPayload
   const march = payload.rows[2]
@@ -91,11 +89,9 @@ it('daily activity uses actual weighted leap-day evidence, applies an exact day,
   expect(screen.getByText('Monthly data only.')).toBeInTheDocument()
 })
 
-// It renders two full-year grids in two languages: about 1s locally and 2.6s on Workers Builds, which once took 5.8s.
 it('names the daily scale and the monthly base in both languages, and tells a known zero from a day with no data', () => {
   vi.stubGlobal('IntersectionObserver', undefined)
   const payload = structuredClone(fixture) as OverviewPayload
-  // The journal starts mid-January, so the first days of the year fall before it.
   payload.rows[0].date = '2020-01-10'
   admit(payload)
   const view = render(<Section span="full" />)
@@ -121,7 +117,6 @@ it('never reads a missing monthly measurement as zero: unmeasured and future mon
   vi.stubGlobal('IntersectionObserver', undefined)
   const payload = structuredClone(fixture) as OverviewPayload
   payload.generatedAt = '2020-06-15T00:00:00.000Z'
-  // January has a flight without a distance; March has no flights at all; July onwards is still ahead.
   payload.rows[0].distanceKm = null
   payload.rows[2].date = '2020-02-20'
   admit(payload)
@@ -188,7 +183,6 @@ it('shows the empty state when the filter leaves too few months, and clears the 
   expect(clear).toHaveBeenCalled()
 })
 
-// The desktop matrix is a stage: picking an exact month must inspect before filtering.
 it('History selects a dated month for the hero and stamper and filters only through the explicit action', () => {
   vi.stubGlobal('IntersectionObserver', undefined)
   const setPeriod = admit(marches())

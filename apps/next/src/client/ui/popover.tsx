@@ -87,7 +87,6 @@ const MountedPopoverContent = forwardRef<HTMLDivElement, RadixPopover.PopoverCon
     },
     ref,
   ) {
-    // Capture on each fresh Portal mount, before child autoFocus or ref callbacks run.
     const { open } = useContext(PopoverState)
     const [wasOpen, setWasOpen] = useState(open)
     const [opener, setOpener] = useState(() => {
@@ -115,7 +114,6 @@ const MountedPopoverContent = forwardRef<HTMLDivElement, RadixPopover.PopoverCon
         onCloseAutoFocus={(event) => {
           onCloseAutoFocus?.(event)
           if (event.defaultPrevented || !opener) return
-          // Radix runs this after unmount; an outside control may already own focus.
           if (
             document.activeElement === document.body ||
             (event.target instanceof HTMLElement && event.target.contains(document.activeElement))
@@ -125,8 +123,6 @@ const MountedPopoverContent = forwardRef<HTMLDivElement, RadixPopover.PopoverCon
           event.preventDefault()
         }}
       >
-        {/* Invisible arrow: Radix then puts the transform origin at the trigger, measured after collision shifts.
-            First child, so `:last-child` rules still see the real last item. */}
         <RadixPopover.Arrow width={0} height={0} aria-hidden="true" />
         {children}
       </RadixPopover.Content>

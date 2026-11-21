@@ -1,4 +1,3 @@
-/* Import flow. Tokens only: no literal colours, no blur, no ambient motion, no `transition: all`. */
 .import-page {
   max-width: 860px;
   margin: 0 auto;
@@ -87,7 +86,6 @@
   align-items: flex-start;
 }
 
-/* Quick Add: two equal source actions that stack when two columns would not fit (320px). */
 .quick-add-actions {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
@@ -96,7 +94,6 @@
 .quick-add-actions .ui-button {
   width: 100%;
 }
-/* On a phone the two actions are the pickers; an empty dropzone only returns once a file is chosen. */
 @media (pointer: coarse) {
   .quick-add-drop[data-empty='true'] {
     display: none;
@@ -111,7 +108,6 @@
   background: var(--surface);
 }
 
-/* Stepper: named steps, never bare dots. */
 .import-steps {
   list-style: none;
   margin: 0;
@@ -163,7 +159,6 @@
   color: var(--accent-foreground);
 }
 
-/* Source */
 .import-textarea {
   display: block;
   min-height: 120px;
@@ -183,7 +178,6 @@
   padding-top: var(--space-2);
 }
 
-/* Failure */
 .import-failure {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
@@ -215,7 +209,6 @@
   justify-items: start;
 }
 
-/* Progress */
 .import-source-chip {
   display: inline-flex;
   flex-wrap: wrap;
@@ -323,7 +316,6 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* Review */
 .import-select-head {
   display: flex;
   flex-wrap: wrap;
@@ -516,7 +508,6 @@
   background: var(--surface);
 }
 
-/* Form */
 .import-form {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -550,12 +541,10 @@
   overflow-wrap: anywhere;
 }
 
-/* Review header and action bar */
 .import-review-discard {
   display: flex;
   justify-content: flex-end;
 }
-/* Text-like buttons keep their text-sized look; min-height keeps a 44px target. */
 .import-text-action {
   padding-inline: var(--space-3);
   margin-inline: calc(-1 * var(--space-3));
@@ -588,7 +577,6 @@
   animation: import-spin 1s linear infinite;
 }
 
-/* Questions: one answer for every row with the same cause */
 .import-questions {
   display: grid;
   gap: var(--space-3);
@@ -688,7 +676,6 @@
   font-size: 15px;
   line-height: 22px;
 }
-/* Answers are equal outlined secondary buttons, at least 8px apart. */
 .import-question-answers {
   display: grid;
   gap: var(--space-2);
@@ -746,7 +733,6 @@
 .import-question-year > .ui-button {
   margin-top: calc(24px + var(--space-1));
 }
-/* "I'll set each one": always on its own line under the answers. */
 .import-each {
   justify-self: start;
   color: var(--text);
@@ -763,7 +749,6 @@
 .import-question .ui-disclosure-trigger .ui-disclosure-chevron {
   color: inherit;
 }
-/* Room for focus rings inside the clipped panel. */
 .import-question .ui-disclosure-inner {
   padding: 3px;
   margin: -3px;
@@ -806,7 +791,6 @@
 .import-question-failed {
   color: var(--danger-text);
 }
-/* A settled answer rises in once, when it was added while this view was open. */
 .import-question-done > li[data-settled-new] {
   animation: history-settled-in var(--dur-base) var(--ease-out) backwards;
 }
@@ -816,7 +800,6 @@
     transform: translateY(0.3em);
   }
 }
-/* An answered or skipped card or row fades out before it leaves the list (pointer only; JS releases it). */
 :is(.import-question, .import-row)[data-leaving] {
   animation: history-leave 120ms var(--ease-out) forwards;
 }
@@ -825,7 +808,6 @@
     opacity: 0;
   }
 }
-/* Sending: the departure board of years beside its plain "n of m". */
 .history-board {
   display: flex;
   flex-wrap: wrap;
@@ -857,7 +839,6 @@
   }
 }
 
-/* Done: a reading column, so the stamps and actions do not stretch across the review's width. */
 .import-done {
   max-width: 640px;
 }
@@ -897,7 +878,6 @@
   display: grid;
   gap: var(--space-3);
 }
-/* Up to MAX_STAMPS stamps in a wrapping grid, Passport-sized; no scroll rail. */
 .import-stamps-count {
   color: var(--text-muted);
   font-variant-numeric: tabular-nums;
@@ -975,7 +955,6 @@
   }
 }
 
-/* Several single-source jobs share one focused review and one final save. */
 .unified-import-heading {
   display: flex;
   align-items: center;
@@ -988,7 +967,6 @@
 .unified-import-heading > .ui-button {
   flex: none;
 }
-/* Under the lane figure the source buttons keep their natural width, centred. */
 .unified-import-sources {
   display: grid;
   justify-items: start;
@@ -1004,7 +982,6 @@
 .unified-import-notes[data-empty] {
   text-align: center;
 }
-/* Dropping and pasting files needs a pointer and a keyboard. */
 @media not ((hover: hover) and (pointer: fine)) {
   .unified-import-drop {
     display: none;
@@ -1059,7 +1036,6 @@
 .unified-import .import-row-body {
   flex: 1 1 12rem;
 }
-/* Inside a row card the year answers size to their labels and wrap whole, never mid-word. */
 .unified-import .import-question-answers[data-columns='3'] {
   display: flex;
   flex-wrap: wrap;
@@ -1078,7 +1054,6 @@
   display: grid;
   gap: var(--space-3);
 }
-/* Desktop browsers ignore `capture`; there the camera would only repeat Choose files. */
 @media (hover: hover) and (pointer: fine) {
   .unified-import-camera,
   .ui-menu-item:has(.unified-import-camera) {
@@ -1096,7 +1071,6 @@
   }
 }
 @media (max-width: 700px) {
-  /* The focused route has no tab rail, so the final action rests at the bottom even under a short review. */
   .unified-import {
     display: flex;
     flex-direction: column;
@@ -1111,7 +1085,6 @@
     bottom: calc(env(safe-area-inset-bottom) + var(--import-keyboard-inset, 0px));
     flex-wrap: wrap;
   }
-  /* A disabled Save sits in a wrapper with its reason; both span the bar. */
   .unified-import .ui-action-bar-actions,
   .unified-import .ui-action-bar-actions > *,
   .unified-import .ui-action-bar-actions .ui-button {
@@ -1128,7 +1101,6 @@
   overflow-wrap: break-word;
 }
 
-/* Flighty CSV import: the chosen clock offset of a record. */
 .import-question-answers .ui-button[aria-pressed='true'] {
   box-shadow: inset 0 0 0 2px var(--selection-contour);
 }

@@ -29,7 +29,6 @@ export function ZeroResult() {
   const { actions, locale, scope, filter } = useOverview()
   const ground = scope?.figures.scope === 'ground'
   const facets = useAppliedFacets()
-  // Name what is filtering, so an empty result reads as these conditions, not as an empty journal.
   const conditions = [
     ...(scope?.figures.scope === 'flights'
       ? [t(S.scopeFlights, locale)]

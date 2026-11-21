@@ -35,10 +35,8 @@ const MONTHS: CountForms = {
 const pad = (month: number) => String(month).padStart(2, '0')
 const monthKey = (month: number) => `m${pad(month)}`
 const yearKey = (year: number) => `y${year}`
-// The stage's width on the sheet and on the desktop card; twelve columns fill it at these sizes, and more years squeeze the pitch.
 const AVAILABLE = { sheet: 342, full: 636 }
 const COLUMNS = { sheet: { barWidth: 20, pitch: 29 }, full: { barWidth: 40, pitch: 52 } }
-// The least a year label (four mono digits) needs between two ticks.
 const TICK_GAP = 34
 
 function columnsFor(count: number, span: Span) {
@@ -68,7 +66,6 @@ export function Section({ span }: { span: Span }) {
   const historyYears = showAll ? data?.years : data?.years.slice(0, 6)
   const cap = (text: string) => text.charAt(0).toLocaleUpperCase(locale) + text.slice(1)
 
-  // History reads dated months; seasonality combines calendar months; Years reads yearly totals.
   const rows: Row[] = !data
     ? []
     : history
@@ -90,7 +87,6 @@ export function Section({ span }: { span: Span }) {
             year: row.year,
           }))
   const filled = rows.filter((row) => row.flights > 0)
-  // The busiest month is the rhythm's own; the busiest year is the latest of any tie.
   const busiest = calendar
     ? data?.busiestMonthOfYear
       ? monthKey(data.busiestMonthOfYear.month)

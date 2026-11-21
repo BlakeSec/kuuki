@@ -40,7 +40,6 @@ const countryForms: CountForms = {
 const noun = (locale: Locale, n: number, set: CountForms) =>
   formatCount(locale, n, set).replace(formatNumber(locale, n), '').trim()
 
-/** One leading fact and a static drawing; explanations stay with the values they qualify. */
 export function HeroPanel() {
   const { scope, all, payload, filter, locale, ownerKey } = useOverview()
   const f = scope?.figures

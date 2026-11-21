@@ -48,7 +48,6 @@ it('describes clock refunds without calling eastbound date-line flights westboun
   const crossings = ready(candidate.crossings)
   expect(crossings.eastboundShare).toBe(1)
   expect(crossings.backHours).toBeGreaterThan(2 * crossings.forwardHours)
-  // A Continents line may win the slot; the clock-refund trigger must still fire and never say west.
   expect(params('crossings:mostly-backwards', candidate, candidate)).toEqual({
     back: crossings.backHours,
   })
@@ -220,7 +219,6 @@ it('keeps signed clock jumps absolute and departure times ungrouped at their thr
   expect(params('records:latest-departure', candidate)).toBeNull()
 })
 
-// Unknown coordinates must not turn into an absence claim, even when clocks are ready.
 it.each([0, 1])(
   'suppresses geographic absence claims with coordinate coverage %s',
   (locatedFlights) => {

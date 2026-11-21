@@ -47,7 +47,6 @@ describe('PassportManage aircraft outcomes', () => {
 
   it('shows saved, failed and uncertain rows separately and reloads the list', async () => {
     const user = userEvent.setup()
-    // Flight 3 is missing from the answer: the server said nothing about it, so it may or may not have been written.
     mocks.accept.mockResolvedValueOnce({
       results: [
         { id: 1, status: 'accepted', flight: { id: 1, aircraft_icao: 'A320' } },
@@ -77,7 +76,6 @@ describe('PassportManage aircraft outcomes', () => {
     expect(within(rows[2]).getByText('May not be saved')).toBeInTheDocument()
     expect(within(rows[2]).getByText(/trying again is safe/i)).toBeInTheDocument()
     expect(label(1)).not.toContain('2026-03-01')
-    // Something saved: one polite announcement with every count, nothing assertive.
     expect(screen.getByRole('status')).toHaveTextContent(
       'Saved: 1 · Not saved: 1 · May not be saved: 1',
     )
@@ -88,7 +86,6 @@ describe('PassportManage aircraft outcomes', () => {
       { id: 3, aircraft_icao: 'A320' },
     ])
     expect(mocks.acknowledge).toHaveBeenCalledWith({ derived_state: 'pending', revision: 3 })
-    // The saved flight left the eligible set; the failed and uncertain ones stay selected for another attempt.
     await waitFor(() => expect(mocks.list).toHaveBeenCalledTimes(2))
     const fieldset = screen.getByRole('group', { name: 'Flights' })
     await waitFor(() => expect(within(fieldset).getAllByRole('checkbox')).toHaveLength(2))
@@ -122,7 +119,6 @@ describe('PassportManage aircraft outcomes', () => {
         .filter((box) => (box as HTMLInputElement).checked),
     ).toHaveLength(2)
 
-    // The type picker may have changed since; the retry still resends what was sent.
     await user.clear(screen.getByRole('combobox', { name: 'Aircraft type' }))
     await user.type(screen.getByRole('combobox', { name: 'Aircraft type' }), 'B738{Enter}')
     mocks.accept.mockResolvedValueOnce({
@@ -182,7 +178,6 @@ describe('PassportManage aircraft outcomes', () => {
     expect(screen.getByRole('alert')).not.toHaveTextContent('Saved: 1')
     expect(screen.getByRole('status')).toBeEmptyDOMElement()
     expect(mocks.accept).toHaveBeenLastCalledWith([{ id: 2, aircraft_icao: 'A320' }])
-    // The row list still shows the accumulated states.
     expect(
       within(screen.getByRole('list', { name: 'Result' }))
         .getAllByRole('listitem')

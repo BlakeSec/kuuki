@@ -254,7 +254,6 @@ export function AirportScreen({
             ...window.history.state,
             kuukiAirportCompare: { ownerId, iata: entry.iata },
           }
-          // Next copies its own fields and publishes the URL for external History calls.
           delete state.__NA
           delete state._N
           if (compareCode) window.history.replaceState(state, '', next)

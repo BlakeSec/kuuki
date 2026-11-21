@@ -110,7 +110,6 @@
   }
 }
 
-/* ---------- Manual flight entry (Paper "Manual flight entry", board 04) ---------- */
 .flight-editor :is(.route-fieldset, .date-tiles, .flight-times) {
   min-width: 0;
   margin: 0;
@@ -145,7 +144,6 @@
   gap: var(--space-3);
 }
 
-/* Route card: two airport rows on a decorative dotted spine (a route marker, not a row divider). */
 .route-group {
   position: relative;
 }
@@ -312,7 +310,6 @@
   max-height: 420px;
 }
 
-/* Route shortcuts: 40px inset chips; the block stays in place after use so nothing below shifts. */
 .route-shortcuts {
   display: grid;
   gap: var(--space-2);
@@ -351,7 +348,6 @@
   color: var(--text-muted);
 }
 
-/* Date tiles: native radios on an inset track. Solid accent stays reserved for Save. */
 .date-tiles-track {
   display: flex;
   gap: var(--space-1);
@@ -418,7 +414,6 @@
   margin-block-start: var(--space-4);
 }
 
-/* Optional details: fields, then times as one leg. */
 .flight-details {
   display: grid;
   gap: var(--space-6);
@@ -477,7 +472,6 @@
   color: var(--text-muted);
 }
 
-/* Save notices sit in the footer directly above their actions: icon, status title, muted detail. No box, no rail. */
 .flight-footer-block {
   flex: 1 1 100%;
   display: grid;

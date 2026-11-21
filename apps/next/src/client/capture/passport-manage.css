@@ -1,4 +1,3 @@
-/* Arc checkbox/list composition, using native selection and the accepted Kuuki field/menu authority (MIT; ui/ARC-LICENSE.txt). */
 .capture-manage .capture-card {
   min-width: 0;
   border-radius: var(--radius-md);

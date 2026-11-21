@@ -1,6 +1,3 @@
-/* Achievement ladder figures. Thumbs are line-only: faces take the background they sit on (--ladder-bg, set by the mark or the strip),
-   strokes are muted, and only the lit part keeps the accent. Locked rungs (next, later) restroke everything, accent included, in
-   --iso-ghost-line; later rungs sit at 50%. No figure animates: the only motion is the cabinet's unboxing (profile.css). */
 .ladder-figure {
   display: grid;
   place-items: center;
@@ -32,7 +29,6 @@
   inline-size: 100%;
   block-size: 200px;
 }
-/* Dark faces sit one step off the sheet's --surface, or the hero reads as a wireframe. Ladders only: the overview figures keep theirs. */
 :root[data-theme='dark'] .ladder-figure[data-size='hero'] {
   --ladder-top: var(--iso-top);
   --ladder-front: var(--iso-front);

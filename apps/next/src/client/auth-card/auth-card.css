@@ -1,6 +1,3 @@
-/* Auth card (boards 1.1 and 3.1 to 3.3, build notes 4.1). Colours are tokens only; the auth tokens live in styles.css. */
-
-/* ---------- Wordmark ---------- */
 .kuuki-wordmark {
   display: inline-flex;
   align-items: baseline;
@@ -15,7 +12,6 @@
   color: var(--text);
 }
 
-/* ---------- Page and card (desktop) ---------- */
 .auth-page {
   min-height: 100dvh;
   display: grid;
@@ -51,7 +47,6 @@
   inset: 0;
   pointer-events: none;
 }
-/* The くうき watermark behind the brand field: stacked one per line on desktop (board 1.1), in a row across the band on mobile. */
 .auth-watermark {
   position: absolute;
   left: 0;
@@ -68,7 +63,6 @@
   position: relative;
   --wordmark-size: 36px;
 }
-/* The top padding clears the corner controls; the extra 48px over the bottom centres the column 24px low, as on the boards. */
 .auth-form-panel {
   position: relative;
   flex: 1 1 0;
@@ -87,7 +81,6 @@
   width: min(360px, 100%);
 }
 
-/* ---------- Corner controls ---------- */
 .auth-corner {
   position: absolute;
   top: 36px;
@@ -123,22 +116,18 @@
   justify-items: center;
   padding-inline: 12px;
 }
-/* The current language's code keeps its box, so the width never changes. */
 .auth-corner-control[data-kind='language'] > span {
   grid-area: 1 / 1;
 }
 .auth-corner-control[data-kind='language'] > span:not([data-shown]) {
   visibility: hidden;
 }
-/* A drop of the accent: the one corner icon in colour, because it shows the choice it changes. */
 .auth-corner-control[data-kind='accent'] svg {
   color: var(--accent);
 }
-/* Keyline puts fill="none" on the path itself, so the fill has to be set there. */
 .auth-corner-control[data-kind='accent'] svg path {
   fill: currentColor;
 }
-/* Only the five-swatch tray: the menu hugs it instead of taking the 200px menu width. */
 .auth-accent-menu {
   min-width: 0;
 }
@@ -149,7 +138,6 @@
 .auth-accent-menu .ui-menu-tray {
   grid-template-columns: repeat(var(--n), 40px);
 }
-/* Move the Keyline sun below the clipped sky; the horizon stays in place. */
 .auth-horizon-icon {
   position: relative;
   width: 16px;
@@ -176,7 +164,6 @@
   translate: 0 50%;
 }
 
-/* ---------- Heading, fields and actions ---------- */
 .auth-heading {
   display: flex;
   flex-direction: column;
@@ -193,7 +180,6 @@
   margin: 0;
   color: var(--text-muted);
 }
-/* The Russian welcome heading wraps to two lines (up to 375px wide and from 701px) where the create heading fits one, so the step reserves both lines and the centred column does not shift. */
 @media (max-width: 389px), (min-width: 701px) {
   :lang(ru) .auth-step[data-step] .auth-heading h1 {
     min-height: 2lh;
@@ -284,7 +270,6 @@
   padding-block: 9px;
   line-height: 24px;
 }
-/* Checking… and Creating… keep the accent fill at full opacity (board 1.3); `aria-busy` already blocks the press. */
 .ui-button.auth-primary[aria-busy='true'] {
   background: var(--accent);
   border-color: var(--accent);
@@ -320,7 +305,6 @@
     rotate: 360deg;
   }
 }
-/* While checking, the fields keep their values and focus but read as paused (board 1.3). */
 .auth-form[aria-busy='true'] .auth-input {
   border-color: var(--hairline);
   color: var(--text-muted);
@@ -380,13 +364,11 @@
   overflow-wrap: anywhere;
 }
 
-/* ---------- Steps ---------- */
 .auth-step {
   display: flex;
   flex-direction: column;
   gap: inherit;
 }
-/* Reserve the final layout once, then fade the status; the collapsed row cancels its extra flex gap. */
 .auth-status {
   display: grid;
   grid-template-rows: 0fr;
@@ -403,11 +385,9 @@
   min-height: 0;
   overflow: hidden;
 }
-/* Open and focused, the clip lets the Change button's focus ring out. */
 .auth-step[data-step='create'] .auth-status:focus-within .auth-status-clip {
   overflow: visible;
 }
-/* Create-step status line (board 1.2): the checked email and Change. It grows if a long email wraps. */
 .auth-status-line {
   display: flex;
   align-items: center;
@@ -430,7 +410,6 @@
   font-weight: 500;
   color: var(--text);
 }
-/* 40px tall inside the 44px bar; the hit area reaches the bar's edges. */
 .auth-status-change {
   position: relative;
   flex-shrink: 0;
@@ -459,8 +438,6 @@
   color: var(--text-muted);
 }
 
-/* Text links: 13/20 accent text with a 44px hit area from padding and an equal negative margin.
-   `-up` grows up and sideways only, so a link above an input never reaches into it. */
 .auth-text-link {
   display: inline-block;
   padding: 12px 8px;
@@ -481,7 +458,6 @@
   color: var(--text-muted);
   cursor: default;
 }
-/* The 24px it grows up must clear the field above, so a field whose label row holds one sits 8px lower (24px, not 16). The create step's hint keeps the same 8px so the field does not jump when the step changes. */
 .auth-field:has(.auth-field-label-row :is(.auth-text-link-up, .auth-field-hint)) {
   margin-top: 8px;
 }
@@ -518,14 +494,11 @@
   }
 }
 
-/* ---------- Mobile: brand band above a bottom sheet (boards 3.2 and 3.3) ---------- */
 @media (max-width: 700px) {
-  /* The band meets the status bar and the sheet meets the bottom controls. */
   :root:has(.auth-page) {
     --edge-top-background: var(--auth-band-surface);
     --edge-bottom-background: var(--surface);
   }
-  /* The top row clears the fixed .edge-top strip, which would otherwise paint over the corner controls' focus rings. */
   .auth-page {
     --auth-page-top: max(12px, env(safe-area-inset-top));
     display: block;
@@ -543,7 +516,6 @@
     background: transparent;
     overflow: visible;
   }
-  /* The band is 302px under a 52px header row (board 3.2 minus the device status bar) and gives up height first. */
   .auth-brand {
     flex: 0 0 auto;
     height: clamp(160px, 100dvh - 480px, 302px);
@@ -553,7 +525,6 @@
   .auth-brand-wordmark {
     --wordmark-size: 28px;
   }
-  /* The watermark fills the band below the header row. */
   .auth-watermark {
     left: 0;
     right: 0;

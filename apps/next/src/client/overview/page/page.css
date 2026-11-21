@@ -1,7 +1,5 @@
 .ov3-page {
-  /* The shell already applies --content-width and --page-gutter; adding them again here doubled the gutter. */
   width: 100%;
-  /* .page-shell already pads the top; a second 40px here left an empty band under the header. */
   padding-block: 0 96px;
   display: flex;
   flex-direction: column;
@@ -21,7 +19,6 @@
 .ov3-scope {
   color: var(--text-muted);
 }
-/* The common filters drive the map, the figures and the chapters, so they lead the whole composition: one row above the globe and figures. */
 .ov3-overview-workspace {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -95,7 +92,6 @@
   color: var(--text-muted);
   font-size: 13px;
 }
-/* In flow under the globe card, never over it. On wide screens the note drops under both buttons. */
 .ov3-first-run {
   order: 1;
   max-width: 520px;
@@ -194,14 +190,11 @@
   color: var(--text-muted);
   font-size: 13px;
 }
-/* Wide screens: the map card grows with the viewport (capped). */
 @media (min-width: 1280px) {
   .ov3-globe-band {
     --ov-globe-h: clamp(520px, 30vw, 720px);
   }
 }
-/* Very wide screens: the globe card had spare space at its sides, so the globe key (Visits per country) docks as a third card after the figures, and the row grows taller (up to the viewport less the header) so the round globe fills more of its card; height, not width, limits its size.
-   2176px is where the band reaches ~2080px: the shell caps at 2560px with a gutter that reaches 48px. A media query, not measurement, so the server's first paint already has the final layout. */
 @media (min-width: 2176px) {
   .ov3-overview-workspace > .ov3-globe-band:has(> [data-region='figures']) {
     --ov-globe-h: max(720px, min(42vw, 100svh - 260px));
@@ -222,7 +215,6 @@
     display: none;
   }
 }
-/* Tablets keep the phone order while one column is all that fits: filters, compact figures, globe. */
 @media (max-width: 1023px) {
   .ov3-globe-band {
     grid-template-columns: minmax(0, 1fr);
@@ -249,7 +241,6 @@
     min-height: 360px;
     padding: 16px;
   }
-  /* Common filters sit outside the phone card, leaving the corner free. */
   .ov3-globe-region .globe-top-left {
     inline-size: auto;
     min-inline-size: 0;
@@ -278,7 +269,6 @@
   }
 }
 
-/* Under Всё with ground data the chapters stay flight-only; one muted line above them says so. */
 .ov3-flights-only {
   margin: 0;
   color: var(--text-muted);

@@ -1,4 +1,3 @@
-/* Journal shortcuts popover. Tokens only; weights 400 and 500; space groups the rows, no rules between them. */
 .journal-shortcuts {
   width: max-content;
   max-width: min(420px, calc(100vw - 16px));
@@ -32,7 +31,6 @@
   font-weight: 400;
 }
 
-/* No hardware keyboard to list on touch. */
 @media (pointer: coarse) {
   .ui-button.journal-shortcuts-button {
     display: none;

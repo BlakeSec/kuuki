@@ -1,6 +1,3 @@
-/* Passport blocks: avatar, headline numbers, badge cabinet, ranks, join card and closed covers (spec .scratch/profile-redesign,
-   boards 21.x). Arc avatar and badge composition (MIT; ../ui/ARC-LICENSE.txt); Facehash and journal-derived values stay authoritative. */
-
 .profile-avatar {
   display: block;
   border-radius: var(--radius-full);
@@ -60,7 +57,6 @@
   animation: profile-rise var(--dur-base) var(--ease-out) both;
   animation-delay: calc(60ms + var(--block-i, 0) * 60ms);
 }
-/* Member Passport and its visitor preview stay readable immediately on every visit. */
 .passport-page:is([data-mode='owner'], [data-mode='preview']) .profile-block {
   animation: none;
 }
@@ -97,7 +93,6 @@
   text-wrap: pretty;
 }
 
-/* Headline numbers: Commissioner with tabular figures (Paper Mono splits "412,580" at the comma). */
 .profile-numbers {
   gap: var(--space-8);
 }
@@ -158,7 +153,6 @@
   color: var(--text-muted);
 }
 
-/* Badge cabinet: earned only. */
 .profile-badges {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -210,7 +204,6 @@
   line-height: 18px;
   color: var(--text-muted);
 }
-/* The 72px mark holds the ladder's 56px line-only thumb (ladders.css), or the Founding crew stub. */
 .profile-badge-mark {
   --ladder-bg: var(--surface-inset);
   position: relative;
@@ -222,8 +215,6 @@
   background: var(--surface-inset);
   box-shadow: inset 0 1px 0 var(--surface-highlight);
 }
-/* Unboxing (owner): the badge presses into its slot and the ink settles; the New tag is pinned to the corner,
-   out of flow, so the grid never moves when it clears. */
 .profile-badges [data-fresh] .profile-badge-mark {
   box-shadow: 0 0 0 2px var(--accent);
   animation: badge-press var(--dur-sheet) var(--ease-out) both;
@@ -278,7 +269,6 @@
   font-weight: 600;
   cursor: pointer;
 }
-/* Ladder sheet: hero figure on its stage, Normal then Sarcastic, the earned date, then the rung strip. Space groups, no rules. */
 .ladder-stage {
   --ladder-bg: var(--surface);
   display: grid;
@@ -348,7 +338,6 @@
   color: var(--text-muted);
 }
 
-/* Ranks: gate signs, static. Light hangs ink signs; dark raises slabs. */
 .profile-gates {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(176px, 1fr));
@@ -383,7 +372,6 @@
   align-self: flex-start;
 }
 
-/* Closed covers: private (accent) and not found (neutral). Spine on the left. */
 .profile-closed {
   display: flex;
   flex-direction: column;
@@ -462,7 +450,6 @@
   text-decoration: none;
 }
 
-/* Quiet entrance: the page's blocks rise in turn, 60ms apart. No scroll reveals, no count-ups. */
 @keyframes profile-rise {
   from {
     opacity: 0;
@@ -486,7 +473,6 @@
   }
 }
 
-/* Tablet. */
 @media (max-width: 1023px) {
   .profile-badges {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -496,7 +482,6 @@
   }
 }
 
-/* Mobile. */
 @media (max-width: 700px) {
   .profile-distance-value > span:first-child {
     font-size: 56px;
@@ -563,8 +548,6 @@
     opacity: 1;
   }
 }
-/* Generated avatar: ink eyes on a tint of the same ink. Each character keeps a resting pose; a fine pointer meets
-   its gaze, and the account trigger glances down at the boarding pass while the menu is open. */
 .avatar-face {
   display: grid;
   place-items: center;
@@ -574,7 +557,6 @@
   background: color-mix(in oklab, var(--avatar-ink) var(--avatar-tint, 16%), var(--surface));
   color: var(--avatar-ink);
 }
-/* Dark inks are pale, so the paper needs more of them to read as tinted. */
 :root[data-theme='dark'] .avatar-face {
   --avatar-tint: 26%;
 }
@@ -613,18 +595,15 @@
   rotate: none;
 }
 @media (prefers-reduced-motion: no-preference) {
-  /* Crossed eyes do not blink. */
   .avatar-face:not([data-face='jetlag']) svg > g {
     animation: var(--avatar-idle, avatar-blink) 9s linear var(--avatar-blink-delay, 0s) infinite;
   }
-  /* The face on the pass and a newly picked face in Settings blink once as they appear; listed last, it overrides the idle blink while it runs. */
   .account-who .avatar-face:not([data-face='jetlag']) svg > g,
   .settings-avatar .profile-avatar .avatar-face:not([data-face='jetlag']) svg > g {
     animation:
       var(--avatar-idle, avatar-blink) 9s linear var(--avatar-blink-delay, 0s) infinite,
       avatar-hello 260ms var(--ease-in-out) 180ms backwards;
   }
-  /* The picker's faces hold still; the preview beside them carries the motion. */
   .settings-face .avatar-face[data-face] svg > g {
     animation: none;
   }
@@ -639,7 +618,6 @@
     scale: 1 0.1;
   }
 }
-/* Sleepy lids stay down a beat longer. */
 @keyframes avatar-doze {
   0%,
   94%,

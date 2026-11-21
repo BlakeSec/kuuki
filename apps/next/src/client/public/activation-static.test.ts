@@ -256,7 +256,6 @@ it('runs the plane field only while visible and keeps the explicit pause through
 
 it('applies a picked accent at once and marks it for the profile after sign-in', () => {
   boot(false)
-  // jsdom has no popover API, so the closed tray's cells are reached directly.
   const matcha = () => screen.getByRole('radio', { name: 'Matcha', hidden: true })
   fireEvent.click(matcha())
   expect(document.documentElement.dataset.accent).toBe('matcha')
