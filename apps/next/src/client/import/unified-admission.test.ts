@@ -1,4 +1,4 @@
-import { expect, it } from 'vitest'
+import { expect, it, vi } from 'vitest'
 import { UnifiedSession } from './unified-session'
 import { importAccount, postJob } from '../../../../../functions/test/import-fixture'
 import type { BatchApi } from './batch-run'
@@ -103,4 +103,46 @@ it('admits Nomads files without a provider, resolves airports and requires expli
   } finally {
     await dispose()
   }
+})
+
+it('keeps a Nomads export with no possible flights finished after a reload', async () => {
+  const submit = vi.fn()
+  const api: BatchApi = {
+    submit,
+    readBatch: async () => {
+      throw new Error('Unexpected batch read')
+    },
+    connect: async () => {},
+    sleep: async () => {},
+  }
+  const session = new UnifiedSession(api)
+  session.add([
+    new File(
+      [
+        JSON.stringify({
+          trips: [
+            {
+              place: 'Boston',
+              country_code: 'US',
+              date_start: '2026-01-01',
+              date_end: '2026-01-02',
+            },
+          ],
+        }),
+      ],
+      'nomads.json',
+      { type: 'application/json' },
+    ),
+  ])
+  await expect.poll(() => session.getEntries()[0]?.phase).toBe('empty')
+  expect(session.requiresSelection()).toBe(false)
+  const restored = new UnifiedSession(api)
+  restored.resume(JSON.parse(JSON.stringify(session.retained())))
+  expect(restored.getEntries()[0]).toMatchObject({
+    phase: 'empty',
+    nomads: { stays: 1, routes: 0 },
+  })
+  expect(submit).not.toHaveBeenCalled()
+  session.leave()
+  restored.leave()
 })

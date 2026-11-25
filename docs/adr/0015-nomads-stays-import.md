@@ -12,7 +12,7 @@ A Nomads.com export is a JSON list of city stays (`trips[]` with `place`, `count
 
 ### The export is read on the device
 
-[`nomadsToText`](../../apps/next/src/client/import/nomads-json.ts) parses the file in the browser and sends only derived route lines, one per change of city, through the existing text source. Profile details, trip IDs and the original JSON never leave the device; the source label is the file name. No provider and no AI are involved: every line is in the format the shared structured-text parser accepts, so the server admits it without Gemini.
+[`nomadsToText`](../../apps/next/src/client/import/nomads-json.ts) parses the file in the browser and sends only derived route lines, one per change of city, through the existing text source. Profile details, trip IDs and the original JSON never leave the device; the source label is the file name. No provider and no AI are involved: every line is in the format the shared structured-text parser accepts, so the server admits it without Gemini. A single unreadable line would make the parser hand the whole text to Gemini, so place names are normalized first (NFC, control, format and line-separator characters and runs of whitespace become one space) and a test feeds hostile place names through the real parser. [`prepareNomads`](../../apps/next/src/client/import/nomads-json.ts) turns the file into a text source, an empty result or a failure; `UnifiedSession` only routes that result.
 
 ### A change of city is only a possible flight
 
@@ -26,8 +26,12 @@ A Nomads.com export is a JSON list of city stays (`trips[]` with `place`, `count
 
 ### City hints resolve airports
 
-A route label `City, CC` with a catalog country code narrows [`airportCandidates`](../../functions/api/import/_text.ts) to that country: a single airport fills the code, several become `origin_options`/`destination_options`. A suffix that is not a catalog country keeps the old whole-label match. When nothing matches, the label is kept as `origin_hint`/`destination_hint` and shown in place of the code until the owner chooses an airport.
+A route label `City, CC` with a catalog country code narrows [`airportCandidates`](../../functions/api/import/_text.ts) to that country: a single airport fills the code, several become `origin_options`/`destination_options`. A suffix that is not a catalog country keeps the old whole-label match. A route splits at an arrow before the word `to`, so a place such as `Road to Hana` stays whole. When nothing matches, the label is kept as `origin_hint`/`destination_hint` and shown in place of the code until the owner chooses an airport.
 
 ### Admission of hint-only rows (amends ADR 0001 §6)
 
 [`normalizeFlights`](../../functions/api/import/_extract.ts) still rejects a row with no airport codes and no calendar date, unless it has two different non-empty hints and `review_required === true`. Such a row is admitted as an unselected draft. The exception applies to every source, so a model reply that names two cities and flags uncertainty is also kept for review instead of being dropped.
+
+### An export with no possible flight stays finished
+
+It creates no batch. The retained session record keeps `empty: true` with the summary, so a reload shows the same finished result instead of asking for the file again, and such an export does not switch the session to explicit selection.

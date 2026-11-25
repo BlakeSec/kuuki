@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { normalizeFlights } from '../api/import/_extract'
 import { airportCandidates, parseStructuredText } from '../api/import/_text'
 
 const ROWS = [
@@ -125,5 +126,52 @@ describe('airportCandidates', () => {
   it('keeps an unknown or mismatched country from matching another place', () => {
     expect(airportCandidates('Boston, GB')).toEqual([])
     expect(airportCandidates('Portland, OR')).toEqual([])
+  })
+})
+
+describe('route splitting', () => {
+  it('splits at an arrow before a place name containing the word to', () => {
+    expect(
+      parseStructuredText('Undated | Road to Hana, US → Paris, FR [possible]')?.flights[0],
+    ).toMatchObject({
+      origin_hint: 'Road to Hana, US',
+      destination: '',
+    })
+  })
+
+  it('still reads a route written with to', () => {
+    expect(parseStructuredText('2024-03-15 | JFK to LAX')?.flights[0]).toMatchObject({
+      origin: 'JFK',
+      destination: 'LAX',
+    })
+  })
+})
+
+describe('hint-only routes', () => {
+  const flight = {
+    date: '',
+    origin: '',
+    destination: '',
+    airline_iata: 'ZZ',
+    confidence: 0.5,
+    origin_hint: 'Canggu, ID',
+    destination_hint: 'Tbilisi, GE',
+    review_required: true,
+  }
+
+  it('keeps an undated row with two different city hints for review', () => {
+    expect(normalizeFlights({ flights: [flight] }).flights[0]).toMatchObject({
+      origin_hint: 'Canggu, ID',
+      destination_hint: 'Tbilisi, GE',
+      review_required: true,
+    })
+  })
+
+  it.each([
+    ['not marked for review', { review_required: false }],
+    ['naming one place twice', { destination_hint: 'canggu, id' }],
+    ['missing a hint', { destination_hint: '' }],
+  ])('rejects a row %s', (_label, change) => {
+    expect(() => normalizeFlights({ flights: [{ ...flight, ...change }] })).toThrow()
   })
 })

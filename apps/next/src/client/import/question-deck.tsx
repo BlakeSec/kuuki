@@ -26,6 +26,7 @@ import {
   type Question,
 } from './questions'
 import { cityOf } from './reference'
+import { endpointText, RouteEndpoint } from './route-endpoint'
 
 export interface QuestionDeckProps {
   compact?: boolean
@@ -107,19 +108,14 @@ export function QuestionDeck({
   if (shown.length === 0 && resolved.length === 0 && skippedRows.length === 0 && !notice)
     return null
 
-  const place = (draft: Draft, endpoint: Endpoint) =>
-    draft.fields[endpoint] || draft.fields[`${endpoint}_hint`] || '—'
   const route = (draft: Draft, gap?: Endpoint) =>
-    `${gap === 'origin' ? '?' : place(draft, 'origin')} → ${gap === 'destination' ? '?' : place(draft, 'destination')}`
-  const routeView = (draft: Draft) =>
-    (['origin', 'destination'] as const).map((endpoint, index) => (
-      <span key={endpoint}>
-        {index ? ' → ' : null}
-        <span className={draft.fields[endpoint] ? 'import-code' : undefined}>
-          {place(draft, endpoint)}
-        </span>
-      </span>
-    ))
+    `${gap === 'origin' ? '?' : endpointText(draft, 'origin')} → ${gap === 'destination' ? '?' : endpointText(draft, 'destination')}`
+  const routeView = (draft: Draft) => (
+    <>
+      <RouteEndpoint draft={draft} endpoint="origin" /> →{' '}
+      <RouteEndpoint draft={draft} endpoint="destination" />
+    </>
+  )
   const when = (draft: Draft) => {
     const monthDay = monthDayOf(draft)
     const ordinal = ordinalOf(draft)
@@ -355,22 +351,17 @@ export function QuestionDeck({
               const itemId = `${titleId}-${draft.id}-${endpoint}`
               const rowBusy = frozen || saving([draft])
               const cityName = <span className="import-question-city">{city}</span>
-              const other = (end: Endpoint) => (
-                <span className={draft.fields[end] ? 'import-code' : undefined}>
-                  {place(draft, end)}
-                </span>
-              )
               return (
                 <li key={`${draft.id}:${endpoint}`} role="group" aria-labelledby={itemId}>
                   <p id={itemId} className="import-question-what">
                     <span>
                       {endpoint === 'origin' ? (
                         <>
-                          {cityName} → {other('destination')}
+                          {cityName} → <RouteEndpoint draft={draft} endpoint="destination" />
                         </>
                       ) : (
                         <>
-                          {other('origin')} → {cityName}
+                          <RouteEndpoint draft={draft} endpoint="origin" /> → {cityName}
                         </>
                       )}
                     </span>

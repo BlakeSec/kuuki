@@ -1,9 +1,7 @@
 import { expect, it } from 'vitest'
-import { NOMADS_MAX_ROUTES, nomadsSummaryOf, nomadsToText } from './nomads-json'
+import { NOMADS_MAX_ROUTES, nomadsSummaryOf, nomadsToText, prepareNomads } from './nomads-json'
 import { nomadsLeftOut, nomadsStory } from './nomads-note'
 import { parseStructuredText } from '../../../../../functions/api/import/_text'
-import { rowOf } from '../../../../../functions/api/_services/importJob'
-import { normalizeFlights } from '../../../../../functions/api/import/_extract'
 
 const stay = (place: string, start: string, end = start, country_code = 'US') => ({
   place,
@@ -13,53 +11,38 @@ const stay = (place: string, start: string, end = start, country_code = 'US') =>
 })
 const exportOf = (trips: unknown[], extra: Record<string, unknown> = {}) =>
   JSON.stringify({ ...extra, trips })
-const rows = (content: string) =>
-  parseStructuredText(content)!.flights.map((flight) => rowOf(flight))
+const lines = (content: string) => (content ? content.split('\n') : [])
+const route = (line: string) => line.replace(/^\S+ \| /, '').replace(/ \[.*\]$/, '')
 
-it('resolves airports by city and country, strips profile data and leaves every draft unselected', () => {
+it('orders stays, dates each move by the next stay and keeps profile data out', () => {
   const result = nomadsToText(
     exportOf([stay('Boston', '2026-03-12'), stay('New York', '2026-03-01', '2026-03-10')], {
       username: 'private-user',
       photo: 'private-photo',
     }),
   )
-  expect(result.content).not.toContain('private')
-  const [row] = rows(result.content)
-  expect(row).toMatchObject({
-    selected: false,
-    fields: { date: '2026-03-12', origin: '', destination: 'BOS', review_required: true },
-  })
-  expect(row.fields.origin_options).toEqual(expect.arrayContaining(['JFK', 'LGA']))
+  expect(lines(result.content)).toEqual([
+    '2026-03-12 | New York, US → Boston, US [possible flight from Nomads stays]',
+  ])
   expect(result.summary).toMatchObject({ stays: 2, countries: 1, routes: 1 })
 })
 
-it('keeps a city without an airport as a hint to choose from', () => {
-  const result = nomadsToText(
-    exportOf([
-      stay('Bangkok', '2026-01-01', '2026-01-09', 'TH'),
-      stay('Canggu', '2026-01-10', '2026-01-20', 'ID'),
-    ]),
-  )
-  expect(rows(result.content)[0].fields).toMatchObject({
-    origin: '',
-    destination: '',
-    destination_hint: 'Canggu, ID',
-  })
-})
-
-it('leaves out hops short enough to travel by land and says so', () => {
+it('leaves out hops short enough to travel by land and keeps cities without airports', () => {
   const result = nomadsToText(
     exportOf([
       stay('Rome', '2026-04-01', '2026-04-05', 'IT'),
       stay('Naples', '2026-04-06', '2026-04-08', 'IT'),
       stay('Lisbon', '2026-04-09', '2026-04-12', 'PT'),
       stay('Porto', '2026-04-13', '2026-04-15', 'PT'),
+      stay('Canggu', '2026-04-20', '2026-04-25', 'ID'),
     ]),
   )
-  expect(result.summary).toMatchObject({ routes: 2, ground: 1 })
-  expect(result.content).not.toContain('Rome, IT → Naples, IT')
-  expect(result.content).toContain('Lisbon, PT → Porto, PT')
-  expect(nomadsLeftOut('en', result.summary)).toBe('Left out: 1 hop under 250 km')
+  expect(lines(result.content).map(route)).toEqual([
+    'Naples, IT → Lisbon, PT',
+    'Lisbon, PT → Porto, PT',
+    'Porto, PT → Canggu, ID',
+  ])
+  expect(result.summary).toMatchObject({ routes: 3, ground: 1 })
 })
 
 it('merges repeated stays, leaves overlaps undated and skips moves with an unclear order', () => {
@@ -72,14 +55,13 @@ it('merges repeated stays, leaves overlaps undated and skips moves with an uncle
       stay('Seattle', '2026-01-15'),
     ]),
   )
+  expect(lines(result.content)).toEqual([
+    'Undated | New York, US → Boston, US [possible flight from Nomads stays]',
+  ])
   expect(result.summary).toMatchObject({ routes: 1, unclear: 2, ground: 0 })
-  const normalized = normalizeFlights(parseStructuredText(result.content)!)
-  expect(normalized.flights).toHaveLength(1)
-  expect(normalized.flights[0].date).toBe('')
-  expect(rowOf(normalized.flights[0]).selected).toBe(false)
 })
 
-it('skips unreadable stays one by one instead of refusing the export', () => {
+it('skips unreadable stays one by one and treats a missing country as unknown', () => {
   const result = nomadsToText(
     exportOf([
       stay('Boston', '2026-02-30'),
@@ -88,8 +70,8 @@ it('skips unreadable stays one by one instead of refusing the export', () => {
       stay('Boston', '2026-01-02'),
     ]),
   )
-  expect(result.summary).toMatchObject({ stays: 2, invalid: 2, routes: 1 })
-  expect(result.content).toContain('Boston, US → Chicago')
+  expect(lines(result.content).map(route)).toEqual(['Boston, US → Chicago'])
+  expect(result.summary).toMatchObject({ stays: 2, invalid: 2 })
 })
 
 it('refuses files that are not a Nomads trips export', () => {
@@ -100,6 +82,7 @@ it('refuses files that are not a Nomads trips export', () => {
     exportOf(Array(10_001).fill(1)),
   ])
     expect(() => nomadsToText(input)).toThrow()
+  expect(prepareNomads(new TextEncoder().encode('{'), 'trips.json')).toEqual({ kind: 'failed' })
 })
 
 it('keeps the newest routes when an export has more than one batch can hold', () => {
@@ -111,12 +94,37 @@ it('keeps the newest routes when an export has more than one batch can hold', ()
   )
   const result = nomadsToText(exportOf(trips))
   expect(result.summary).toMatchObject({ routes: NOMADS_MAX_ROUTES, older: 2 })
-  expect(result.content.split('\n').at(-1)).toContain(day((NOMADS_MAX_ROUTES + 2) * 2))
+  expect(lines(result.content).at(-1)).toContain(day((NOMADS_MAX_ROUTES + 2) * 2))
 })
 
 it('does not invent flights for an empty export or a single stay', () => {
-  expect(nomadsToText(exportOf([])).content).toBe('')
+  expect(prepareNomads(new TextEncoder().encode(exportOf([])), 'trips.json')).toMatchObject({
+    kind: 'empty',
+  })
   expect(nomadsToText(exportOf([stay('Boston', '2026-01-01')])).content).toBe('')
+})
+
+it('produces only lines the deterministic parser reads, so nothing falls back to the model', () => {
+  const places = [
+    'Road to Hana',
+    'London\u2028West',
+    'Tab\tCity',
+    'Zero\u200bWidth',
+    'São Paulo',
+    'Tōkyō',
+    'A -- B',
+    'Saint-Denis (Réunion)',
+    'Hà Nội?',
+    'x'.repeat(60),
+  ]
+  const month = (index: number) => `2025-${String(index + 1).padStart(2, '0')}-01`
+  const result = nomadsToText(
+    exportOf(places.map((place, index) => stay(place, month(index), month(index), 'FR'))),
+  )
+  expect(result.summary.routes).toBe(places.length - 1)
+  expect(parseStructuredText(result.content)?.flights).toHaveLength(result.summary.routes)
+  expect(result.content).toContain('London West, FR')
+  expect(result.content).not.toMatch(/[\u2028\u200b\t]/)
 })
 
 it('tells the story in real Russian plural forms', () => {
@@ -143,23 +151,4 @@ it('restores only a well-formed summary from session storage', () => {
   expect(nomadsSummaryOf({ ...summary, extra: 'x' })).toEqual(summary)
   expect(nomadsSummaryOf({ skipped: 1 })).toBeUndefined()
   expect(nomadsSummaryOf({ ...summary, routes: -1 })).toBeUndefined()
-})
-
-it('still rejects undated empty routes without distinct city hints and an explicit review marker', () => {
-  const flight = {
-    date: '',
-    origin: '',
-    destination: '',
-    airline_iata: 'ZZ',
-    confidence: 0.5,
-    origin_hint: 'Boston',
-    destination_hint: 'Chicago',
-    review_required: true,
-  }
-  for (const change of [
-    { review_required: false },
-    { destination_hint: 'Boston' },
-    { destination_hint: '' },
-  ])
-    expect(() => normalizeFlights({ flights: [{ ...flight, ...change }] })).toThrow()
 })

@@ -2,6 +2,7 @@ import { airportLabels } from '@kuuki/data/airport-labels'
 import { findAirport } from '@kuuki/data/airport-lookup'
 import { foldSearchText, isCalendarDate } from '@kuuki/shared'
 import { greatCircleKm, type LatLon } from '@kuuki/shared/geo'
+import type { ImportSource } from './import-api'
 
 export const NOMADS_ACCEPT = '.json,application/json'
 export const NOMADS_MAX_STAYS = 10_000
@@ -57,7 +58,13 @@ const MARKUP = /[|[\]\r\n→➝<>]|->/
 function stayOf(value: unknown): Stay | null {
   if (!value || typeof value !== 'object') return null
   const stay = value as Record<string, unknown>
-  const place = typeof stay.place === 'string' ? stay.place.trim() : ''
+  const place =
+    typeof stay.place === 'string'
+      ? stay.place
+          .normalize('NFC')
+          .replace(/[\p{Cc}\p{Cf}\s]+/gu, ' ')
+          .trim()
+      : ''
   const country = stay.country_code ?? ''
   if (
     !place ||
@@ -160,4 +167,22 @@ export function nomadsToText(content: string): { content: string; summary: Nomad
   }
   summary.routes = lines.length
   return { content: lines.join('\n'), summary }
+}
+
+export type NomadsPreparation =
+  | { kind: 'source'; source: ImportSource; summary: NomadsSummary }
+  | { kind: 'empty'; summary: NomadsSummary }
+  | { kind: 'failed' }
+
+export function prepareNomads(bytes: Uint8Array, label: string): NomadsPreparation {
+  try {
+    const { content, summary } = nomadsToText(
+      new TextDecoder('utf-8', { fatal: true }).decode(bytes),
+    )
+    return content
+      ? { kind: 'source', source: { type: 'text', content, sourceLabel: label }, summary }
+      : { kind: 'empty', summary }
+  } catch {
+    return { kind: 'failed' }
+  }
 }

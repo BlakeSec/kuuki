@@ -82,7 +82,8 @@ export function parseStructuredText(content: string): ParseResponse | null {
       )
     )
       continue
-    const route = parts[1]?.match(/^(.+?)\s*(?:→|➝|->|\bto\b)\s*(.+)$/i)
+    const route =
+      parts[1]?.match(/^(.+?)\s*(?:→|➝|->)\s*(.+)$/) ?? parts[1]?.match(/^(.+?)\s*\bto\b\s*(.+)$/i)
     const toOnly = parts[1]?.match(/^to\s+(.+)$/i)
     if (!route && !toOnly) {
       if (parts.length === 1 || /partial booking evidence/i.test(notes)) {

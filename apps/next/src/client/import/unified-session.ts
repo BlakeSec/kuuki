@@ -15,7 +15,7 @@ import type { ImportRuns } from './import-runs'
 import type { Draft } from './import-types'
 import { runConfirm, type RowOutcome } from './confirm-runner'
 import { checkFile, MAX_FILE_BYTES } from './source-step'
-import { isNomadsFile, nomadsSummaryOf, nomadsToText, type NomadsSummary } from './nomads-json'
+import { isNomadsFile, nomadsSummaryOf, prepareNomads, type NomadsSummary } from './nomads-json'
 import { uploadSource } from './quick-add-source'
 import {
   localToday,
@@ -73,6 +73,7 @@ export interface RetainedEntry {
   selectionRequired?: boolean
   fingerprint?: string
   problem?: EntryProblem
+  empty?: true
   nomads?: SessionEntry['nomads']
 }
 
@@ -124,6 +125,7 @@ export class UnifiedSession {
       excludedIds: entry.excludedIds ?? [],
       selectionRequired: this.selectionRequired,
       ...(entry.problem ? { problem: entry.problem } : {}),
+      ...(entry.phase === 'empty' && !entry.runs.length ? { empty: true as const } : {}),
       ...(entry.nomads ? { nomads: entry.nomads } : {}),
       ...(entry.fingerprint ? { fingerprint: entry.fingerprint } : {}),
     }))
@@ -180,7 +182,11 @@ export class UnifiedSession {
           fingerprint: record.fingerprint,
           nomads: nomadsSummaryOf(record.nomads),
         },
-        record.batchIds.length ? { phase: 'online' } : { phase: 'failed', problem: 'reselect' },
+        record.batchIds.length
+          ? { phase: 'online' }
+          : record.empty
+            ? { phase: 'empty' }
+            : { phase: 'failed', problem: 'reselect' },
       )
       this.entries.push(entry)
       for (const id of record.batchIds) {
@@ -402,13 +408,13 @@ export class UnifiedSession {
   private async process(entry: SessionEntry) {
     try {
       const nomads = entry.file && isNomadsFile(entry.file)
-      const problem = entry.file
-        ? nomads
-          ? entry.file.size > MAX_FILE_BYTES
+      const problem = !entry.file
+        ? null
+        : !nomads
+          ? checkFile(entry.file)
+          : entry.file.size > MAX_FILE_BYTES
             ? 'size'
             : null
-          : checkFile(entry.file)
-        : null
       if (problem) {
         setState(entry, { phase: 'failed', problem })
         return
@@ -442,23 +448,18 @@ export class UnifiedSession {
       }
       entry.fingerprint = fingerprint
       this.publish()
-      let nomadsSource: ImportSource | undefined
-      if (nomads) {
-        try {
-          const result = nomadsToText(new TextDecoder('utf-8', { fatal: true }).decode(bytes))
-          this.selectionRequired = true
-          entry.nomads = result.summary
-          if (!result.content) {
-            setState(entry, { phase: 'empty' })
-            entry.file = undefined
-            return
-          }
-          nomadsSource = { type: 'text', content: result.content, sourceLabel: entry.label }
-        } catch {
-          setState(entry, { phase: 'failed', problem: 'nomads' })
-          return
-        }
+      const prepared = nomads ? prepareNomads(bytes, entry.label) : null
+      if (prepared?.kind === 'failed') {
+        setState(entry, { phase: 'failed', problem: 'nomads' })
+        return
       }
+      if (prepared) entry.nomads = prepared.summary
+      if (prepared?.kind === 'empty') {
+        entry.file = undefined
+        setState(entry, { phase: 'empty' })
+        return
+      }
+      if (prepared) this.selectionRequired = true
       let legs: Leg[] = []
       if (entry.file && !nomads && !entry.barcode?.getState().drafts.length) {
         const local = await readBoardingPass(entry.file)
@@ -477,7 +478,7 @@ export class UnifiedSession {
       }
       setState(entry, { phase: 'online' })
       this.publish()
-      const source = nomadsSource ?? entry.source ?? (await uploadSource(entry.file!))
+      const source = prepared?.source ?? entry.source ?? (await uploadSource(entry.file!))
       const online = await this.submit(entry, source, entry.operationId)
       const state = online.getState()
       if (entry.barcode) await this.reconcile(entry, entry.barcode, online)

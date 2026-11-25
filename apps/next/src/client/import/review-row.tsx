@@ -13,6 +13,7 @@ import { BLOCK, FIELD_LABEL, S, tx } from './copy'
 import type { DraftChange, SaveState } from './draft-saver'
 import type { Draft } from './import-types'
 import { RowForm } from './row-form'
+import { RouteEndpoint, routeText } from './route-endpoint'
 import { formatMonthDay } from './question-deck'
 import { monthDayOf, ordinalOf } from './questions'
 import {
@@ -112,9 +113,7 @@ export function ReviewRow({
   const airline = draft.fields.airline_iata
     ? (airlineName(draft.fields.airline_iata) ?? draft.fields.airline_iata)
     : undefined
-  const originLabel = draft.fields.origin || draft.fields.origin_hint || '—'
-  const destinationLabel = draft.fields.destination || draft.fields.destination_hint || '—'
-  const routeLabel = `${originLabel} → ${destinationLabel}`
+  const routeLabel = routeText(draft)
   const yearToConfirm = !draft.fields.date && ordinalOf(draft) !== null
   const monthDay = compact && !draft.fields.date ? monthDayOf(draft) : null
   const dateText = draft.fields.date
@@ -405,12 +404,10 @@ export function ReviewRow({
         {checkbox}
         <div className="import-row-body">
           <p className="import-row-route">
-            <span className={draft.fields.origin ? 'import-code' : undefined}>{originLabel}</span>
+            <RouteEndpoint draft={draft} endpoint="origin" />
             <span aria-hidden="true"> → </span>
             <span className="sr-only"> {locale === 'ru' ? 'в' : 'to'} </span>
-            <span className={draft.fields.destination ? 'import-code' : undefined}>
-              {destinationLabel}
-            </span>
+            <RouteEndpoint draft={draft} endpoint="destination" />
           </p>
           <p className="import-row-meta">
             <span>{dateText}</span>
