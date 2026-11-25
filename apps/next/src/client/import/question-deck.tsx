@@ -107,8 +107,19 @@ export function QuestionDeck({
   if (shown.length === 0 && resolved.length === 0 && skippedRows.length === 0 && !notice)
     return null
 
+  const place = (draft: Draft, endpoint: Endpoint) =>
+    draft.fields[endpoint] || draft.fields[`${endpoint}_hint`] || '—'
   const route = (draft: Draft, gap?: Endpoint) =>
-    `${gap === 'origin' ? '?' : draft.fields.origin || '—'} → ${gap === 'destination' ? '?' : draft.fields.destination || '—'}`
+    `${gap === 'origin' ? '?' : place(draft, 'origin')} → ${gap === 'destination' ? '?' : place(draft, 'destination')}`
+  const routeView = (draft: Draft) =>
+    (['origin', 'destination'] as const).map((endpoint, index) => (
+      <span key={endpoint}>
+        {index ? ' → ' : null}
+        <span className={draft.fields[endpoint] ? 'import-code' : undefined}>
+          {place(draft, endpoint)}
+        </span>
+      </span>
+    ))
   const when = (draft: Draft) => {
     const monthDay = monthDayOf(draft)
     const ordinal = ordinalOf(draft)
@@ -260,7 +271,7 @@ export function QuestionDeck({
               return (
                 <li key={draft.id} role="group" aria-labelledby={itemId}>
                   <p id={itemId} className="import-question-what">
-                    <span className="import-code import-question-route">{route(draft)}</span>
+                    <span className="import-question-route">{routeView(draft)}</span>
                     <span className="import-question-meta">
                       {when(draft)}
                       {draft.fields.flight_number ? (
@@ -344,18 +355,22 @@ export function QuestionDeck({
               const itemId = `${titleId}-${draft.id}-${endpoint}`
               const rowBusy = frozen || saving([draft])
               const cityName = <span className="import-question-city">{city}</span>
-              const other = (code: string) => <span className="import-code">{code || '—'}</span>
+              const other = (end: Endpoint) => (
+                <span className={draft.fields[end] ? 'import-code' : undefined}>
+                  {place(draft, end)}
+                </span>
+              )
               return (
                 <li key={`${draft.id}:${endpoint}`} role="group" aria-labelledby={itemId}>
                   <p id={itemId} className="import-question-what">
                     <span>
                       {endpoint === 'origin' ? (
                         <>
-                          {cityName} → {other(draft.fields.destination)}
+                          {cityName} → {other('destination')}
                         </>
                       ) : (
                         <>
-                          {other(draft.fields.origin)} → {cityName}
+                          {other('origin')} → {cityName}
                         </>
                       )}
                     </span>
@@ -410,7 +425,7 @@ export function QuestionDeck({
             return (
               <li key={draft.id} role="group" aria-labelledby={itemId}>
                 <p id={itemId} className="import-question-what">
-                  <span className="import-code import-question-route">{route(draft)}</span>
+                  <span className="import-question-route">{routeView(draft)}</span>
                   <span
                     className="import-question-meta"
                     data-tone={issue || !draft.fields.date ? 'warning' : undefined}

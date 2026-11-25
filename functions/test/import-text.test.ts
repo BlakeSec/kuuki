@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { parseStructuredText } from '../api/import/_text'
+import { airportCandidates, parseStructuredText } from '../api/import/_text'
 
 const ROWS = [
   '2024-03-15 | JFK → LAX | American Airlines AA 123 | 08:30 → 11:45',
@@ -112,5 +112,18 @@ describe('parseStructuredText', () => {
       ].join('\n'),
     )
     expect(parsed?.flights.map((flight) => flight.date)).toEqual(['2024-03-15', ''])
+  })
+})
+
+describe('airportCandidates', () => {
+  it('narrows a city to the country named after a comma', () => {
+    expect(airportCandidates('Boston, US')).toEqual(['BOS'])
+    expect(airportCandidates('London, GB')).not.toContain('LOZ')
+    expect(airportCandidates('London')).toContain('LOZ')
+  })
+
+  it('keeps an unknown or mismatched country from matching another place', () => {
+    expect(airportCandidates('Boston, GB')).toEqual([])
+    expect(airportCandidates('Portland, OR')).toEqual([])
   })
 })

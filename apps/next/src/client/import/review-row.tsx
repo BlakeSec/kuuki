@@ -405,10 +405,12 @@ export function ReviewRow({
         {checkbox}
         <div className="import-row-body">
           <p className="import-row-route">
-            <span className="import-code">{originLabel}</span>
+            <span className={draft.fields.origin ? 'import-code' : undefined}>{originLabel}</span>
             <span aria-hidden="true"> → </span>
             <span className="sr-only"> {locale === 'ru' ? 'в' : 'to'} </span>
-            <span className="import-code">{destinationLabel}</span>
+            <span className={draft.fields.destination ? 'import-code' : undefined}>
+              {destinationLabel}
+            </span>
           </p>
           <p className="import-row-meta">
             <span>{dateText}</span>

@@ -16,14 +16,26 @@ const airportName = (value: string) =>
     .replace(/\s+/g, ' ')
     .trim()
 
+const catalogCountries = new Set(airportCatalog.map((row) => row.countryCode))
+
+function countryQualified(value: string): { place: string; country?: string } {
+  const qualified = value.match(/^(.+?),\s*([A-Z]{2})$/)
+  return qualified && catalogCountries.has(qualified[2])
+    ? { place: qualified[1].trim(), country: qualified[2] }
+    : { place: value }
+}
+
 export function airportCandidates(label: string): string[] {
   const value = label.replace(/[.,]$/, '').trim()
   if (/^[A-Z]{3}$/.test(value)) return [value]
-  const name = airportName(value).replace(/^rostov-on-don$/, 'rostov')
-  const matches = airportCatalog.filter((row) =>
-    [row.iata, row.city, row.name, ...Object.values(airportAliases[row.iata] ?? {})].some(
-      (label) => airportName(label) === name,
-    ),
+  const { place, country } = countryQualified(value)
+  const name = airportName(place).replace(/^rostov-on-don$/, 'rostov')
+  const matches = airportCatalog.filter(
+    (row) =>
+      (!country || row.countryCode === country) &&
+      [row.iata, row.city, row.name, ...Object.values(airportAliases[row.iata] ?? {})].some(
+        (label) => airportName(label) === name,
+      ),
   )
   return [...new Set(matches.map((row) => row.iata))].sort().slice(0, 6)
 }

@@ -15,7 +15,7 @@ import type { ImportRuns } from './import-runs'
 import type { Draft } from './import-types'
 import { runConfirm, type RowOutcome } from './confirm-runner'
 import { checkFile, MAX_FILE_BYTES } from './source-step'
-import { isNomadsFile, nomadsToText } from './nomads-json'
+import { isNomadsFile, nomadsSummaryOf, nomadsToText, type NomadsSummary } from './nomads-json'
 import { uploadSource } from './quick-add-source'
 import {
   localToday,
@@ -50,7 +50,7 @@ interface EntryFields {
   file?: File
   source?: ImportSource
   fingerprint?: string
-  nomads?: { skipped: number }
+  nomads?: NomadsSummary
 }
 export type SessionEntry = EntryFields & EntryState
 
@@ -178,6 +178,7 @@ export class UnifiedSession {
           suppressedIds: record.suppressedIds,
           excludedIds: record.excludedIds,
           fingerprint: record.fingerprint,
+          nomads: nomadsSummaryOf(record.nomads),
         },
         record.batchIds.length ? { phase: 'online' } : { phase: 'failed', problem: 'reselect' },
       )
@@ -446,7 +447,7 @@ export class UnifiedSession {
         try {
           const result = nomadsToText(new TextDecoder('utf-8', { fatal: true }).decode(bytes))
           this.selectionRequired = true
-          entry.nomads = { skipped: result.skipped }
+          entry.nomads = result.summary
           if (!result.content) {
             setState(entry, { phase: 'empty' })
             entry.file = undefined

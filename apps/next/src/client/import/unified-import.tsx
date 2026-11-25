@@ -32,6 +32,7 @@ import {
 import { ACCEPT } from './source-step'
 import { failureOf } from './batch-run'
 import { NOMADS_ACCEPT } from './nomads-json'
+import { NomadsNote } from './nomads-note'
 import { FAILURE, ROW_FAILURE, S, count } from './copy'
 import { UnifiedSession, type RetainedEntry, type SessionEntry } from './unified-session'
 import { HistoryImport } from './history-import'
@@ -48,22 +49,14 @@ const C = {
   photo: { en: 'Take a photo', ru: 'Сфотографировать' },
   paste: { en: 'Paste text', ru: 'Вставить текст' },
   flighty: { en: 'Flighty history', ru: 'История из Flighty' },
-  nomads: { en: 'Nomads.com JSON', ru: 'JSON с Nomads.com' },
-  nomadsHint: {
-    en: 'Nomads JSON is read on this device. Only tentative routes are sent to Kuuki for review. Choose airports, check estimated dates and exclude ground journeys before saving.',
-    ru: 'JSON Nomads читается на устройстве. В Kuuki отправляются только предполагаемые маршруты для проверки. Выберите аэропорты, проверьте примерные даты и исключите наземные переезды перед сохранением.',
-  },
+  nomads: { en: 'Nomads.com trips', ru: 'Поездки из Nomads.com' },
   nomadsBad: {
-    en: 'Could not read this Nomads.com export. Use valid stay dates and at most 501 stays.',
-    ru: 'Не удалось прочитать экспорт Nomads.com. Проверьте даты пребывания; в файле должно быть не более 501 записи.',
-  },
-  nomadsSkipped: {
-    en: 'Repeated stays or transitions with ambiguous start dates were skipped.',
-    ru: 'Пропущены повторные пребывания или переходы с неоднозначным порядком дат.',
+    en: 'This file does not look like a Nomads.com trips export.',
+    ru: 'Этот файл не похож на экспорт поездок из Nomads.com.',
   },
   online: {
-    en: 'Documents and text are read online. A Flighty file is read on this device.',
-    ru: 'Документы и текст распознаются онлайн. Файл Flighty читается на устройстве.',
+    en: 'Documents and text are read online. Flighty and Nomads.com files are read on this device.',
+    ru: 'Документы и текст распознаются онлайн. Файлы Flighty и Nomads.com читаются на устройстве.',
   },
   drop: {
     en: 'You can also drop or paste files here.',
@@ -567,9 +560,6 @@ export function UnifiedImport({
               <Upload size={18} aria-hidden="true" />
               {C.more[locale]}
             </MenuItem>
-            <MenuItem disabled={saving} onSelect={() => nomadsInput.current?.click()}>
-              {C.nomads[locale]}
-            </MenuItem>
             <MenuItem disabled={saving} onSelect={() => cameraInput.current?.click()}>
               <Camera className="unified-import-camera" size={18} aria-hidden="true" />
               {C.photo[locale]}
@@ -613,7 +603,6 @@ export function UnifiedImport({
           className="sr-only"
           type="file"
           accept={NOMADS_ACCEPT}
-          multiple
           tabIndex={-1}
           aria-hidden="true"
           onChange={(event) => {
@@ -625,7 +614,7 @@ export function UnifiedImport({
           ref={fileInput}
           className="sr-only"
           type="file"
-          accept={`${ACCEPT},.csv,text/csv`}
+          accept={`${ACCEPT},.csv,text/csv,${NOMADS_ACCEPT}`}
           multiple
           tabIndex={-1}
           aria-hidden="true"
@@ -666,7 +655,6 @@ export function UnifiedImport({
           )}
         </div>
       </div>
-      <p className="import-hint">{C.nomadsHint[locale]}</p>
       {guard.dialog}
       {textOpen ? (
         <form
@@ -700,34 +688,41 @@ export function UnifiedImport({
                 <span>{(entry.label || S.title[locale]).replace(/\.(pdf|png|jpe?g)$/i, '')}</span>
                 <span>{entry.label.match(/\.(pdf|png|jpe?g)$/i)?.[0]}</span>
               </span>
-              <span className="import-hint">
-                {entry.phase === 'queued' || entry.phase === 'local' || entry.phase === 'online' ? (
-                  <TextShimmer>
-                    {entry.phase === 'online' ? C.onlineReading[locale] : C[entry.phase][locale]}
-                  </TextShimmer>
-                ) : entry.phase === 'failed' ? (
-                  entry.problem === 'type' ? (
-                    S.fileBad[locale]
-                  ) : entry.problem === 'nomads' ? (
-                    C.nomadsBad[locale]
-                  ) : entry.problem === 'size' ? (
-                    C.tooBig[locale]
-                  ) : entry.problem === 'partial' ? (
-                    C.partial[locale]
-                  ) : entry.problem === 'reselect' ? (
-                    C.reselect[locale]
-                  ) : failure ? (
-                    FAILURE[failure.kind][locale].title
+              {entry.nomads && (entry.phase === 'ready' || entry.phase === 'empty') ? (
+                <NomadsNote
+                  locale={locale}
+                  summary={entry.nomads}
+                  empty={entry.phase === 'empty'}
+                />
+              ) : (
+                <span className="import-hint">
+                  {entry.phase === 'queued' ||
+                  entry.phase === 'local' ||
+                  entry.phase === 'online' ? (
+                    <TextShimmer>
+                      {entry.phase === 'online' ? C.onlineReading[locale] : C[entry.phase][locale]}
+                    </TextShimmer>
+                  ) : entry.phase === 'failed' ? (
+                    entry.problem === 'type' ? (
+                      S.fileBad[locale]
+                    ) : entry.problem === 'nomads' ? (
+                      C.nomadsBad[locale]
+                    ) : entry.problem === 'size' ? (
+                      C.tooBig[locale]
+                    ) : entry.problem === 'partial' ? (
+                      C.partial[locale]
+                    ) : entry.problem === 'reselect' ? (
+                      C.reselect[locale]
+                    ) : failure ? (
+                      FAILURE[failure.kind][locale].title
+                    ) : (
+                      S.fileRead[locale]
+                    )
                   ) : (
-                    S.fileRead[locale]
-                  )
-                ) : (
-                  C[entry.phase][locale]
-                )}
-              </span>
-              {entry.nomads && entry.nomads.skipped > 0 ? (
-                <span className="import-hint">{C.nomadsSkipped[locale]}</span>
-              ) : null}
+                    C[entry.phase][locale]
+                  )}
+                </span>
+              )}
               {entry.phase === 'failed' && entry.problem !== 'type' && entry.problem !== 'size' ? (
                 <Button
                   dense

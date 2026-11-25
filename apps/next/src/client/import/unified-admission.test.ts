@@ -36,7 +36,7 @@ it(
   },
 )
 
-it('admits Nomads files without a provider, preserves hints and requires explicit selection', async () => {
+it('admits Nomads files without a provider, resolves airports and requires explicit selection', async () => {
   const { db, dispose } = await importAccount()
   const sources: unknown[] = []
   try {
@@ -88,17 +88,16 @@ it('admits Nomads files without a provider, preserves hints and requires explici
     expect(session.drafts()).toHaveLength(2)
     expect(session.drafts()[0]).toMatchObject({
       selected: false,
-      fields: {
-        origin_hint: 'New York, US',
-        destination_hint: 'Boston, US',
-        review_required: true,
-      },
+      fields: { date: '2026-03-12', origin: '', destination: 'BOS', review_required: true },
     })
+    expect(session.drafts()[0].fields.origin_options).toEqual(expect.arrayContaining(['JFK']))
     expect(session.requiresSelection()).toBe(true)
     expect(session.drafts()[1]).toMatchObject({
       selected: false,
-      fields: { date: '', origin_hint: 'Boston, US', destination_hint: 'Chicago, US' },
+      fields: { date: '', origin: 'BOS', destination: '' },
     })
+    expect(session.drafts()[1].fields.destination_options).toEqual(expect.arrayContaining(['ORD']))
+    expect(session.getEntries()[0].nomads).toMatchObject({ stays: 3, countries: 1, routes: 2 })
     expect(JSON.stringify(sources)).not.toContain('private-user')
     session.leave()
   } finally {

@@ -1035,6 +1035,23 @@
 .unified-import-files > li > .import-hint {
   min-block-size: 20px;
 }
+.unified-import-nomads {
+  display: grid;
+  gap: var(--space-1);
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
+  text-wrap: pretty;
+}
+.unified-import-nomads > :first-child {
+  color: var(--text);
+  font-weight: 500;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .unified-import-nomads > :first-child {
+    animation: history-settled-in var(--dur-base) var(--ease-out) backwards;
+  }
+}
 .unified-import-files:empty,
 .unified-import-rows:empty {
   display: none;
